@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+import '../constants/signup_colors.dart';
+import '../constants/signup_strings.dart';
+import '../constants/signup_dimensions.dart';
+
+class TermsAgreementComponent extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const TermsAgreementComponent({
+    Key? key,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  State<TermsAgreementComponent> createState() =>
+      _TermsAgreementComponentState();
+}
+
+class _TermsAgreementComponentState extends State<TermsAgreementComponent>
+    with SingleTickerProviderStateMixin {
+  bool _isHovered = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    final fontSize = isTablet ? 15.0 : (isSmallScreen ? 12.0 : 13.0);
+
+    final horizontalPadding = isSmallScreen ? 24.0 : 32.0;
+
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Container(
+          margin:
+              EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                SignupStrings.termsAgreementText,
+                style: TextStyle(
+                  color: SignupColors.hintColor,
+                  fontSize: fontSize,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+              ),
+              MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    _isHovered = true;
+                  });
+                  _controller.forward();
+                },
+                onExit: (_) {
+                  setState(() {
+                    _isHovered = false;
+                  });
+                  _controller.reverse();
+                },
+                child: Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: GestureDetector(
+                    onTap: widget.onTap,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _isHovered
+                            ? SignupColors.lightPurple.withOpacity(0.3)
+                            : Colors.transparent,
+                        borderRadius:
+                            BorderRadius.circular(SignupDimensions.smallRadius),
+                      ),
+                      child: Text(
+                        SignupStrings.termsText,
+                        style: TextStyle(
+                          color: SignupColors.darkPurple,
+                          fontWeight: FontWeight.bold,
+                          fontSize: fontSize,
+                          fontFamily: 'SYMBIOAR+LT',
+                          decoration: _isHovered
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
+                          decorationColor: SignupColors.mediumPurple,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
