@@ -20,12 +20,45 @@ class SignupFirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // دالة للتحقق من فرادة اسم المستخدم
+  Future<bool> isUsernameUnique(String username) async {
+    try {
+      print(
+          "[signup_firebase_service] التحقق من فرادة اسم المستخدم: $username");
+
+      // التحقق في مجموعة المستخدمين
+      final userQuery = await _firestore
+          .collection('students')
+          .where('username', isEqualTo: username)
+          .get();
+
+      // التحقق في مجموعة المستخدمين الأخرى (users)
+      final altQuery = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .get();
+
+      // إذا لم نجد أي مستخدم بهذا الاسم، فهو فريد
+      final isUnique = userQuery.docs.isEmpty && altQuery.docs.isEmpty;
+
+      print(
+          "[signup_firebase_service] نتيجة التحقق من فرادة اسم المستخدم: $isUnique");
+      return isUnique;
+    } catch (e) {
+      print(
+          "[signup_firebase_service] خطأ في التحقق من فرادة اسم المستخدم: $e");
+      return false; // نفترض أنه غير فريد في حالة حدوث خطأ للأمان
+    }
+  }
+
   // دالة تسجيل مستخدم جديد مع معالجة إجبارية عند الضرورة
   Future<SignupResult> registerUser({
     required String name,
     required String email,
     required String password,
     required String major,
+    required String username,
+    required String universityName,
   }) async {
     try {
       print("[signup_firebase_service] بدء عملية التسجيل في Firebase...");
@@ -65,11 +98,19 @@ class SignupFirebaseService {
             .doc(userCredential.user!.uid)
             .set({
           'name': name,
+          'username': username,
+          'universityName': universityName,
           'email': email,
           'major': major,
           'createdAt': FieldValue.serverTimestamp(),
           'lastLogin': FieldValue.serverTimestamp(),
           'isEmailVerified': false,
+        });
+
+        // حفظ سجل اسم المستخدم لضمان فرادته مستقبلاً
+        await _firestore.collection('usernames').doc(username).set({
+          'uid': userCredential.user!.uid,
+          'createdAt': FieldValue.serverTimestamp(),
         });
 
         print(

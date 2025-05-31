@@ -12,12 +12,17 @@ class SignupController extends ChangeNotifier {
 
   // متحكمات النص للحقول
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController universityNameController =
+      TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController majorController = TextEditingController();
 
-  // نقطة تركيز للتخصص
+  // نقاط التركيز
   final FocusNode majorFocusNode = FocusNode();
+  final FocusNode usernameFocusNode = FocusNode();
+  final FocusNode universityFocusNode = FocusNode();
 
   // متغيرات الحالة
   bool _isLoading = false;
@@ -25,21 +30,29 @@ class SignupController extends ChangeNotifier {
   bool _isFormValid = false;
   String? _selectedMajor;
   bool _isOtherMajor = false;
+  String? _selectedUniversity;
+  bool _isOtherUniversity = false;
   String? _serverError;
   double _signupProgress = 0.0;
+  bool _isCheckingUsername = false;
 
-  // القائمة الخاصة بالتخصصات
+  // القوائم
   final List<String> _majorsList = SignupStrings.majors;
+  final List<String> _universitiesList = SignupStrings.universities;
 
   // الحصول على الحالات
   bool get isLoading => _isLoading;
   bool get passwordVisible => _passwordVisible;
   bool get isFormValid => _isFormValid;
   bool get isOtherMajor => _isOtherMajor;
+  bool get isOtherUniversity => _isOtherUniversity;
   String? get selectedMajor => _selectedMajor;
+  String? get selectedUniversity => _selectedUniversity;
   String? get serverError => _serverError;
   double get signupProgress => _signupProgress;
   List<String> get getMajorsList => _majorsList;
+  List<String> get getUniversitiesList => _universitiesList;
+  bool get isCheckingUsername => _isCheckingUsername;
 
   // تهيئة وحدة التحكم
   void init(BuildContext context) {
@@ -49,6 +62,12 @@ class SignupController extends ChangeNotifier {
   // تعيين حالة التحميل
   void setLoading(bool loading) {
     _isLoading = loading;
+    notifyListeners();
+  }
+
+  // تعيين حالة التحقق من اسم المستخدم
+  void setCheckingUsername(bool checking) {
+    _isCheckingUsername = checking;
     notifyListeners();
   }
 
@@ -64,7 +83,7 @@ class SignupController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // تحديد التخصص
+  // تحديد التخصص - تحديث فوري عند الاختيار
   void selectMajor(String? major) {
     _selectedMajor = major;
     if (major == 'أخرى') {
@@ -74,6 +93,21 @@ class SignupController extends ChangeNotifier {
       _isOtherMajor = false;
       if (major != null) {
         majorController.text = major;
+      }
+    }
+    notifyListeners();
+  }
+
+  // تحديد الجامعة - تحديث فوري عند الاختيار
+  void selectUniversity(String? university) {
+    _selectedUniversity = university;
+    if (university == 'أخرى') {
+      _isOtherUniversity = true;
+      universityNameController.text = '';
+    } else {
+      _isOtherUniversity = false;
+      if (university != null) {
+        universityNameController.text = university;
       }
     }
     notifyListeners();
@@ -90,6 +124,42 @@ class SignupController extends ChangeNotifier {
     }
 
     return null;
+  }
+
+  // التحقق من اسم المستخدم
+  String? validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الرجاء إدخال اسم المستخدم';
+    }
+
+    if (!Student.isValidUsername(value)) {
+      return 'اسم المستخدم يجب أن يتكون من أحرف وأرقام فقط';
+    }
+
+    return null;
+  }
+
+  // التحقق من اسم الجامعة
+  String? validateUniversityName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الرجاء إدخال اسم الجامعة';
+    }
+
+    if (_isOtherUniversity && !Student.isValidUniversityName(value)) {
+      return 'الرجاء إدخال اسم جامعة صالح';
+    }
+
+    return null;
+  }
+
+  // التحقق من صحة الجامعة
+  bool validateUniversity() {
+    if (_isOtherUniversity) {
+      return universityNameController.text.trim().length >= 2 &&
+          Student.isValidUniversityName(universityNameController.text.trim());
+    } else {
+      return _selectedUniversity != null && _selectedUniversity!.isNotEmpty;
+    }
   }
 
   // التحقق من البريد الإلكتروني
@@ -131,13 +201,41 @@ class SignupController extends ChangeNotifier {
   // التحقق من صحة النموذج بالكامل
   bool validateForm() {
     final isNameValid = validateName(nameController.text) == null;
+    final isUsernameValid = validateUsername(usernameController.text) == null;
+    final isUniversityValid = validateUniversity();
     final isEmailValid = validateEmail(emailController.text) == null;
     final isPasswordValid = validatePassword(passwordController.text) == null;
     final isMajorValid = validateMajor();
 
-    _isFormValid =
-        isNameValid && isEmailValid && isPasswordValid && isMajorValid;
+    _isFormValid = isNameValid &&
+        isUsernameValid &&
+        isUniversityValid &&
+        isEmailValid &&
+        isPasswordValid &&
+        isMajorValid;
     return _isFormValid;
+  }
+
+  // التحقق من فرادة اسم المستخدم
+  Future<bool> checkUsernameUnique() async {
+    try {
+      setCheckingUsername(true);
+      final isUnique = await _firebaseService
+          .isUsernameUnique(usernameController.text.trim());
+      setCheckingUsername(false);
+
+      if (!isUnique) {
+        setServerError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
+      } else {
+        setServerError(null);
+      }
+
+      return isUnique;
+    } catch (e) {
+      setCheckingUsername(false);
+      setServerError("حدث خطأ أثناء التحقق من اسم المستخدم");
+      return false;
+    }
   }
 
   // تغيير نسبة تقدم التسجيل
@@ -152,6 +250,8 @@ class SignupController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       // مسح بيانات المستخدم المحلية
       await prefs.remove('user_name');
+      await prefs.remove('user_username');
+      await prefs.remove('user_university');
       await prefs.remove('user_major');
       await prefs.remove('user_name_key');
       await prefs.remove('user_major_key');
@@ -167,12 +267,22 @@ class SignupController extends ChangeNotifier {
 
   // دالة التسجيل المعدلة مع رسائل تصحيح
   Future<bool> signup(GlobalKey<FormState> formKey) async {
-    if (!formKey.currentState!.validate() || !validateMajor()) {
+    if (!formKey.currentState!.validate() ||
+        !validateMajor() ||
+        !validateUniversity()) {
       print("[signup_controller] فشل التحقق من صحة النموذج");
       return false;
     }
 
     try {
+      // التحقق من فرادة اسم المستخدم
+      print("[signup_controller] التحقق من فرادة اسم المستخدم...");
+      final isUsernameUnique = await checkUsernameUnique();
+      if (!isUsernameUnique) {
+        print("[signup_controller] اسم المستخدم مستخدم بالفعل");
+        return false;
+      }
+
       // مسح بيانات المستخدم السابق
       await _clearPreviousUserData();
 
@@ -190,6 +300,8 @@ class SignupController extends ChangeNotifier {
       // استخدام خدمة Firebase للتسجيل
       final result = await _firebaseService.registerUser(
         name: nameController.text.trim(),
+        username: usernameController.text.trim(),
+        universityName: universityNameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         major: majorController.text.trim(),
@@ -242,6 +354,8 @@ class SignupController extends ChangeNotifier {
 
       final userId = currentUser.uid;
       final name = nameController.text.trim();
+      final username = usernameController.text.trim();
+      final universityName = universityNameController.text.trim();
       final major = majorController.text.trim();
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
@@ -249,6 +363,8 @@ class SignupController extends ChangeNotifier {
       // حفظ البيانات في Firestore
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'name': name,
+        'username': username,
+        'universityName': universityName,
         'major': major,
         'email': email,
         'createdAt': FieldValue.serverTimestamp(),
@@ -261,6 +377,8 @@ class SignupController extends ChangeNotifier {
 
       // مسح أي بيانات سابقة
       await prefs.remove('user_name');
+      await prefs.remove('user_username');
+      await prefs.remove('user_university');
       await prefs.remove('user_major');
       await prefs.remove('user_id');
       await prefs.remove('prefUserNameKey');
@@ -269,6 +387,8 @@ class SignupController extends ChangeNotifier {
 
       // حفظ البيانات الجديدة
       await prefs.setString('user_name', name);
+      await prefs.setString('user_username', username);
+      await prefs.setString('user_university', universityName);
       await prefs.setString('user_major', major);
       await prefs.setString('user_id', userId);
       await prefs.setString('prefUserNameKey', name);
@@ -289,10 +409,14 @@ class SignupController extends ChangeNotifier {
   @override
   void dispose() {
     nameController.dispose();
+    usernameController.dispose();
+    universityNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     majorController.dispose();
     majorFocusNode.dispose();
+    usernameFocusNode.dispose();
+    universityFocusNode.dispose();
     super.dispose();
   }
 }

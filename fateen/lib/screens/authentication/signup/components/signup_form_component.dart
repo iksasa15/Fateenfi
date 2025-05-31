@@ -27,6 +27,33 @@ class SignupFormComponent extends StatelessWidget {
           textInputAction: TextInputAction.next,
         ),
 
+        // حقل اسم المستخدم (الجديد)
+        _buildInputField(
+          context: context,
+          title: SignupStrings.usernameLabel,
+          hintText: SignupStrings.usernameHint,
+          controller: controller.usernameController,
+          focusNode: controller.usernameFocusNode,
+          icon: Icons.alternate_email,
+          validator: controller.validateUsername,
+          textInputAction: TextInputAction.next,
+          suffixIcon: controller.isCheckingUsername
+              ? Container(
+                  width: 20,
+                  height: 20,
+                  margin: const EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: SignupColors.mediumPurple,
+                  ),
+                )
+              : null,
+          onFieldSubmitted: (_) async {
+            // التحقق من فرادة اسم المستخدم عند الانتهاء من الكتابة
+            await controller.checkUsernameUnique();
+          },
+        ),
+
         // حقل البريد الإلكتروني
         _buildInputField(
           context: context,
@@ -55,7 +82,6 @@ class SignupFormComponent extends StatelessWidget {
             if (controller.validateForm()) {
               final formKey = Form.of(context);
               if (formKey != null) {
-                // استخدام registerUser بدلاً من signup
                 controller.signup(formKey as GlobalKey<FormState>);
               }
             }
@@ -114,6 +140,7 @@ class SignupFormComponent extends StatelessWidget {
     required TextEditingController controller,
     required IconData icon,
     required String? Function(String?) validator,
+    FocusNode? focusNode,
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
@@ -155,6 +182,7 @@ class SignupFormComponent extends StatelessWidget {
               controller: controller,
               keyboardType: keyboardType,
               obscureText: obscureText,
+              focusNode: focusNode,
               textAlign: TextAlign.right,
               textInputAction: textInputAction,
               onFieldSubmitted: onFieldSubmitted,

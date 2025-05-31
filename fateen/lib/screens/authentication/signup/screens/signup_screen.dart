@@ -3,12 +3,14 @@ import '../controllers/signup_controller.dart';
 import '../components/signup_header_component.dart';
 import '../components/signup_form_component.dart';
 import '../components/signup_major_field.dart';
+import '../components/signup_university_field.dart';
 import '../components/social_signup_component.dart';
 import '../components/terms_agreement_component.dart';
 import '../components/signup_button_component.dart';
 import '../components/error_message_component.dart';
 import '../components/signup_skeletonizer_component.dart';
 import '../components/major_picker_component.dart';
+import '../components/university_picker_component.dart';
 import '../../shared/components/auth_toggle_bar.dart';
 import '../constants/signup_strings.dart';
 import '../constants/signup_colors.dart';
@@ -52,7 +54,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
         majorsList: _controller.getMajorsList,
         selectedMajor: _controller.selectedMajor,
         onMajorSelected: (major) {
+          // التحديث الفوري للاختيار
           _controller.selectMajor(major);
+        },
+        onCancel: () {
+          Navigator.pop(context);
+        },
+        onDone: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  // عرض منتقي الجامعة
+  void _showUniversityPicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => UniversityPickerComponent(
+        universitiesList: _controller.getUniversitiesList,
+        selectedUniversity: _controller.selectedUniversity,
+        onUniversitySelected: (university) {
+          // التحديث الفوري للاختيار
+          _controller.selectUniversity(university);
         },
         onCancel: () {
           Navigator.pop(context);
@@ -66,7 +92,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   // معالجة النقر على زر التسجيل - مع إجبار الانتقال لصفحة التحقق
   Future<void> _handleSignup() async {
-    if (_formKey.currentState!.validate() && _controller.validateMajor()) {
+    if (_formKey.currentState!.validate() &&
+        _controller.validateMajor() &&
+        _controller.validateUniversity()) {
       // عرض مؤشر تقدم مؤقت
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -206,6 +234,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             _controller.signupProgress == 0,
                         child: SignupFormComponent(
                           controller: _controller,
+                        ),
+                      ),
+
+                      // حقل الجامعة
+                      SignupSkeletonizerComponent(
+                        isLoading: _controller.isLoading &&
+                            _controller.signupProgress == 0,
+                        child: SignupUniversityField(
+                          controller: _controller.universityNameController,
+                          focusNode: _controller.universityFocusNode,
+                          isOtherUniversity: _controller.isOtherUniversity,
+                          onTap: _showUniversityPicker,
+                          errorText: !_controller.validateUniversity() &&
+                                  _controller.isFormValid
+                              ? SignupStrings.universityRequiredError
+                              : null,
                         ),
                       ),
 

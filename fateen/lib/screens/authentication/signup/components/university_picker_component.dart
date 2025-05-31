@@ -3,34 +3,35 @@ import '../constants/signup_colors.dart';
 import '../constants/signup_strings.dart';
 import '../constants/signup_dimensions.dart';
 
-class MajorPickerComponent extends StatefulWidget {
-  final List<String> majorsList;
-  final String? selectedMajor;
-  final Function(String) onMajorSelected;
+class UniversityPickerComponent extends StatefulWidget {
+  final List<String> universitiesList;
+  final String? selectedUniversity;
+  final Function(String) onUniversitySelected;
   final VoidCallback onCancel;
   final VoidCallback onDone;
 
-  const MajorPickerComponent({
+  const UniversityPickerComponent({
     Key? key,
-    required this.majorsList,
-    required this.selectedMajor,
-    required this.onMajorSelected,
+    required this.universitiesList,
+    required this.selectedUniversity,
+    required this.onUniversitySelected,
     required this.onCancel,
     required this.onDone,
   }) : super(key: key);
 
   @override
-  State<MajorPickerComponent> createState() => _MajorPickerComponentState();
+  State<UniversityPickerComponent> createState() =>
+      _UniversityPickerComponentState();
 }
 
-class _MajorPickerComponentState extends State<MajorPickerComponent> {
+class _UniversityPickerComponentState extends State<UniversityPickerComponent> {
   String? _currentSelection;
 
   @override
   void initState() {
     super.initState();
     // تعيين القيمة الأولية من الخارج
-    _currentSelection = widget.selectedMajor;
+    _currentSelection = widget.selectedUniversity;
   }
 
   @override
@@ -98,7 +99,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   child: Text(
-                    'إلغاء',
+                    SignupStrings.cancelButtonText,
                     style: TextStyle(
                       fontSize: isTablet ? 16 : 14,
                       fontFamily: 'SYMBIOAR+LT',
@@ -108,7 +109,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
 
                 // العنوان
                 Text(
-                  'اختر التخصص',
+                  SignupStrings.universityPickerTitle,
                   style: TextStyle(
                     fontSize: isTablet ? 18 : 16,
                     fontWeight: FontWeight.bold,
@@ -122,7 +123,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
                   onPressed: () {
                     // تأكيد الاختيار إذا كان محدداً
                     if (_currentSelection != null) {
-                      widget.onMajorSelected(_currentSelection!);
+                      widget.onUniversitySelected(_currentSelection!);
                     }
                     widget.onDone();
                   },
@@ -131,7 +132,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   child: Text(
-                    'تم',
+                    SignupStrings.doneButtonText,
                     style: TextStyle(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.bold,
@@ -149,10 +150,10 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
             color: Colors.white,
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: widget.majorsList.length,
+              itemCount: widget.universitiesList.length,
               itemBuilder: (context, index) {
-                final major = widget.majorsList[index];
-                final isSelected = major == _currentSelection;
+                final university = widget.universitiesList[index];
+                final isSelected = university == _currentSelection;
 
                 return Material(
                   color: Colors.transparent,
@@ -160,10 +161,10 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
                     onTap: () {
                       // تحديث الاختيار مباشرة وإعادة بناء القائمة
                       setState(() {
-                        _currentSelection = major;
+                        _currentSelection = university;
                       });
                       // تحديث القيمة في وحدة التحكم مباشرة
-                      widget.onMajorSelected(major);
+                      widget.onUniversitySelected(university);
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -198,7 +199,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent> {
                           SizedBox(width: isTablet ? 16 : 12),
                           Expanded(
                             child: Text(
-                              major,
+                              university,
                               style: TextStyle(
                                 fontSize: isTablet ? 16 : 14,
                                 color: isSelected
