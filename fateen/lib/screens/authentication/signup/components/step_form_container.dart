@@ -30,6 +30,9 @@ class StepFormContainer extends StatefulWidget {
 
 class _StepFormContainerState extends State<StepFormContainer>
     with SingleTickerProviderStateMixin {
+  // إضافة مفتاح النموذج
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -150,6 +153,23 @@ class _StepFormContainerState extends State<StepFormContainer>
     // لا حاجة لتعيين التركيز هنا لأن didUpdateWidget ستتعامل مع ذلك
   }
 
+  // دالة جديدة للتعامل مع إنشاء الحساب
+  void _handleCreateAccount() async {
+    // تنفيذ عملية إنشاء الحساب
+    final success = await widget.controller.signup(_formKey);
+
+    // إذا نجحت عملية التسجيل، انتقل إلى صفحة التحقق
+    if (success && mounted) {
+      // تأخير بسيط لإظهار رسالة النجاح
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // الانتقال إلى صفحة التحقق
+      Navigator.of(context).pushReplacementNamed('/verification');
+    }
+
+    // إذا فشلت العملية، فإن الكنترولر سيقوم بتحديث حالة الخطأ تلقائياً
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -167,56 +187,60 @@ class _StepFormContainerState extends State<StepFormContainer>
     final screenWidth = size.width;
     final screenHeight = size.height;
 
-    return Column(
-      children: [
-        // مؤشر التقدم محسن
-        _buildEnhancedProgressIndicator(),
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          // مؤشر التقدم محسن
+          _buildEnhancedProgressIndicator(),
 
-        // عنوان الخطوة محسن
-        _buildEnhancedStepTitle(),
+          // عنوان الخطوة محسن
+          _buildEnhancedStepTitle(),
 
-        // محتوى الخطوة الحالية
-        ScaleTransition(
-          scale: _scaleAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 0.2),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                layoutBuilder: (currentChild, previousChildren) {
-                  return Stack(
-                    alignment: Alignment.topCenter,
-                    children: <Widget>[
-                      ...previousChildren,
-                      if (currentChild != null) currentChild,
-                    ],
-                    clipBehavior: Clip.none,
-                  );
-                },
-                child: _buildCurrentStepContent(),
+          // محتوى الخطوة الحالية
+          ScaleTransition(
+            scale: _scaleAnimation,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0.0, 0.2),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  layoutBuilder: (currentChild, previousChildren) {
+                    return Stack(
+                      alignment: Alignment.topCenter,
+                      children: <Widget>[
+                        ...previousChildren,
+                        if (currentChild != null) currentChild,
+                      ],
+                      clipBehavior: Clip.none,
+                    );
+                  },
+                  child: _buildCurrentStepContent(),
+                ),
               ),
             ),
           ),
-        ),
 
-        // أزرار التنقل محسنة
-        _buildEnhancedNavigationButtons(),
-      ],
+          // أزرار التنقل محسنة
+          _buildEnhancedNavigationButtons(),
+        ],
+      ),
     );
   }
 
@@ -446,32 +470,108 @@ class _StepFormContainerState extends State<StepFormContainer>
   }
 
   Widget _buildEmailField() {
-    return _buildEnhancedInputField(
-      title: 'البريد الإلكتروني',
-      hintText: 'أدخل بريدك الإلكتروني',
-      controller: widget.controller.emailController,
-      focusNode: _emailFocusNode,
-      icon: Icons.email_outlined,
-      validator: widget.controller.validateEmail,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
-      onSubmitted: (_) {
-        if (widget.controller.validateCurrentStep()) {
-          _navigateToNextStep();
-        }
-      },
-      helperText: 'سيتم استخدامه للتحقق من حسابك',
-      onChanged: (value) {
-        // تحقق فوري من صحة البريد الإلكتروني
-        if (value.contains('@') && value.split('@').length == 2) {
-          // تأخير بسيط لتجنب الكثير من الطلبات
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (value == widget.controller.emailController.text) {
-              widget.controller.validateEmailExists();
+    return Column(
+      children: [
+        _buildEnhancedInputField(
+          title: 'البريد الإلكتروني',
+          hintText: 'أدخل بريدك الإلكتروني',
+          controller: widget.controller.emailController,
+          focusNode: _emailFocusNode,
+          icon: Icons.email_outlined,
+          validator: widget.controller.validateEmail,
+          textInputAction: TextInputAction.next,
+          keyboardType: TextInputType.emailAddress,
+          onSubmitted: (_) {
+            if (widget.controller.validateCurrentStep()) {
+              _navigateToNextStep();
             }
-          });
-        }
-      },
+          },
+          helperText: 'سيتم استخدامه للتحقق من حسابك',
+          onChanged: (value) {
+            // تحقق فوري من صحة البريد الإلكتروني
+            if (value.contains('@') && value.split('@').length == 2) {
+              // تأخير بسيط لتجنب الكثير من الطلبات
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (value == widget.controller.emailController.text) {
+                  widget.controller.validateEmailExists();
+                }
+              });
+            }
+          },
+          // إضافة مؤشر تحميل عند التحقق من البريد
+          suffixIcon: widget.controller.isCheckingEmail
+              ? Container(
+                  width: 20,
+                  height: 20,
+                  margin: const EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: SignupColors.mediumPurple,
+                  ),
+                )
+              : null,
+        ),
+        // إضافة رسالة الخطأ إذا كان البريد موجوداً
+        if (widget.controller.emailError != null)
+          Container(
+            margin: EdgeInsets.only(
+              top: 8,
+              right: MediaQuery.of(context).size.width * 0.06,
+              left: MediaQuery.of(context).size.width * 0.06,
+            ),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: SignupColors.accentColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: SignupColors.accentColor.withOpacity(0.5),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: SignupColors.accentColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.controller.emailError!,
+                        style: TextStyle(
+                          color: SignupColors.accentColor,
+                          fontFamily: 'SYMBIOAR+LT',
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () {
+                          // الانتقال إلى صفحة تسجيل الدخول
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        },
+                        child: Text(
+                          'انتقل لتسجيل الدخول',
+                          style: TextStyle(
+                            color: SignupColors.mediumPurple,
+                            fontFamily: 'SYMBIOAR+LT',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 
@@ -533,57 +633,246 @@ class _StepFormContainerState extends State<StepFormContainer>
   Widget _buildFinalStep() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenWidth < 360;
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(screenWidth * 0.04),
-          child: Text(
-            'أنت على وشك إنشاء حساب جديد',
-            style: TextStyle(
-              fontSize: screenWidth * 0.045,
-              fontWeight: FontWeight.bold,
-              color: SignupColors.darkPurple,
-              fontFamily: 'SYMBIOAR+LT',
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // أيقونة النجاح مع تأثير حركي
+          Container(
+            margin: EdgeInsets.only(
+                top: screenHeight * 0.01, bottom: screenHeight * 0.02),
+            width: screenWidth * 0.22,
+            height: screenWidth * 0.22,
+            decoration: BoxDecoration(
+              color: SignupColors.lightPurple.withOpacity(0.3),
+              shape: BoxShape.circle,
             ),
-            textAlign: TextAlign.center,
+            child: Icon(
+              Icons.check_circle_outline,
+              color: SignupColors.darkPurple,
+              size: screenWidth * 0.15,
+            ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-          child: Card(
-            elevation: 2,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: EdgeInsets.all(screenWidth * 0.04),
-              child: Column(
-                children: [
-                  _buildEnhancedSummaryItem(
-                      'الاسم', widget.controller.nameController.text),
-                  _buildEnhancedSummaryItem('اسم المستخدم',
-                      widget.controller.usernameController.text),
-                  _buildEnhancedSummaryItem('البريد الإلكتروني',
-                      widget.controller.emailController.text),
-                  _buildEnhancedSummaryItem('الجامعة',
-                      widget.controller.universityNameController.text),
-                  _buildEnhancedSummaryItem(
-                      'التخصص', widget.controller.majorController.text),
-                ],
+
+          // عنوان محسن
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.06,
+              vertical: screenHeight * 0.01,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'أنت على وشك إنشاء حساب جديد',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.052,
+                    fontWeight: FontWeight.bold,
+                    color: SignupColors.darkPurple,
+                    fontFamily: 'SYMBIOAR+LT',
+                    height: 1.3,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: screenHeight * 0.01),
+                Text(
+                  'تأكد من صحة بياناتك قبل المتابعة',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.038,
+                    color: SignupColors.hintColor,
+                    fontFamily: 'SYMBIOAR+LT',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: screenHeight * 0.02),
+
+          // بطاقة معلومات المستخدم محسنة
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: SignupColors.mediumPurple.withOpacity(0.15),
+                  blurRadius: 15,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // عنوان البطاقة
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: screenHeight * 0.016,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        SignupColors.mediumPurple,
+                        SignupColors.darkPurple,
+                      ],
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'معلومات الحساب',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenWidth * 0.042,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SYMBIOAR+LT',
+                      ),
+                    ),
+                  ),
+                ),
+
+                // عناصر البيانات
+                Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.045),
+                  child: Column(
+                    children: [
+                      _buildFinalStepInfoItem(
+                        icon: Icons.person,
+                        label: 'الاسم',
+                        value: widget.controller.nameController.text,
+                      ),
+                      _buildDivider(),
+                      _buildFinalStepInfoItem(
+                        icon: Icons.alternate_email,
+                        label: 'اسم المستخدم',
+                        value: widget.controller.usernameController.text,
+                      ),
+                      _buildDivider(),
+                      _buildFinalStepInfoItem(
+                        icon: Icons.email_outlined,
+                        label: 'البريد الإلكتروني',
+                        value: widget.controller.emailController.text,
+                      ),
+                      _buildDivider(),
+                      _buildFinalStepInfoItem(
+                        icon: Icons.school_outlined,
+                        label: 'الجامعة',
+                        value: widget.controller.universityNameController.text,
+                      ),
+                      _buildDivider(),
+                      _buildFinalStepInfoItem(
+                        icon: Icons.book_outlined,
+                        label: 'التخصص',
+                        value: widget.controller.majorController.text,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: screenHeight * 0.03),
+
+          // شروط الاستخدام محسنة
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: screenHeight * 0.02,
+            ),
+            decoration: BoxDecoration(
+              color: SignupColors.lightPurple.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: SignupColors.mediumPurple.withOpacity(0.3),
+                width: 1,
               ),
             ),
+            child: TermsAgreementComponent(
+              onTap: () {
+                _showTermsAndConditions(context);
+              },
+            ),
           ),
-        ),
-        SizedBox(height: screenHeight * 0.03),
-        TermsAgreementComponent(
-          onTap: () {
-            // عرض الشروط والأحكام
-            _showTermsAndConditions(context);
-          },
-        ),
-        SizedBox(height: screenHeight * 0.02),
-        SocialSignupComponent(),
-      ],
+
+          SizedBox(height: screenHeight * 0.02),
+        ],
+      ),
+    );
+  }
+
+  // دالة مساعدة لبناء عنصر معلومات في الصفحة النهائية
+  Widget _buildFinalStepInfoItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: SignupColors.lightPurple.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: SignupColors.darkPurple,
+              size: 20,
+            ),
+          ),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: SignupColors.hintColor,
+                  fontSize: screenWidth * 0.032,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+              SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  color: SignupColors.textColor,
+                  fontSize: screenWidth * 0.038,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // دالة مساعدة لإنشاء خط فاصل
+  Widget _buildDivider() {
+    return Divider(
+      color: SignupColors.lightPurple.withOpacity(0.3),
+      thickness: 1,
+      height: 20,
     );
   }
 
@@ -618,49 +907,6 @@ class _StepFormContainerState extends State<StepFormContainer>
                 fontFamily: 'SYMBIOAR+LT',
                 fontWeight: FontWeight.bold,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEnhancedSummaryItem(String label, String value) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
-      child: Row(
-        textDirection: TextDirection.rtl,
-        children: [
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.015),
-            decoration: BoxDecoration(
-              color: SignupColors.lightPurple,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: SignupColors.darkPurple,
-                fontSize: screenWidth * 0.035,
-                fontFamily: 'SYMBIOAR+LT',
-              ),
-            ),
-          ),
-          SizedBox(width: screenWidth * 0.02),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: SignupColors.textColor,
-                fontSize: screenWidth * 0.035,
-                fontFamily: 'SYMBIOAR+LT',
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -703,6 +949,7 @@ class _StepFormContainerState extends State<StepFormContainer>
     final hasDigit = controller.text.contains(RegExp(r'[0-9]'));
     final hasSpecialChar =
         controller.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    final hasNoArabic = !RegExp(r'[\u0600-\u06FF]').hasMatch(controller.text);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -798,6 +1045,7 @@ class _StepFormContainerState extends State<StepFormContainer>
                 fontSize: isSmallScreen ? 10 : 12,
                 fontFamily: 'SYMBIOAR+LT',
               ),
+              errorMaxLines: 3, // السماح بعرض الخطأ على عدة أسطر
               contentPadding: EdgeInsets.symmetric(
                 vertical: isTablet ? 20.0 : (isSmallScreen ? 16.0 : 18.0),
                 horizontal: 20,
@@ -908,6 +1156,14 @@ class _StepFormContainerState extends State<StepFormContainer>
                           hasSpecialChar,
                           helperTextSize,
                         ),
+
+                        // إضافة متطلب عدم وجود حروف عربية
+                        SizedBox(height: 4),
+                        _buildPasswordRequirement(
+                          'لا تستخدم حروف عربية',
+                          hasNoArabic,
+                          helperTextSize,
+                        ),
                       ],
                     ),
                   ),
@@ -944,22 +1200,9 @@ class _StepFormContainerState extends State<StepFormContainer>
     );
   }
 
-  // حساب قوة كلمة المرور
+  // حساب قوة كلمة المرور - استدعاء من الكنترولر
   double _calculatePasswordStrength(String password) {
-    double strength = 0.0;
-
-    // طول كلمة المرور
-    if (password.length >= 8) strength += 0.2;
-    if (password.length >= 12) strength += 0.1;
-
-    // تنوع الأحرف
-    if (password.contains(RegExp(r'[A-Z]'))) strength += 0.2;
-    if (password.contains(RegExp(r'[a-z]'))) strength += 0.2;
-    if (password.contains(RegExp(r'[0-9]'))) strength += 0.2;
-    if (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) strength += 0.2;
-
-    // الحد الأقصى هو 1.0
-    return strength > 1.0 ? 1.0 : strength;
+    return widget.controller.calculatePasswordStrength(password);
   }
 
   // دالة للحصول على لون قوة كلمة المرور
@@ -974,12 +1217,7 @@ class _StepFormContainerState extends State<StepFormContainer>
 
   // دالة للحصول على نص قوة كلمة المرور
   String _getPasswordStrengthText(String password) {
-    double strength = _calculatePasswordStrength(password);
-
-    if (strength < 0.3) return 'ضعيفة';
-    if (strength < 0.6) return 'متوسطة';
-    if (strength < 0.8) return 'جيدة';
-    return 'قوية';
+    return widget.controller.getPasswordStrengthText(password);
   }
 
   Widget _buildEnhancedNavigationButtons() {
@@ -1006,7 +1244,9 @@ class _StepFormContainerState extends State<StepFormContainer>
               child: isFirstStep
                   ? const SizedBox.shrink()
                   : TextButton(
-                      onPressed: widget.onPrevPressed,
+                      onPressed: widget.controller.isLoading
+                          ? null
+                          : widget.onPrevPressed,
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                           vertical: screenHeight * 0.015,
@@ -1043,22 +1283,33 @@ class _StepFormContainerState extends State<StepFormContainer>
             ),
           ),
 
-          // زر التالي أو الإنهاء - مع تأثير نبض عندما يكون جاهزًا
+          // زر التالي أو الإنهاء - مع مؤشر دوران أثناء التحميل
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isFirstStep ? screenWidth * 0.88 : screenWidth * 0.6,
             height: screenHeight * 0.06,
             child: ElevatedButton(
-              onPressed: widget.controller.canMoveToNextStep
-                  ? (isLastStep ? widget.onSubmitPressed : _navigateToNextStep)
-                  : null,
+              onPressed: (widget.controller.isLoading ||
+                      !widget.controller.canMoveToNextStep)
+                  ? null
+                  : () {
+                      if (isLastStep) {
+                        // استخدام الدالة الجديدة بدلاً من widget.onSubmitPressed
+                        _handleCreateAccount();
+                      } else {
+                        _navigateToNextStep();
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: SignupColors.mediumPurple,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor:
                     SignupColors.mediumPurple.withOpacity(0.5),
                 disabledForegroundColor: Colors.white.withOpacity(0.7),
-                elevation: widget.controller.canMoveToNextStep ? 4 : 0,
+                elevation: widget.controller.canMoveToNextStep &&
+                        !widget.controller.isLoading
+                    ? 4
+                    : 0,
                 shadowColor: SignupColors.mediumPurple.withOpacity(0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -1068,26 +1319,50 @@ class _StepFormContainerState extends State<StepFormContainer>
                   vertical: screenHeight * 0.015,
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    isLastStep ? 'إنشاء الحساب' : 'التالي',
-                    style: TextStyle(
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.04,
+              child: widget.controller.isLoading
+                  // عرض مؤشر الدوران عند التحميل
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * 0.05,
+                          height: screenWidth * 0.05,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        Text(
+                          'جاري التسجيل...',
+                          style: TextStyle(
+                            fontFamily: 'SYMBIOAR+LT',
+                            fontSize: screenWidth * 0.037,
+                          ),
+                        ),
+                      ],
+                    )
+                  // عرض النص العادي
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          isLastStep ? 'إنشاء الحساب' : 'التالي',
+                          style: TextStyle(
+                            fontFamily: 'SYMBIOAR+LT',
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenWidth * 0.04,
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        Icon(
+                          isLastStep
+                              ? Icons.check_circle_outline
+                              : Icons.arrow_forward_ios,
+                          size: screenWidth * 0.04,
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Icon(
-                    isLastStep
-                        ? Icons.check_circle_outline
-                        : Icons.arrow_forward_ios,
-                    size: screenWidth * 0.04,
-                  ),
-                ],
-              ),
             ),
           ),
         ],

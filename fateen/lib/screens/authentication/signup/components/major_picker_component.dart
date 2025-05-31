@@ -56,164 +56,159 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
 
   @override
   Widget build(BuildContext context) {
-    // استخدام LayoutBuilder للحصول على قيود الحاوية
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // الحصول على أبعاد الشاشة
-        final size = MediaQuery.of(context).size;
-        final screenWidth = size.width;
-        final screenHeight = size.height;
+    // تحقق من حجم الشاشة
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-        final isSmallScreen = screenWidth < 360;
-        final isTablet = screenWidth > 600;
+    final isSmallScreen = screenWidth < 360;
+    final isTablet = screenWidth > 600;
 
-        // تحسب ارتفاع الشريط العلوي بنسبة من ارتفاع الشاشة
-        final headerHeight = isTablet
-            ? screenHeight * 0.08
-            : (isSmallScreen ? screenHeight * 0.07 : screenHeight * 0.075);
+    // تحسب ارتفاع الشريط العلوي
+    final headerHeight = isTablet ? 70.0 : (isSmallScreen ? 56.0 : 64.0);
 
-        // تحسب ارتفاع القائمة بنسبة من ارتفاع الشاشة
-        final listHeight = screenHeight * 0.4;
+    // تحسب ارتفاع القائمة بنسبة من ارتفاع الشاشة
+    final maxAvailableHeight = screenHeight - bottomPadding - 20;
+    final listHeight =
+        maxAvailableHeight * 0.4 > 150 ? maxAvailableHeight * 0.4 : 150;
 
-        return AnimatedBuilder(
-            animation: _slideAnimation,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, screenHeight * _slideAnimation.value),
-                child: Container(
-                  height: headerHeight + listHeight,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        offset: const Offset(0, -1),
-                      ),
-                    ],
+    // تأكد من أن الارتفاع الإجمالي لا يتجاوز المساحة المتاحة
+    final totalHeight = headerHeight + listHeight > maxAvailableHeight * 0.5
+        ? maxAvailableHeight * 0.5
+        : headerHeight + listHeight;
+
+    return AnimatedBuilder(
+        animation: _slideAnimation,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(0, screenHeight * _slideAnimation.value),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: bottomPadding),
+              child: Container(
+                height: totalHeight,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
-                  child: Column(
-                    children: [
-                      // مؤشر السحب في الأعلى
-                      Container(
-                        margin: EdgeInsets.only(top: screenHeight * 0.01),
-                        width: screenWidth * 0.1,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      spreadRadius: 0,
+                      offset: const Offset(0, -1),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // مؤشر السحب في الأعلى
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      width: screenWidth * 0.1,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
                       ),
+                    ),
 
-                      // شريط العنوان
-                      Container(
-                        height: headerHeight,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.05),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(24),
-                            topRight: Radius.circular(24),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              blurRadius: 4,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
+                    // شريط العنوان - تم تعديله ليشبه منتقي الجامعة
+                    Container(
+                      height: headerHeight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // زر الإلغاء
-                            TextButton(
-                              onPressed: () {
-                                // تشغيل رسوم متحركة للخروج
-                                _animationController.reverse().then((_) {
-                                  widget.onCancel();
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: SignupColors.hintColor,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.03),
-                              ),
-                              child: Text(
-                                'إلغاء',
-                                style: TextStyle(
-                                  fontSize: isTablet
-                                      ? screenWidth * 0.025
-                                      : (isSmallScreen
-                                          ? screenWidth * 0.035
-                                          : screenWidth * 0.032),
-                                  fontFamily: 'SYMBIOAR+LT',
-                                ),
-                              ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 4,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        textDirection: TextDirection.rtl,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // زر الإلغاء
+                          TextButton(
+                            onPressed: () {
+                              // تشغيل رسوم متحركة للخروج
+                              _animationController.reverse().then((_) {
+                                widget.onCancel();
+                              });
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: SignupColors.hintColor,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                             ),
-
-                            // العنوان
-                            Text(
-                              'اختر التخصص',
+                            child: Text(
+                              'إلغاء',
                               style: TextStyle(
-                                fontSize: isTablet
-                                    ? screenWidth * 0.028
-                                    : (isSmallScreen
-                                        ? screenWidth * 0.04
-                                        : screenWidth * 0.035),
-                                fontWeight: FontWeight.bold,
-                                color: SignupColors.darkPurple,
+                                fontSize: isTablet ? 16 : 14,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
+                          ),
 
-                            // زر الموافقة
-                            TextButton(
-                              onPressed: () {
-                                // تأكيد الاختيار إذا كان محدداً
-                                if (_currentSelection != null) {
-                                  widget.onMajorSelected(_currentSelection!);
-                                }
+                          // العنوان
+                          Text(
+                            'اختر التخصص',
+                            style: TextStyle(
+                              fontSize: isTablet ? 18 : 16,
+                              fontWeight: FontWeight.bold,
+                              color: SignupColors.darkPurple,
+                              fontFamily: 'SYMBIOAR+LT',
+                            ),
+                          ),
 
-                                // تشغيل رسوم متحركة للخروج
-                                _animationController.reverse().then((_) {
-                                  widget.onDone();
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: SignupColors.mediumPurple,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.03),
-                              ),
-                              child: Text(
-                                'تم',
-                                style: TextStyle(
-                                  fontSize: isTablet
-                                      ? screenWidth * 0.025
-                                      : (isSmallScreen
-                                          ? screenWidth * 0.035
-                                          : screenWidth * 0.032),
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'SYMBIOAR+LT',
-                                ),
+                          // زر الموافقة
+                          TextButton(
+                            onPressed: () {
+                              // تأكيد الاختيار إذا كان محدداً
+                              if (_currentSelection != null) {
+                                widget.onMajorSelected(_currentSelection!);
+                              }
+
+                              // تشغيل رسوم متحركة للخروج
+                              _animationController.reverse().then((_) {
+                                widget.onDone();
+                              });
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: SignupColors.mediumPurple,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            child: Text(
+                              'تم',
+                              style: TextStyle(
+                                fontSize: isTablet ? 16 : 14,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      // القائمة
-                      Container(
-                        height: listHeight,
+                    // استخدام Expanded لضمان عدم تجاوز المساحة المتاحة
+                    Expanded(
+                      child: Container(
                         color: Colors.white,
                         child: ListView.builder(
+                          shrinkWrap: true,
                           physics: const BouncingScrollPhysics(),
                           itemCount: widget.majorsList.length,
                           itemBuilder: (context, index) {
@@ -224,7 +219,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                  // استخدام تأثير صوتي عند النقر (اختياري)
+                                  // استخدام تأثير صوتي عند النقر
                                   HapticFeedback.lightImpact();
 
                                   // تحديث الاختيار مباشرة وإعادة بناء القائمة
@@ -236,12 +231,8 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.06,
-                                    vertical: isTablet
-                                        ? screenHeight * 0.018
-                                        : (isSmallScreen
-                                            ? screenHeight * 0.014
-                                            : screenHeight * 0.016),
+                                    horizontal: 24,
+                                    vertical: isTablet ? 16 : 14,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
@@ -256,52 +247,28 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                                     ),
                                   ),
                                   child: Row(
+                                    textDirection: TextDirection.rtl,
                                     children: [
-                                      // أيقونة الاختيار مع تأثير ظهور وإخفاء سلس
-                                      AnimatedSwitcher(
-                                        duration:
-                                            const Duration(milliseconds: 200),
-                                        transitionBuilder: (Widget child,
-                                            Animation<double> animation) {
-                                          return ScaleTransition(
-                                              scale: animation, child: child);
-                                        },
-                                        child: isSelected
-                                            ? Icon(
-                                                Icons.check_circle,
-                                                key: const ValueKey('selected'),
-                                                color:
-                                                    SignupColors.mediumPurple,
-                                                size: isTablet
-                                                    ? screenWidth * 0.04
-                                                    : (isSmallScreen
-                                                        ? screenWidth * 0.055
-                                                        : screenWidth * 0.05),
-                                              )
-                                            : Icon(
-                                                Icons.circle_outlined,
-                                                key: const ValueKey(
-                                                    'unselected'),
-                                                color: SignupColors.hintColor,
-                                                size: isTablet
-                                                    ? screenWidth * 0.04
-                                                    : (isSmallScreen
-                                                        ? screenWidth * 0.055
-                                                        : screenWidth * 0.05),
-                                              ),
-                                      ),
+                                      // أيقونة الاختيار - تم تبسيطها لتشبه منتقي الجامعة
+                                      isSelected
+                                          ? Icon(
+                                              Icons.check_circle,
+                                              color: SignupColors.mediumPurple,
+                                              size: isTablet ? 24 : 20,
+                                            )
+                                          : Icon(
+                                              Icons.circle_outlined,
+                                              color: SignupColors.hintColor,
+                                              size: isTablet ? 24 : 20,
+                                            ),
 
-                                      SizedBox(width: screenWidth * 0.03),
+                                      SizedBox(width: isTablet ? 16 : 12),
 
                                       Expanded(
                                         child: Text(
                                           major,
                                           style: TextStyle(
-                                            fontSize: isTablet
-                                                ? screenWidth * 0.025
-                                                : (isSmallScreen
-                                                    ? screenWidth * 0.035
-                                                    : screenWidth * 0.032),
+                                            fontSize: isTablet ? 16 : 14,
                                             color: isSelected
                                                 ? SignupColors.darkPurple
                                                 : SignupColors.textColor,
@@ -321,12 +288,12 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                           },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            });
-      },
-    );
+              ),
+            ),
+          );
+        });
   }
 }

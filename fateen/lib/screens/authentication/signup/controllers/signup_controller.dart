@@ -150,43 +150,44 @@ class SignupController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // التحقق من الاسم - مع منع الأرقام
+  // التحقق من الاسم - استخدام كلاس الطالب
   String? validateName(String? value) {
     if (value == null || value.isEmpty) {
       return 'الرجاء إدخال الاسم الكامل';
     }
 
     if (!Student.isValidName(value)) {
-      return 'الاسم لا يجب أن يحتوي على أرقام';
+      return 'الاسم يجب أن يتكون من حروف فقط ويكون على الأقل 3 أحرف';
     }
 
     return null;
   }
 
-  // التحقق من اسم المستخدم
+  // التحقق من اسم المستخدم - استخدام الشروط المحسنة من كلاس الطالب
   String? validateUsername(String? value) {
     if (value == null || value.isEmpty) {
       return 'الرجاء إدخال اسم المستخدم';
     }
 
-    if (!Student.isValidUsername(value)) {
-      return 'اسم المستخدم يجب أن يتكون من أحرف وأرقام فقط';
-    }
-
-    return null;
+    return Student.validateUsername(value);
   }
 
-  // التحقق من اسم الجامعة
-  String? validateUniversityName(String? value) {
+  // التحقق من البريد الإلكتروني
+  String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال اسم الجامعة';
+      return 'الرجاء إدخال البريد الإلكتروني';
     }
 
-    if (_isOtherUniversity && !Student.isValidUniversityName(value)) {
-      return 'الرجاء إدخال اسم جامعة صالح';
+    return Student.validateEmail(value);
+  }
+
+  // التحقق من كلمة المرور
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الرجاء إدخال كلمة المرور';
     }
 
-    return null;
+    return Student.validatePassword(value);
   }
 
   // التحقق من صحة الجامعة
@@ -199,34 +200,34 @@ class SignupController extends ChangeNotifier {
     }
   }
 
-  // التحقق من البريد الإلكتروني
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال البريد الإلكتروني';
+  // التحقق من صحة التخصص
+  bool validateMajor() {
+    if (_isOtherMajor) {
+      return majorController.text.trim().length >= 2 &&
+          Student.isValidMajor(majorController.text.trim());
+    } else {
+      return _selectedMajor != null && _selectedMajor!.isNotEmpty;
     }
-
-    if (!Student.isValidEmail(value)) {
-      return 'الرجاء إدخال بريد إلكتروني صحيح';
-    }
-
-    return null;
   }
 
-  // التحقق المباشر من وجود البريد الإلكتروني
+  // التحقق المباشر من وجود البريد الإلكتروني باستخدام كلاس الطالب
   Future<bool> validateEmailExists() async {
     try {
       // البريد فارغ أو غير صالح
       if (emailController.text.isEmpty ||
           validateEmail(emailController.text) != null) {
+        setEmailError(null); // إزالة أي خطأ سابق
         return false;
       }
 
       setCheckingEmail(true);
 
-      // استخدام Firebase Auth للتحقق من البريد
-      final methods = await FirebaseAuth.instance
-          .fetchSignInMethodsForEmail(emailController.text.trim());
-      final bool emailExists = methods.isNotEmpty;
+      // تأخير بسيط لإظهار المؤشر
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // استخدام دالة التحقق من كلاس الطالب
+      final bool emailExists =
+          await Student.isEmailAlreadyRegistered(emailController.text.trim());
 
       setCheckingEmail(false);
 
@@ -234,6 +235,9 @@ class SignupController extends ChangeNotifier {
       if (emailExists) {
         setEmailError(
             "البريد الإلكتروني مستخدم بالفعل، هل تريد تسجيل الدخول بدلاً من ذلك؟");
+        // تحديث حالة التحقق
+        _canMoveToNextStep = false;
+        notifyListeners();
       } else {
         setEmailError(null);
       }
@@ -242,30 +246,8 @@ class SignupController extends ChangeNotifier {
     } catch (e) {
       setCheckingEmail(false);
       debugPrint("خطأ في التحقق من البريد الإلكتروني: $e");
-      return true; // نفترض أنه غير موجود في حالة حدوث خطأ
-    }
-  }
-
-  // التحقق من كلمة المرور - استخدام منطق التحقق من Student
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال كلمة المرور';
-    }
-
-    if (!Student.isValidPassword(value)) {
-      return 'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، وحرف كبير، وحرف صغير، ورقم، ورمز خاص';
-    }
-
-    return null;
-  }
-
-  // التحقق من التخصص
-  bool validateMajor() {
-    if (_isOtherMajor) {
-      return majorController.text.trim().length >= 2 &&
-          Student.isValidMajor(majorController.text.trim());
-    } else {
-      return _selectedMajor != null && _selectedMajor!.isNotEmpty;
+      setEmailError("حدث خطأ أثناء التحقق من البريد الإلكتروني");
+      return false; // نفترض أنه موجود في حالة حدوث خطأ للأمان
     }
   }
 
@@ -431,12 +413,13 @@ class SignupController extends ChangeNotifier {
     }
   }
 
-  // التحقق من فرادة اسم المستخدم
+  // التحقق من فرادة اسم المستخدم باستخدام كلاس الطالب
   Future<bool> checkUsernameUnique() async {
     try {
       setCheckingUsername(true);
-      final isUnique = await _firebaseService
-          .isUsernameUnique(usernameController.text.trim());
+      // استخدام دالة التحقق من كلاس الطالب
+      final isUnique =
+          await Student.isUsernameUnique(usernameController.text.trim());
       setCheckingUsername(false);
 
       if (!isUnique) {
@@ -451,6 +434,16 @@ class SignupController extends ChangeNotifier {
       setServerError("حدث خطأ أثناء التحقق من اسم المستخدم");
       return false;
     }
+  }
+
+  // حساب قوة كلمة المرور باستخدام كلاس الطالب
+  double calculatePasswordStrength(String password) {
+    return Student.calculatePasswordStrength(password);
+  }
+
+  // الحصول على نص قوة كلمة المرور باستخدام كلاس الطالب
+  String getPasswordStrengthText(String password) {
+    return Student.getPasswordStrengthText(password);
   }
 
   // تغيير نسبة تقدم التسجيل
@@ -495,6 +488,14 @@ class SignupController extends ChangeNotifier {
       final isUsernameUnique = await checkUsernameUnique();
       if (!isUsernameUnique) {
         print("[signup_controller] اسم المستخدم مستخدم بالفعل");
+        return false;
+      }
+
+      // التحقق من البريد الإلكتروني
+      print("[signup_controller] التحقق من البريد الإلكتروني...");
+      final isEmailValid = await validateEmailExists();
+      if (!isEmailValid) {
+        print("[signup_controller] البريد الإلكتروني مستخدم بالفعل");
         return false;
       }
 
