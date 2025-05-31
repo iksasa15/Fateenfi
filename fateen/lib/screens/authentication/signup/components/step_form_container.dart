@@ -30,9 +30,6 @@ class StepFormContainer extends StatefulWidget {
 
 class _StepFormContainerState extends State<StepFormContainer>
     with SingleTickerProviderStateMixin {
-  // إضافة مفتاح النموذج
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -153,23 +150,6 @@ class _StepFormContainerState extends State<StepFormContainer>
     // لا حاجة لتعيين التركيز هنا لأن didUpdateWidget ستتعامل مع ذلك
   }
 
-  // دالة جديدة للتعامل مع إنشاء الحساب
-  void _handleCreateAccount() async {
-    // تنفيذ عملية إنشاء الحساب
-    final success = await widget.controller.signup(_formKey);
-
-    // إذا نجحت عملية التسجيل، انتقل إلى صفحة التحقق
-    if (success && mounted) {
-      // تأخير بسيط لإظهار رسالة النجاح
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // الانتقال إلى صفحة التحقق
-      Navigator.of(context).pushReplacementNamed('/verification');
-    }
-
-    // إذا فشلت العملية، فإن الكنترولر سيقوم بتحديث حالة الخطأ تلقائياً
-  }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -187,60 +167,56 @@ class _StepFormContainerState extends State<StepFormContainer>
     final screenWidth = size.width;
     final screenHeight = size.height;
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          // مؤشر التقدم محسن
-          _buildEnhancedProgressIndicator(),
+    return Column(
+      children: [
+        // مؤشر التقدم محسن
+        _buildEnhancedProgressIndicator(),
 
-          // عنوان الخطوة محسن
-          _buildEnhancedStepTitle(),
+        // عنوان الخطوة محسن
+        _buildEnhancedStepTitle(),
 
-          // محتوى الخطوة الحالية
-          ScaleTransition(
-            scale: _scaleAnimation,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0.0, 0.2),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      ),
-                    );
-                  },
-                  layoutBuilder: (currentChild, previousChildren) {
-                    return Stack(
-                      alignment: Alignment.topCenter,
-                      children: <Widget>[
-                        ...previousChildren,
-                        if (currentChild != null) currentChild,
-                      ],
-                      clipBehavior: Clip.none,
-                    );
-                  },
-                  child: _buildCurrentStepContent(),
-                ),
+        // محتوى الخطوة الحالية
+        ScaleTransition(
+          scale: _scaleAnimation,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.0, 0.2),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                layoutBuilder: (currentChild, previousChildren) {
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    children: <Widget>[
+                      ...previousChildren,
+                      if (currentChild != null) currentChild,
+                    ],
+                    clipBehavior: Clip.none,
+                  );
+                },
+                child: _buildCurrentStepContent(),
               ),
             ),
           ),
+        ),
 
-          // أزرار التنقل محسنة
-          _buildEnhancedNavigationButtons(),
-        ],
-      ),
+        // أزرار التنقل محسنة
+        _buildEnhancedNavigationButtons(),
+      ],
     );
   }
 
@@ -1244,9 +1220,7 @@ class _StepFormContainerState extends State<StepFormContainer>
               child: isFirstStep
                   ? const SizedBox.shrink()
                   : TextButton(
-                      onPressed: widget.controller.isLoading
-                          ? null
-                          : widget.onPrevPressed,
+                      onPressed: widget.onPrevPressed,
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                           vertical: screenHeight * 0.015,
@@ -1283,33 +1257,22 @@ class _StepFormContainerState extends State<StepFormContainer>
             ),
           ),
 
-          // زر التالي أو الإنهاء - مع مؤشر دوران أثناء التحميل
+          // زر التالي أو الإنهاء - مع تأثير نبض عندما يكون جاهزًا
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isFirstStep ? screenWidth * 0.88 : screenWidth * 0.6,
             height: screenHeight * 0.06,
             child: ElevatedButton(
-              onPressed: (widget.controller.isLoading ||
-                      !widget.controller.canMoveToNextStep)
-                  ? null
-                  : () {
-                      if (isLastStep) {
-                        // استخدام الدالة الجديدة بدلاً من widget.onSubmitPressed
-                        _handleCreateAccount();
-                      } else {
-                        _navigateToNextStep();
-                      }
-                    },
+              onPressed: widget.controller.canMoveToNextStep
+                  ? (isLastStep ? widget.onSubmitPressed : _navigateToNextStep)
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: SignupColors.mediumPurple,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor:
                     SignupColors.mediumPurple.withOpacity(0.5),
                 disabledForegroundColor: Colors.white.withOpacity(0.7),
-                elevation: widget.controller.canMoveToNextStep &&
-                        !widget.controller.isLoading
-                    ? 4
-                    : 0,
+                elevation: widget.controller.canMoveToNextStep ? 4 : 0,
                 shadowColor: SignupColors.mediumPurple.withOpacity(0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -1319,50 +1282,26 @@ class _StepFormContainerState extends State<StepFormContainer>
                   vertical: screenHeight * 0.015,
                 ),
               ),
-              child: widget.controller.isLoading
-                  // عرض مؤشر الدوران عند التحميل
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: screenWidth * 0.05,
-                          height: screenWidth * 0.05,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Text(
-                          'جاري التسجيل...',
-                          style: TextStyle(
-                            fontFamily: 'SYMBIOAR+LT',
-                            fontSize: screenWidth * 0.037,
-                          ),
-                        ),
-                      ],
-                    )
-                  // عرض النص العادي
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          isLastStep ? 'إنشاء الحساب' : 'التالي',
-                          style: TextStyle(
-                            fontFamily: 'SYMBIOAR+LT',
-                            fontWeight: FontWeight.bold,
-                            fontSize: screenWidth * 0.04,
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Icon(
-                          isLastStep
-                              ? Icons.check_circle_outline
-                              : Icons.arrow_forward_ios,
-                          size: screenWidth * 0.04,
-                        ),
-                      ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isLastStep ? 'إنشاء الحساب' : 'التالي',
+                    style: TextStyle(
+                      fontFamily: 'SYMBIOAR+LT',
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.04,
                     ),
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Icon(
+                    isLastStep
+                        ? Icons.check_circle_outline
+                        : Icons.arrow_forward_ios,
+                    size: screenWidth * 0.04,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
