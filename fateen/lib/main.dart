@@ -267,21 +267,45 @@ class MyApp extends StatelessWidget {
             '/reset-password': (context) => const ResetPasswordScreen(),
           },
 
-          // معالجة المسارات غير المعروفة
+          // معالجة المسارات غير المعروفة - تم تعديل هذا الجزء للحصول على انتقالات بدون تأثيرات
           onGenerateRoute: (settings) {
             debugPrint('محاولة الوصول إلى مسار: ${settings.name}');
             switch (settings.name) {
               case '/login':
-                return MaterialPageRoute(builder: (_) => const LoginScreen());
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (context, _, __) => const LoginScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
               case '/signup':
-                return MaterialPageRoute(builder: (_) => const SignUpScreen());
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (context, _, __) => const SignUpScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
               case '/reset-password':
-                return MaterialPageRoute(
-                    builder: (_) => const ResetPasswordScreen());
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (context, _, __) => const ResetPasswordScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
               case '/home':
-                return MaterialPageRoute(builder: (_) => const AuthChecker());
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (context, _, __) => const AuthChecker(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
               default:
-                return MaterialPageRoute(builder: (_) => const LoginScreen());
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (context, _, __) => const LoginScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
             }
           },
         );

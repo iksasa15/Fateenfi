@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../constants/auth_colors.dart';
 import '../constants/auth_strings.dart';
 
@@ -157,6 +158,18 @@ class _AuthToggleBarState extends State<AuthToggleBar>
     }
   }
 
+  // تطبيق تأثير حسي عند الضغط
+  void _handleLoginPressed() {
+    HapticFeedback.selectionClick();
+    widget.onLoginPressed();
+  }
+
+  // تطبيق تأثير حسي عند الضغط
+  void _handleSignupPressed() {
+    HapticFeedback.selectionClick();
+    widget.onSignupPressed();
+  }
+
   @override
   Widget build(BuildContext context) {
     // الحصول على حجم الشاشة
@@ -202,7 +215,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
                         boxShadow: _getShadow(true),
                       ),
                       child: MaterialButton(
-                        onPressed: widget.onLoginPressed,
+                        onPressed: _handleLoginPressed,
                         elevation: 0,
                         focusElevation: 0,
                         highlightElevation: 0,
@@ -238,7 +251,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
                         boxShadow: _getShadow(false),
                       ),
                       child: MaterialButton(
-                        onPressed: widget.onSignupPressed,
+                        onPressed: _handleSignupPressed,
                         elevation: 0,
                         highlightElevation: 0,
                         shape: RoundedRectangleBorder(

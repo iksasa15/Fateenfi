@@ -92,7 +92,10 @@ class _StepFormContainerState extends State<StepFormContainer>
     FocusScope.of(context).unfocus();
 
     // تعيين التركيز الجديد بناءً على الخطوة الحالية
-    Future.delayed(const Duration(milliseconds: 150), () {
+    // تأخير بسيط لضمان اكتمال الانتقال بين الخطوات قبل إظهار لوحة المفاتيح
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+
       switch (widget.controller.currentStep) {
         case SignupStep.name:
           FocusScope.of(context).requestFocus(_nameFocusNode);
@@ -106,11 +109,45 @@ class _StepFormContainerState extends State<StepFormContainer>
         case SignupStep.password:
           FocusScope.of(context).requestFocus(_passwordFocusNode);
           break;
+        case SignupStep.university:
+          // إظهار منتقي الجامعة تلقائياً إذا كان الحقل فارغاً
+          if (widget.controller.universityNameController.text.isEmpty) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              if (mounted) {
+                _showUniversityPicker(context);
+              }
+            });
+          } else {
+            FocusScope.of(context)
+                .requestFocus(widget.controller.universityFocusNode);
+          }
+          break;
+        case SignupStep.major:
+          // إظهار منتقي التخصص تلقائياً إذا كان الحقل فارغاً
+          if (widget.controller.majorController.text.isEmpty) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              if (mounted) {
+                _showMajorPicker(context);
+              }
+            });
+          } else {
+            FocusScope.of(context)
+                .requestFocus(widget.controller.majorFocusNode);
+          }
+          break;
         default:
-          // لا حاجة للتركيز في باقي الخطوات
+          // لا حاجة للتركيز في الخطوة الأخيرة
           break;
       }
     });
+  }
+
+  // دالة مخصصة للانتقال إلى الخطوة التالية وتفعيل لوحة المفاتيح
+  void _navigateToNextStep() {
+    // استدعاء الدالة الأصلية للانتقال
+    widget.onNextPressed();
+
+    // لا حاجة لتعيين التركيز هنا لأن didUpdateWidget ستتعامل مع ذلك
   }
 
   @override
@@ -372,7 +409,7 @@ class _StepFormContainerState extends State<StepFormContainer>
       textInputAction: TextInputAction.next,
       onSubmitted: (_) {
         if (widget.controller.validateCurrentStep()) {
-          widget.onNextPressed();
+          _navigateToNextStep();
         }
       },
       helperText: 'مثال: محمد عبدالله العنزي',
@@ -390,7 +427,7 @@ class _StepFormContainerState extends State<StepFormContainer>
       textInputAction: TextInputAction.next,
       onSubmitted: (_) {
         if (widget.controller.validateCurrentStep()) {
-          widget.onNextPressed();
+          _navigateToNextStep();
         }
       },
       suffixIcon: widget.controller.isCheckingUsername
@@ -420,7 +457,7 @@ class _StepFormContainerState extends State<StepFormContainer>
       keyboardType: TextInputType.emailAddress,
       onSubmitted: (_) {
         if (widget.controller.validateCurrentStep()) {
-          widget.onNextPressed();
+          _navigateToNextStep();
         }
       },
       helperText: 'سيتم استخدامه للتحقق من حسابك',
@@ -461,7 +498,7 @@ class _StepFormContainerState extends State<StepFormContainer>
       ),
       onSubmitted: (_) {
         if (widget.controller.validateCurrentStep()) {
-          widget.onNextPressed();
+          _navigateToNextStep();
         }
       },
       helperText: 'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل',
@@ -654,34 +691,18 @@ class _StepFormContainerState extends State<StepFormContainer>
     final isTablet = screenWidth > 600;
 
     // تعديل الأحجام حسب حجم الشاشة
-    final fontSize = screenWidth * 0.04;
-    final labelSize = screenWidth * 0.035;
-    final iconSize = screenWidth * 0.055;
-    final helperTextSize = screenWidth * 0.03;
+    final fontSize = isTablet ? 16.0 : (isSmallScreen ? 14.0 : 15.0);
+    final labelSize = isTablet ? 14.0 : (isSmallScreen ? 12.0 : 13.0);
+    final iconSize = isTablet ? 24.0 : (isSmallScreen ? 20.0 : 22.0);
+    final helperTextSize = isTablet ? 12.0 : (isSmallScreen ? 10.0 : 11.0);
 
-    // حساب قوة كلمة المرور إذا كان مطلوبًا
-    double passwordStrength = 0.0;
-    Color passwordStrengthColor = Colors.red;
-    String passwordStrengthText = '';
-
-    if (showPasswordStrength && controller.text.isNotEmpty) {
-      // حساب قوة كلمة المرور
-      passwordStrength = _calculatePasswordStrength(controller.text);
-
-      if (passwordStrength < 0.3) {
-        passwordStrengthColor = Colors.red;
-        passwordStrengthText = 'ضعيفة';
-      } else if (passwordStrength < 0.6) {
-        passwordStrengthColor = Colors.orange;
-        passwordStrengthText = 'متوسطة';
-      } else if (passwordStrength < 0.8) {
-        passwordStrengthColor = Colors.blue;
-        passwordStrengthText = 'جيدة';
-      } else {
-        passwordStrengthColor = Colors.green;
-        passwordStrengthText = 'قوية';
-      }
-    }
+    // فحص متطلبات كلمة المرور إذا كان showPasswordStrength صحيحًا
+    final hasMinLength = controller.text.length >= 8;
+    final hasUppercase = controller.text.contains(RegExp(r'[A-Z]'));
+    final hasLowercase = controller.text.contains(RegExp(r'[a-z]'));
+    final hasDigit = controller.text.contains(RegExp(r'[0-9]'));
+    final hasSpecialChar =
+        controller.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -691,99 +712,104 @@ class _StepFormContainerState extends State<StepFormContainer>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // حقل الإدخال المحسن
-          Material(
-            elevation: 0,
-            shadowColor: SignupColors.shadowColor,
-            borderRadius: BorderRadius.circular(16),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: focusNode.hasFocus
-                        ? SignupColors.mediumPurple.withOpacity(0.2)
-                        : SignupColors.shadowColor.withOpacity(0.1),
-                    blurRadius: focusNode.hasFocus ? 8 : 4,
-                    spreadRadius: focusNode.hasFocus ? 2 : 1,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: focusNode.hasFocus
-                      ? SignupColors.mediumPurple
-                      : Colors.grey.shade200,
-                  width: focusNode.hasFocus ? 1.5 : 1,
+          // حقل الإدخال المحسن بأسلوب متناسق مع صفحة تسجيل الدخول
+          TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            textAlign: TextAlign.right,
+            textInputAction: textInputAction,
+            onFieldSubmitted: onSubmitted,
+            // تعديل لإظهار لوحة المفاتيح تلقائياً عند الضغط على الحقل
+            onTap: () {
+              // تضمن فتح لوحة المفاتيح عند الضغط على الحقل
+              FocusScope.of(context).requestFocus(focusNode);
+            },
+            onChanged: (value) {
+              if (onChanged != null) {
+                onChanged(value);
+              }
+              // تحديث الحالة عند تغيير كلمة المرور
+              if (showPasswordStrength) {
+                setState(() {});
+              }
+            },
+            style: TextStyle(
+              color: SignupColors.textColor,
+              fontSize: fontSize,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+            decoration: InputDecoration(
+              hintText: hintText,
+              labelText: title,
+              labelStyle: TextStyle(
+                color: focusNode.hasFocus
+                    ? SignupColors.mediumPurple
+                    : SignupColors.textColor.withOpacity(0.7),
+                fontSize: labelSize,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+              hintStyle: TextStyle(
+                color: SignupColors.hintColor,
+                fontSize: labelSize,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+              prefixIcon: Icon(
+                icon,
+                color: focusNode.hasFocus || controller.text.isNotEmpty
+                    ? SignupColors.mediumPurple
+                    : SignupColors.hintColor,
+                size: iconSize,
+              ),
+              suffixIcon: suffixIcon,
+              filled: true,
+              fillColor: Colors.white,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade200,
+                  width: 1,
                 ),
               ),
-              child: TextFormField(
-                controller: controller,
-                focusNode: focusNode,
-                keyboardType: keyboardType,
-                obscureText: obscureText,
-                textAlign: TextAlign.right,
-                textInputAction: textInputAction,
-                onFieldSubmitted: onSubmitted,
-                onChanged: onChanged,
-                style: TextStyle(
-                  color: SignupColors.textColor,
-                  fontSize: fontSize,
-                  fontFamily: 'SYMBIOAR+LT',
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: SignupColors.mediumPurple,
+                  width: 1.5,
                 ),
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  labelText: title,
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                  labelStyle: TextStyle(
-                    color: focusNode.hasFocus
-                        ? SignupColors.mediumPurple
-                        : SignupColors.textColor.withOpacity(0.7),
-                    fontSize: labelSize,
-                    fontFamily: 'SYMBIOAR+LT',
-                    fontWeight: FontWeight.w500,
-                  ),
-                  hintStyle: TextStyle(
-                    color: SignupColors.hintColor,
-                    fontSize: labelSize,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                  prefixIcon: Icon(
-                    icon,
-                    color: focusNode.hasFocus
-                        ? SignupColors.mediumPurple
-                        : SignupColors.hintColor,
-                    size: iconSize,
-                  ),
-                  suffixIcon: suffixIcon,
-                  filled: true,
-                  fillColor: focusNode.hasFocus
-                      ? SignupColors.focusColor.withOpacity(0.05)
-                      : Colors.white,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  errorStyle: TextStyle(
-                    color: SignupColors.accentColor,
-                    fontSize: helperTextSize,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: size.height * 0.02,
-                    horizontal: screenWidth * 0.05,
-                  ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: SignupColors.accentColor,
+                  width: 1,
                 ),
-                validator: validator,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: SignupColors.accentColor,
+                  width: 1.5,
+                ),
+              ),
+              errorStyle: TextStyle(
+                color: SignupColors.accentColor,
+                fontSize: isSmallScreen ? 10 : 12,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: isTablet ? 20.0 : (isSmallScreen ? 16.0 : 18.0),
+                horizontal: 20,
               ),
             ),
+            validator: validator,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
           ),
 
-          // نص المساعدة إذا كان موجودًا
-          if (helperText != null)
+          // نص المساعدة إذا كان موجودًا ولم يبدأ المستخدم بكتابة كلمة المرور
+          if (helperText != null &&
+              (!showPasswordStrength || controller.text.isEmpty))
             Padding(
               padding: EdgeInsets.only(
                 top: size.height * 0.01,
@@ -800,23 +826,25 @@ class _StepFormContainerState extends State<StepFormContainer>
               ),
             ),
 
-          // مؤشر قوة كلمة المرور إذا كان مطلوبًا
+          // متطلبات كلمة المرور والتلميحات إذا كان هذا حقل كلمة المرور وبدأ المستخدم بالكتابة
           if (showPasswordStrength && controller.text.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(
                 top: size.height * 0.015,
                 right: screenWidth * 0.03,
+                left: screenWidth * 0.03,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // مؤشر قوة كلمة المرور
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'قوة كلمة المرور: $passwordStrengthText',
+                        'قوة كلمة المرور: ${_getPasswordStrengthText(controller.text)}',
                         style: TextStyle(
-                          color: passwordStrengthColor,
+                          color: _getPasswordStrengthColor(controller.text),
                           fontSize: helperTextSize,
                           fontFamily: 'SYMBIOAR+LT',
                           fontWeight: FontWeight.bold,
@@ -828,11 +856,59 @@ class _StepFormContainerState extends State<StepFormContainer>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
-                      value: passwordStrength,
+                      value: _calculatePasswordStrength(controller.text),
                       backgroundColor: Colors.grey.shade200,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(passwordStrengthColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          _getPasswordStrengthColor(controller.text)),
                       minHeight: 6,
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.015),
+
+                  // متطلبات كلمة المرور في صفوف منظمة
+                  Padding(
+                    padding: EdgeInsets.only(right: screenWidth * 0.01),
+                    child: Column(
+                      children: [
+                        // متطلب الطول
+                        _buildPasswordRequirement(
+                          '٨ أحرف على الأقل',
+                          hasMinLength,
+                          helperTextSize,
+                        ),
+                        SizedBox(height: 4),
+
+                        // متطلب الحرف الكبير
+                        _buildPasswordRequirement(
+                          'حرف كبير (A-Z)',
+                          hasUppercase,
+                          helperTextSize,
+                        ),
+                        SizedBox(height: 4),
+
+                        // متطلب الحرف الصغير
+                        _buildPasswordRequirement(
+                          'حرف صغير (a-z)',
+                          hasLowercase,
+                          helperTextSize,
+                        ),
+                        SizedBox(height: 4),
+
+                        // متطلب الرقم
+                        _buildPasswordRequirement(
+                          'رقم (0-9)',
+                          hasDigit,
+                          helperTextSize,
+                        ),
+                        SizedBox(height: 4),
+
+                        // متطلب الرمز الخاص
+                        _buildPasswordRequirement(
+                          'رمز خاص (!@#\$%^&*)',
+                          hasSpecialChar,
+                          helperTextSize,
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -840,6 +916,31 @@ class _StepFormContainerState extends State<StepFormContainer>
             ),
         ],
       ),
+    );
+  }
+
+  // دالة لبناء متطلب من متطلبات كلمة المرور
+  Widget _buildPasswordRequirement(
+      String text, bool isFulfilled, double fontSize) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        Icon(
+          isFulfilled ? Icons.check_circle : Icons.circle_outlined,
+          color: isFulfilled ? Colors.green : Colors.grey.shade400,
+          size: fontSize * 1.2,
+        ),
+        SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            color: isFulfilled ? Colors.black87 : Colors.grey.shade600,
+            fontSize: fontSize,
+            fontFamily: 'SYMBIOAR+LT',
+          ),
+          textAlign: TextAlign.right,
+        ),
+      ],
     );
   }
 
@@ -859,6 +960,26 @@ class _StepFormContainerState extends State<StepFormContainer>
 
     // الحد الأقصى هو 1.0
     return strength > 1.0 ? 1.0 : strength;
+  }
+
+  // دالة للحصول على لون قوة كلمة المرور
+  Color _getPasswordStrengthColor(String password) {
+    double strength = _calculatePasswordStrength(password);
+
+    if (strength < 0.3) return Colors.red;
+    if (strength < 0.6) return Colors.orange;
+    if (strength < 0.8) return Colors.blue;
+    return Colors.green;
+  }
+
+  // دالة للحصول على نص قوة كلمة المرور
+  String _getPasswordStrengthText(String password) {
+    double strength = _calculatePasswordStrength(password);
+
+    if (strength < 0.3) return 'ضعيفة';
+    if (strength < 0.6) return 'متوسطة';
+    if (strength < 0.8) return 'جيدة';
+    return 'قوية';
   }
 
   Widget _buildEnhancedNavigationButtons() {
@@ -929,7 +1050,7 @@ class _StepFormContainerState extends State<StepFormContainer>
             height: screenHeight * 0.06,
             child: ElevatedButton(
               onPressed: widget.controller.canMoveToNextStep
-                  ? (isLastStep ? widget.onSubmitPressed : widget.onNextPressed)
+                  ? (isLastStep ? widget.onSubmitPressed : _navigateToNextStep)
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: SignupColors.mediumPurple,

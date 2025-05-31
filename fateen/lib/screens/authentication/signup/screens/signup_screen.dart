@@ -7,6 +7,8 @@ import '../components/step_form_container.dart';
 import '../../shared/components/auth_toggle_bar.dart';
 import '../constants/signup_colors.dart';
 import '../../verification/screens/verification_screen.dart';
+import '../../shared/helpers/custom_route_transitions.dart';
+import '../../../authentication/login/screens/login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -20,9 +22,9 @@ class _SignUpScreenState extends State<SignUpScreen>
   // وحدة التحكم بمنطق التسجيل
   late SignupController _controller;
 
-  // Para la animación - usando inicialización sin late o con valores nulos
-  AnimationController? _animationController;
-  Animation<double>? _fadeAnimation;
+  // تحكم بالرسوم المتحركة للمكونات السفلية
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
 
   // مفتاح النموذج للتحقق من المدخلات
   final _formKey = GlobalKey<FormState>();
@@ -35,24 +37,28 @@ class _SignUpScreenState extends State<SignUpScreen>
     _controller = SignupController();
     _controller.init(context);
 
-    // إعداد الرسوم المتحركة - inicialización segura
+    // إعداد الرسوم المتحركة للمكونات السفلية
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration:
+          const Duration(milliseconds: 800), // توحيد المدة مع login_screen
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeInOut,
-    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3), // توحيد قيمة الإزاحة مع login_screen
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutQuad, // توحيد المنحنى مع login_screen
+    ));
 
-    _animationController!.forward();
+    _animationController.forward();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _animationController?.dispose(); // Dispose seguro con operador ?
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -169,8 +175,8 @@ class _SignUpScreenState extends State<SignUpScreen>
           await Future.delayed(const Duration(milliseconds: 1500));
 
           if (mounted) {
-            // تطبيق تأثير متلاشي قبل الانتقال - manejo seguro de la animación
-            _animationController?.reverse().then((_) {
+            // تطبيق تأثير سحب للأسفل قبل الانتقال
+            _animationController.reverse().then((_) {
               _navigateToVerification();
             });
           }
@@ -182,41 +188,27 @@ class _SignUpScreenState extends State<SignUpScreen>
   // دالة الانتقال إلى صفحة التحقق
   void _navigateToVerification() {
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            VerificationScreen(
+      MaterialPageRoute(
+        builder: (context) => VerificationScreen(
           email: _controller.emailController.text,
           password: _controller.passwordController.text,
         ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOutCubic;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(
-            position: offsetAnimation,
-            child: FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 500),
       ),
     );
   }
 
   // الانتقال إلى شاشة تسجيل الدخول
   void _navigateToLogin() {
-    HapticFeedback.lightImpact();
+    // توحيد تأثير اللمس مع login_screen
+    HapticFeedback.selectionClick();
 
-    // Manejo seguro de la animación
-    _animationController?.reverse().then((_) {
-      Navigator.pushReplacementNamed(context, '/login');
+    // تطبيق تأثير الاختفاء نحو الأسفل قبل الانتقال
+    _animationController.reverse().then((_) {
+      Navigator.of(context).pushReplacement(
+        NoTransitionRoute(
+          page: const LoginScreen(),
+        ),
+      );
     });
   }
 
@@ -227,103 +219,95 @@ class _SignUpScreenState extends State<SignUpScreen>
 
     return Scaffold(
       backgroundColor: SignupColors.backgroundColor,
-      body: FadeTransition(
-        // Uso seguro de _fadeAnimation con un valor predeterminado
-        opacity: _fadeAnimation ?? const AlwaysStoppedAnimation(1.0),
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            return SafeArea(
-              child: GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Form(
-                  key: _formKey,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // رأس الصفحة - يظهر فقط في الخطوة الأولى
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SizeTransition(
-                                sizeFactor: animation,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: _controller.currentStep == SignupStep.name
-                              ? Column(
-                                  key: const ValueKey('header'),
-                                  children: [
-                                    // رأس الصفحة
-                                    const SignupHeaderComponent(),
+      body: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return SafeArea(
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // المكونات العلوية - تظهر بدون رسوم متحركة
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // رأس الصفحة - يظهر فقط في الخطوة الأولى
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SizeTransition(
+                                  sizeFactor: animation,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: _controller.currentStep == SignupStep.name
+                                ? Column(
+                                    key: const ValueKey('header'),
+                                    children: [
+                                      // رأس الصفحة
+                                      const SignupHeaderComponent(),
 
-                                    // فاصل مرئي
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: size.height * 0.01,
-                                        horizontal: size.width * 0.1,
-                                      ),
-                                      height: 1,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.grey.shade200,
-                                            SignupColors.mediumPurple
-                                                .withOpacity(0.5),
-                                            Colors.grey.shade200,
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
+                                      // تم حذف الفاصل المرئي هنا
+
+                                      // زر التبديل بين التسجيل وإنشاء الحساب
+                                      Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: AuthToggleBar(
+                                          currentMode: AuthToggleMode.signup,
+                                          onLoginPressed: _navigateToLogin,
+                                          onSignupPressed: () {},
                                         ),
                                       ),
-                                    ),
-
-                                    // زر التبديل بين التسجيل وإنشاء الحساب
-                                    Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: AuthToggleBar(
-                                        currentMode: AuthToggleMode.signup,
-                                        onLoginPressed: _navigateToLogin,
-                                        onSignupPressed: () {},
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : SizedBox(
-                                  key: const ValueKey('no-header'),
-                                  height: size.height * 0.02,
-                                ),
-                        ),
-
-                        // رسالة خطأ من السيرفر (إذا وجدت)
-                        if (_controller.serverError != null)
-                          ErrorMessageComponent(
-                            errorMessage: _controller.serverError!,
+                                    ],
+                                  )
+                                : SizedBox(
+                                    key: const ValueKey('no-header'),
+                                    height: size.height * 0.02,
+                                  ),
                           ),
+                        ],
+                      ),
 
-                        // مكون النموذج خطوة بخطوة
-                        StepFormContainer(
-                          controller: _controller,
-                          onNextPressed: _handleNextStep,
-                          onPrevPressed: _handlePreviousStep,
-                          onSubmitPressed: _handleSignup,
+                      // المكونات السفلية - تظهر مع رسوم متحركة من الأسفل
+                      SlideTransition(
+                        position: _slideAnimation,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // رسالة خطأ من السيرفر (إذا وجدت)
+                            if (_controller.serverError != null)
+                              ErrorMessageComponent(
+                                errorMessage: _controller.serverError!,
+                              ),
+
+                            // مكون النموذج خطوة بخطوة
+                            StepFormContainer(
+                              controller: _controller,
+                              onNextPressed: _handleNextStep,
+                              onPrevPressed: _handlePreviousStep,
+                              onSubmitPressed: _handleSignup,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
