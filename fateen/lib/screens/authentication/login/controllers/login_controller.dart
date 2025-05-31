@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/login_firebase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,6 +60,8 @@ class LoginController extends ChangeNotifier {
   // تبديل حالة إظهار/إخفاء كلمة المرور
   void togglePasswordVisibility() {
     _obscurePassword = !_obscurePassword;
+    // تأثير حسي عند التبديل
+    HapticFeedback.selectionClick();
     notifyListeners();
   }
 
@@ -170,6 +173,9 @@ class LoginController extends ChangeNotifier {
       );
 
       if (_context.mounted && result.success) {
+        // تأثير حسي عند نجاح تسجيل الدخول
+        HapticFeedback.heavyImpact();
+
         // حفظ بيانات تسجيل الدخول للاستخدام التلقائي
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('user_email', emailController.text.trim());

@@ -6,6 +6,9 @@ import '../constants/signup_strings.dart';
 import '../services/signup_firebase_service.dart';
 import '../../../../models/student.dart'; // استخدام فئة Student
 
+// تعريف خطوات التسجيل
+enum SignupStep { name, username, email, password, university, major, terms }
+
 class SignupController extends ChangeNotifier {
   // إضافة مثيل من SignupFirebaseService
   final SignupFirebaseService _firebaseService = SignupFirebaseService();
@@ -36,6 +39,14 @@ class SignupController extends ChangeNotifier {
   double _signupProgress = 0.0;
   bool _isCheckingUsername = false;
 
+  // متغيرات التحقق من البريد الإلكتروني
+  bool _isCheckingEmail = false;
+  String? _emailError;
+
+  // متغيرات إدارة الخطوات
+  SignupStep _currentStep = SignupStep.name;
+  bool _canMoveToNextStep = false;
+
   // القوائم
   final List<String> _majorsList = SignupStrings.majors;
   final List<String> _universitiesList = SignupStrings.universities;
@@ -53,10 +64,22 @@ class SignupController extends ChangeNotifier {
   List<String> get getMajorsList => _majorsList;
   List<String> get getUniversitiesList => _universitiesList;
   bool get isCheckingUsername => _isCheckingUsername;
+  bool get isCheckingEmail => _isCheckingEmail;
+  String? get emailError => _emailError;
+
+  // الحصول على حالات الخطوات
+  SignupStep get currentStep => _currentStep;
+  bool get canMoveToNextStep => _canMoveToNextStep;
 
   // تهيئة وحدة التحكم
   void init(BuildContext context) {
-    // أي تهيئة إضافية يمكن أن تتم هنا
+    // إضافة المستمعين لتحديث حالة الانتقال بين الخطوات
+    nameController.addListener(_validateStepChanges);
+    usernameController.addListener(_validateStepChanges);
+    emailController.addListener(_validateStepChanges);
+    passwordController.addListener(_validateStepChanges);
+    universityNameController.addListener(_validateStepChanges);
+    majorController.addListener(_validateStepChanges);
   }
 
   // تعيين حالة التحميل
@@ -68,6 +91,18 @@ class SignupController extends ChangeNotifier {
   // تعيين حالة التحقق من اسم المستخدم
   void setCheckingUsername(bool checking) {
     _isCheckingUsername = checking;
+    notifyListeners();
+  }
+
+  // تعيين حالة التحقق من البريد الإلكتروني
+  void setCheckingEmail(bool checking) {
+    _isCheckingEmail = checking;
+    notifyListeners();
+  }
+
+  // تعيين خطأ البريد الإلكتروني
+  void setEmailError(String? error) {
+    _emailError = error;
     notifyListeners();
   }
 
@@ -95,6 +130,7 @@ class SignupController extends ChangeNotifier {
         majorController.text = major;
       }
     }
+    _validateStepChanges();
     notifyListeners();
   }
 
@@ -110,6 +146,7 @@ class SignupController extends ChangeNotifier {
         universityNameController.text = university;
       }
     }
+    _validateStepChanges();
     notifyListeners();
   }
 
@@ -175,6 +212,40 @@ class SignupController extends ChangeNotifier {
     return null;
   }
 
+  // التحقق المباشر من وجود البريد الإلكتروني
+  Future<bool> validateEmailExists() async {
+    try {
+      // البريد فارغ أو غير صالح
+      if (emailController.text.isEmpty ||
+          validateEmail(emailController.text) != null) {
+        return false;
+      }
+
+      setCheckingEmail(true);
+
+      // استخدام Firebase Auth للتحقق من البريد
+      final methods = await FirebaseAuth.instance
+          .fetchSignInMethodsForEmail(emailController.text.trim());
+      final bool emailExists = methods.isNotEmpty;
+
+      setCheckingEmail(false);
+
+      // إذا كان البريد موجودًا، نعرض خطأ
+      if (emailExists) {
+        setEmailError(
+            "البريد الإلكتروني مستخدم بالفعل، هل تريد تسجيل الدخول بدلاً من ذلك؟");
+      } else {
+        setEmailError(null);
+      }
+
+      return !emailExists; // نعيد true إذا كان البريد غير موجود (صالح للتسجيل)
+    } catch (e) {
+      setCheckingEmail(false);
+      debugPrint("خطأ في التحقق من البريد الإلكتروني: $e");
+      return true; // نفترض أنه غير موجود في حالة حدوث خطأ
+    }
+  }
+
   // التحقق من كلمة المرور - استخدام منطق التحقق من Student
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -214,6 +285,150 @@ class SignupController extends ChangeNotifier {
         isPasswordValid &&
         isMajorValid;
     return _isFormValid;
+  }
+
+  // دالة داخلية للتحقق من التغييرات وإمكانية الانتقال للخطوة التالية
+  void _validateStepChanges() {
+    validateCurrentStep();
+    notifyListeners();
+  }
+
+  // التحقق من صحة الخطوة الحالية
+  bool validateCurrentStep() {
+    bool isValid = false;
+
+    switch (_currentStep) {
+      case SignupStep.name:
+        isValid = validateName(nameController.text) == null;
+        break;
+      case SignupStep.username:
+        isValid = validateUsername(usernameController.text) == null;
+        break;
+      case SignupStep.email:
+        isValid =
+            validateEmail(emailController.text) == null && _emailError == null;
+        break;
+      case SignupStep.password:
+        isValid = validatePassword(passwordController.text) == null;
+        break;
+      case SignupStep.university:
+        isValid = validateUniversity();
+        break;
+      case SignupStep.major:
+        isValid = validateMajor();
+        break;
+      case SignupStep.terms:
+        isValid = true; // دائمًا صالح في الخطوة النهائية
+        break;
+    }
+
+    // تحديث حالة إمكانية الانتقال للخطوة التالية
+    if (_canMoveToNextStep != isValid) {
+      _canMoveToNextStep = isValid;
+      notifyListeners();
+    }
+
+    return isValid;
+  }
+
+  // الانتقال إلى الخطوة التالية
+  void moveToNextStep() {
+    if (!validateCurrentStep()) return;
+
+    switch (_currentStep) {
+      case SignupStep.name:
+        _currentStep = SignupStep.username;
+        break;
+      case SignupStep.username:
+        _currentStep = SignupStep.email;
+        break;
+      case SignupStep.email:
+        _currentStep = SignupStep.password;
+        break;
+      case SignupStep.password:
+        _currentStep = SignupStep.university;
+        break;
+      case SignupStep.university:
+        _currentStep = SignupStep.major;
+        break;
+      case SignupStep.major:
+        _currentStep = SignupStep.terms;
+        break;
+      case SignupStep.terms:
+        // آخر خطوة، يجب معالجة التسجيل
+        break;
+    }
+
+    notifyListeners();
+  }
+
+  // الرجوع إلى الخطوة السابقة
+  void moveToPreviousStep() {
+    switch (_currentStep) {
+      case SignupStep.name:
+        // بالفعل في الخطوة الأولى
+        break;
+      case SignupStep.username:
+        _currentStep = SignupStep.name;
+        break;
+      case SignupStep.email:
+        _currentStep = SignupStep.username;
+        break;
+      case SignupStep.password:
+        _currentStep = SignupStep.email;
+        break;
+      case SignupStep.university:
+        _currentStep = SignupStep.password;
+        break;
+      case SignupStep.major:
+        _currentStep = SignupStep.university;
+        break;
+      case SignupStep.terms:
+        _currentStep = SignupStep.major;
+        break;
+    }
+
+    notifyListeners();
+  }
+
+  // الحصول على عنوان للخطوة الحالية
+  String getCurrentStepTitle() {
+    switch (_currentStep) {
+      case SignupStep.name:
+        return 'أدخل اسمك الكامل';
+      case SignupStep.username:
+        return 'اختر اسم المستخدم';
+      case SignupStep.email:
+        return 'أدخل بريدك الإلكتروني';
+      case SignupStep.password:
+        return 'أنشئ كلمة المرور';
+      case SignupStep.university:
+        return 'حدد جامعتك';
+      case SignupStep.major:
+        return 'حدد تخصصك';
+      case SignupStep.terms:
+        return 'إكمال التسجيل';
+    }
+  }
+
+  // الحصول على النسبة المئوية للتقدم
+  double getProgressPercentage() {
+    switch (_currentStep) {
+      case SignupStep.name:
+        return 0.14;
+      case SignupStep.username:
+        return 0.28;
+      case SignupStep.email:
+        return 0.42;
+      case SignupStep.password:
+        return 0.56;
+      case SignupStep.university:
+        return 0.70;
+      case SignupStep.major:
+        return 0.84;
+      case SignupStep.terms:
+        return 1.0;
+    }
   }
 
   // التحقق من فرادة اسم المستخدم
@@ -417,6 +632,15 @@ class SignupController extends ChangeNotifier {
     majorFocusNode.dispose();
     usernameFocusNode.dispose();
     universityFocusNode.dispose();
+
+    // إزالة المستمعين
+    nameController.removeListener(_validateStepChanges);
+    usernameController.removeListener(_validateStepChanges);
+    emailController.removeListener(_validateStepChanges);
+    passwordController.removeListener(_validateStepChanges);
+    universityNameController.removeListener(_validateStepChanges);
+    majorController.removeListener(_validateStepChanges);
+
     super.dispose();
   }
 }

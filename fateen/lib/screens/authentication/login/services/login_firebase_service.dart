@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/login_colors.dart';
+import 'package:flutter/services.dart';
+import '../../shared/constants/auth_colors.dart';
 
 // نموذج بيانات المستخدم
 class UserInfo {
@@ -92,6 +93,9 @@ class LoginFirebaseService {
             success: false, errorMessage: 'تعذر الحصول على بيانات المستخدم');
       }
 
+      // تطبيق تأثير اهتزاز خفيف للنجاح
+      HapticFeedback.lightImpact();
+
       // حفظ بيانات المستخدم في التخزين المحلي للتسجيل التلقائي
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_email', email);
@@ -121,6 +125,9 @@ class LoginFirebaseService {
       return SignInResult(
           success: false, errorMessage: 'تعذر الحصول على بيانات المستخدم');
     } on FirebaseAuthException catch (e) {
+      // تطبيق تأثير اهتزاز للأخطاء
+      HapticFeedback.mediumImpact();
+
       // استخدام Map للحصول على رسائل الخطأ بشكل أكثر فعالية
       final errorMessages = {
         'user-not-found': 'البريد الإلكتروني غير مسجل',
@@ -133,6 +140,7 @@ class LoginFirebaseService {
       final errorMsg = errorMessages[e.code] ?? 'حدث خطأ أثناء تسجيل الدخول';
       return SignInResult(success: false, errorMessage: errorMsg);
     } catch (e) {
+      HapticFeedback.vibrate();
       return SignInResult(
           success: false, errorMessage: 'حدث خطأ غير متوقع: ${e.toString()}');
     }
@@ -147,7 +155,7 @@ class LoginFirebaseService {
           style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: LoginColors.darkPurple,
+        backgroundColor: AuthColors.darkPurple,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/login_colors.dart';
+import '../../shared/constants/auth_colors.dart';
 
 class SkeletonizerComponent extends StatefulWidget {
   final Widget child;
@@ -52,9 +52,12 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
       return widget.child;
     }
 
+    // استخدام MediaQuery للحصول على حجم الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+
     // تعريف الألوان الافتراضية
-    final base = widget.baseColor ?? LoginColors.shimmerBase;
-    final highlight = widget.highlightColor ?? LoginColors.shimmerHighlight;
+    final base = widget.baseColor ?? AuthColors.shimmerBase;
+    final highlight = widget.highlightColor ?? AuthColors.shimmerHighlight;
 
     return AnimatedBuilder(
       animation: _animation,
@@ -70,25 +73,26 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
               tileMode: TileMode.clamp,
             ).createShader(bounds);
           },
-          child: _buildSkeletonWrapper(widget.child),
+          child: _buildSkeletonWrapper(widget.child, screenWidth),
         );
       },
     );
   }
 
-  Widget _buildSkeletonWrapper(Widget widget) {
+  Widget _buildSkeletonWrapper(Widget widget, double screenWidth) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(screenWidth * 0.04), // 4% من عرض الشاشة
       ),
-      child: _buildEnhancedSkeleton(widget),
+      child: _buildEnhancedSkeleton(widget, screenWidth),
     );
   }
 
   // تحويل العناصر إلى هياكل عظمية محسنة
-  Widget _buildEnhancedSkeleton(Widget widget) {
+  Widget _buildEnhancedSkeleton(Widget widget, double screenWidth) {
     if (widget is Text) {
       final height = (widget.style?.fontSize ?? 14.0) * 1.2;
       final width = _calculateTextWidth(
@@ -104,11 +108,12 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
       );
     } else if (widget is Icon) {
       return Container(
-        height: widget.size ?? 24.0,
-        width: widget.size ?? 24.0,
+        height: widget.size ?? screenWidth * 0.067, // ~6.7% من عرض الشاشة
+        width: widget.size ?? screenWidth * 0.067,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius:
+              BorderRadius.circular(screenWidth * 0.022), // ~2.2% من عرض الشاشة
         ),
       );
     } else if (widget is Container) {
@@ -117,30 +122,32 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
         width: widget.constraints?.maxWidth,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius:
+              BorderRadius.circular(screenWidth * 0.033), // ~3.3% من عرض الشاشة
         ),
       );
     } else if (widget is Image) {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(screenWidth * 0.033),
         ),
       );
     } else if (widget is ElevatedButton || widget is TextButton) {
       return Container(
-        height: 56,
+        height: screenWidth * 0.156, // ~15.6% من عرض الشاشة
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius:
+              BorderRadius.circular(screenWidth * 0.044), // ~4.4% من عرض الشاشة
         ),
       );
     } else if (widget is TextField || widget is TextFormField) {
       return Container(
-        height: 60,
+        height: screenWidth * 0.167, // ~16.7% من عرض الشاشة
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(screenWidth * 0.044),
         ),
       );
     }
@@ -148,7 +155,7 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
     // معالجة الأطفال بشكل متكرر
     if (widget is SingleChildScrollView) {
       return SingleChildScrollView(
-        child: _buildEnhancedSkeleton(widget.child!),
+        child: _buildEnhancedSkeleton(widget.child!, screenWidth),
         physics: widget.physics,
         scrollDirection: widget.scrollDirection,
       );
@@ -156,25 +163,29 @@ class _SkeletonizerComponentState extends State<SkeletonizerComponent>
       return Column(
         mainAxisAlignment: widget.mainAxisAlignment,
         crossAxisAlignment: widget.crossAxisAlignment,
-        children: widget.children.map(_buildEnhancedSkeleton).toList(),
+        children: widget.children
+            .map((child) => _buildEnhancedSkeleton(child, screenWidth))
+            .toList(),
       );
     } else if (widget is Row) {
       return Row(
         mainAxisAlignment: widget.mainAxisAlignment,
         crossAxisAlignment: widget.crossAxisAlignment,
-        children: widget.children.map(_buildEnhancedSkeleton).toList(),
+        children: widget.children
+            .map((child) => _buildEnhancedSkeleton(child, screenWidth))
+            .toList(),
       );
     } else if (widget is Padding) {
       return Padding(
         padding: widget.padding,
-        child: _buildEnhancedSkeleton(widget.child!),
+        child: _buildEnhancedSkeleton(widget.child!, screenWidth),
       );
     } else if (widget is SizedBox) {
       if (widget.child != null) {
         return SizedBox(
           width: widget.width,
           height: widget.height,
-          child: _buildEnhancedSkeleton(widget.child!),
+          child: _buildEnhancedSkeleton(widget.child!, screenWidth),
         );
       }
       return widget;

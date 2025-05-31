@@ -10,4 +10,18 @@ class AuthColors {
   static const Color shadowColor = Color(0x0D221291);
   static const Color textColor = Color(0xFF374151);
   static const Color hintColor = Color(0xFF9CA3AF);
+
+  // ألوان إضافية للتأثيرات المتقدمة
+  static const Color cardBackground = Color(0xFFFFFFFF);
+  static const Color cardShadow = Color(0x0F000000);
+  static const Color shimmerBase = Color(0xFFE0E0E0);
+  static const Color shimmerHighlight = Color(0xFFF5F5F5);
+  static const Color dividerColor = Color(0xFFEEEEEE);
+  static const Color focusColor = Color(0xFFEEF2FF);
+  static const Color successColor = Color(0xFF34D399);
+
+  // ألوان وسائل التواصل الاجتماعي
+  static const Color googleColor = Color(0xFFEA4335);
+  static const Color facebookColor = Color(0xFF1877F2);
+  static const Color appleColor = Color(0xFF000000);
 }

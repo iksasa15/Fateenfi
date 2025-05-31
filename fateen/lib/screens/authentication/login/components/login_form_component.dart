@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../constants/login_colors.dart';
+import 'package:flutter/services.dart';
+import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
-import '../constants/login_dimensions.dart';
 import '../controllers/login_controller.dart';
 
 class LoginFormComponent extends StatelessWidget {
@@ -17,7 +17,7 @@ class LoginFormComponent extends StatelessWidget {
     return Column(
       children: [
         // حقل البريد الإلكتروني
-        _buildInputField(
+        _buildEnhancedInputField(
           context: context,
           title: LoginStrings.emailLabel,
           hintText: LoginStrings.emailHint,
@@ -29,7 +29,7 @@ class LoginFormComponent extends StatelessWidget {
         ),
 
         // حقل كلمة المرور
-        _buildInputField(
+        _buildEnhancedInputField(
           context: context,
           title: LoginStrings.passwordLabel,
           hintText: LoginStrings.passwordHint,
@@ -55,16 +55,21 @@ class LoginFormComponent extends StatelessWidget {
 
   // زر إظهار/إخفاء كلمة المرور المحسّن
   Widget _buildPasswordToggleButton(BuildContext context) {
-    final isSmallScreen = MediaQuery.of(context).size.width < 360;
-    final iconSize = isSmallScreen ? 18.0 : 20.0;
+    // استخدام MediaQuery للحصول على حجم الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth < 360 ? 18.0 : 20.0;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(LoginDimensions.mediumRadius),
-          onTap: controller.togglePasswordVisibility,
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            controller.togglePasswordVisibility();
+            // تطبيق تأثير حسي عند الضغط
+            HapticFeedback.selectionClick();
+          },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: AnimatedSwitcher(
@@ -80,8 +85,8 @@ class LoginFormComponent extends StatelessWidget {
                     : Icons.visibility_off_outlined,
                 key: ValueKey<bool>(controller.passwordVisible),
                 color: controller.passwordVisible
-                    ? LoginColors.mediumPurple
-                    : LoginColors.hintColor,
+                    ? AuthColors.mediumPurple
+                    : AuthColors.hintColor,
                 size: iconSize,
               ),
             ),
@@ -91,8 +96,8 @@ class LoginFormComponent extends StatelessWidget {
     );
   }
 
-  // بناء حقل إدخال بدون تأثير تغيير اللون عند الكتابة
-  Widget _buildInputField({
+  // حقل إدخال محسن يتماشى مع أسلوب حقول التسجيل
+  Widget _buildEnhancedInputField({
     required BuildContext context,
     required String title,
     required String hintText,
@@ -105,112 +110,133 @@ class LoginFormComponent extends StatelessWidget {
     TextInputAction? textInputAction,
     void Function(String)? onFieldSubmitted,
   }) {
-    // استخدام LayoutBuilder للتصميم المتجاوب
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final isSmallScreen = screenWidth < 360;
-        final isTablet = screenWidth > 600;
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final isTablet = screenWidth > 600;
 
-        // تعديل الأحجام حسب حجم الشاشة
-        final fontSize = isTablet
-            ? 17.0
-            : (isSmallScreen
-                ? LoginDimensions.smallBodyFontSize
-                : LoginDimensions.bodyFontSize);
-        final labelSize = isTablet ? 16.0 : (isSmallScreen ? 13.0 : 14.0);
-        final iconSize = isTablet ? 26.0 : (isSmallScreen ? 20.0 : 22.0);
-        final verticalPadding = isTablet ? 24.0 : (isSmallScreen ? 16.0 : 18.0);
+    // تعديل الأحجام حسب حجم الشاشة
+    final fontSize = isTablet ? 17.0 : (isSmallScreen ? 14.0 : 15.0);
+    final labelSize = isTablet ? 16.0 : (isSmallScreen ? 13.0 : 14.0);
+    final iconSize = isTablet ? 26.0 : (isSmallScreen ? 20.0 : 22.0);
+    final verticalPadding = isTablet ? 24.0 : (isSmallScreen ? 16.0 : 18.0);
+    // استخدام النسب المئوية لضبط الهوامش بناءً على عرض الشاشة
+    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
+
+    // استخدام FocusNode داخلي لتتبع حالة التركيز
+    final FocusNode focusNode = FocusNode();
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        // إضافة مستمع لحالة التركيز
+        focusNode.addListener(() {
+          setState(() {});
+        });
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
+          padding: EdgeInsets.symmetric(
+              vertical: 10.0, horizontal: horizontalPadding),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(
+                  screenWidth * 0.04), // ~4% من عرض الشاشة
               boxShadow: [
                 BoxShadow(
-                  color: LoginColors.shadowColor.withOpacity(0.05),
+                  color: AuthColors.shadowColor.withOpacity(0.05),
                   blurRadius: 10,
                   spreadRadius: 0.5,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: TextFormField(
-              controller: controller,
-              keyboardType: keyboardType,
-              obscureText: obscureText,
-              textAlign: TextAlign.right,
-              textInputAction: textInputAction,
-              onFieldSubmitted: onFieldSubmitted,
-              style: TextStyle(
-                color: LoginColors.textColor,
-                fontSize: fontSize,
-                fontFamily: 'SYMBIOAR+LT',
-                letterSpacing: 0.2,
-              ),
-              decoration: InputDecoration(
-                hintText: hintText,
-                labelText: title,
-                floatingLabelBehavior: FloatingLabelBehavior.auto,
-                labelStyle: TextStyle(
-                  color: LoginColors.textColor.withOpacity(0.7),
-                  fontSize: labelSize,
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontWeight: FontWeight.w500,
-                ),
-                hintStyle: TextStyle(
-                  color: LoginColors.hintColor,
-                  fontSize: labelSize,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-                prefixIcon: Icon(
-                  icon,
-                  color: LoginColors.hintColor,
-                  size: iconSize,
-                ),
-                suffixIcon: suffixIcon,
-                filled: true,
-                fillColor: Colors.white,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade200,
-                    width: 1,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(
+                    screenWidth * 0.04), // ~4% من عرض الشاشة
+                boxShadow: [
+                  BoxShadow(
+                    color: focusNode.hasFocus
+                        ? AuthColors.mediumPurple.withOpacity(0.2)
+                        : AuthColors.shadowColor.withOpacity(0.1),
+                    blurRadius: focusNode.hasFocus ? 8 : 4,
+                    spreadRadius: focusNode.hasFocus ? 2 : 1,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: LoginColors.mediumPurple,
-                    width: 1.5,
-                  ),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: LoginColors.accentColor,
-                    width: 1,
-                  ),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: LoginColors.accentColor,
-                    width: 1.5,
-                  ),
-                ),
-                errorStyle: TextStyle(
-                  color: LoginColors.accentColor,
-                  fontSize: isSmallScreen ? 10 : 12,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: verticalPadding,
-                  horizontal: 20,
+                ],
+                border: Border.all(
+                  color: focusNode.hasFocus
+                      ? AuthColors.mediumPurple
+                      : Colors.grey.shade200,
+                  width: focusNode.hasFocus ? 1.5 : 1,
                 ),
               ),
-              validator: validator,
+              child: TextFormField(
+                controller: controller,
+                focusNode: focusNode,
+                keyboardType: keyboardType,
+                obscureText: obscureText,
+                textAlign: TextAlign.right,
+                textInputAction: textInputAction,
+                onFieldSubmitted: onFieldSubmitted,
+                onTap: () {
+                  // تطبيق تأثير حسي عند الضغط
+                  HapticFeedback.selectionClick();
+                },
+                style: TextStyle(
+                  color: AuthColors.textColor,
+                  fontSize: fontSize,
+                  fontFamily: 'SYMBIOAR+LT',
+                  letterSpacing: 0.2,
+                ),
+                decoration: InputDecoration(
+                  hintText: hintText,
+                  labelText: title,
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  labelStyle: TextStyle(
+                    color: focusNode.hasFocus
+                        ? AuthColors.mediumPurple
+                        : AuthColors.textColor.withOpacity(0.7),
+                    fontSize: labelSize,
+                    fontFamily: 'SYMBIOAR+LT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                  hintStyle: TextStyle(
+                    color: AuthColors.hintColor,
+                    fontSize: labelSize,
+                    fontFamily: 'SYMBIOAR+LT',
+                  ),
+                  prefixIcon: Icon(
+                    icon,
+                    color: focusNode.hasFocus
+                        ? AuthColors.mediumPurple
+                        : AuthColors.hintColor,
+                    size: iconSize,
+                  ),
+                  suffixIcon: suffixIcon,
+                  filled: true,
+                  fillColor: focusNode.hasFocus
+                      ? AuthColors.lightPurple.withOpacity(0.05)
+                      : Colors.white,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  errorStyle: TextStyle(
+                    color: AuthColors.accentColor,
+                    fontSize: isSmallScreen ? 10 : 12,
+                    fontFamily: 'SYMBIOAR+LT',
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: verticalPadding,
+                    horizontal: 20,
+                  ),
+                ),
+                validator: validator,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
             ),
           ),
         );

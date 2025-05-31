@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../signup/constants/signup_colors.dart';
-import '../../signup/constants/signup_strings.dart';
-import '../../signup/constants/signup_dimensions.dart';
+import 'package:flutter/services.dart';
+import '../../shared/constants/auth_colors.dart';
+import '../constants/login_strings.dart';
 
 class SocialLoginComponent extends StatefulWidget {
   const SocialLoginComponent({Key? key}) : super(key: key);
@@ -27,7 +27,7 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 600),
     );
     _animation = CurvedAnimation(
       parent: _controller,
@@ -69,18 +69,29 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
 
   // فاصل أو سجل دخول باستخدام مع مراعاة حجم الشاشة
   Widget _buildSocialDivider(BuildContext context) {
-    // الحصول على حجم الشاشة
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // ضبط القيم بناءً على حجم الشاشة
     final isSmallScreen = screenWidth < 360;
     final isTablet = screenWidth > 600;
 
-    // تعديل الأحجام والهوامش حسب حجم الشاشة
-    final horizontalPadding = isSmallScreen ? 24.0 : 32.0;
-    final fontSize = isTablet ? 16.0 : (isSmallScreen ? 12.0 : 14.0);
-    final dividerPadding = isSmallScreen ? 12.0 : 16.0;
+    // حساب الأبعاد كنسبة من حجم الشاشة
+    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
+    final verticalMargin = screenHeight * 0.025; // 2.5% من ارتفاع الشاشة
+    final fontSize = isTablet
+        ? screenWidth * 0.027
+        : (isSmallScreen
+            ? screenWidth * 0.033
+            : screenWidth * 0.039); // نسبة من عرض الشاشة
+    final dividerPadding = isSmallScreen
+        ? screenWidth * 0.033
+        : screenWidth * 0.044; // نسبة من عرض الشاشة
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+      margin: EdgeInsets.symmetric(
+          horizontal: horizontalPadding, vertical: verticalMargin),
       child: Row(
         children: [
           Expanded(
@@ -101,16 +112,19 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
           Padding(
             padding: EdgeInsets.symmetric(horizontal: dividerPadding),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.008, // 0.8% من ارتفاع الشاشة
+                horizontal: screenWidth * 0.033, // 3.3% من عرض الشاشة
+              ),
               decoration: BoxDecoration(
-                color: SignupColors.lightPurple.withOpacity(0.3),
-                borderRadius:
-                    BorderRadius.circular(SignupDimensions.mediumRadius),
+                color: AuthColors.lightPurple.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(
+                    screenWidth * 0.03), // 3% من عرض الشاشة
               ),
               child: Text(
-                SignupStrings.orLoginWith,
+                LoginStrings.orLoginWith,
                 style: TextStyle(
-                  color: SignupColors.mediumPurple,
+                  color: AuthColors.mediumPurple,
                   fontSize: fontSize,
                   fontFamily: 'SYMBIOAR+LT',
                   fontWeight: FontWeight.w500,
@@ -140,22 +154,34 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
 
   // أزرار وسائل التواصل الاجتماعي المحسنة
   Widget _buildSocialButtons(BuildContext context) {
-    // الحصول على حجم الشاشة
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // ضبط القيم بناءً على حجم الشاشة
     final isSmallScreen = screenWidth < 360;
     final isTablet = screenWidth > 600;
 
-    // تعديل الأحجام والهوامش حسب حجم الشاشة
+    // حساب الأبعاد كنسبة من حجم الشاشة
     final buttonSize = isTablet
-        ? SignupDimensions.buttonHeight - 10
+        ? screenWidth * 0.093
         : (isSmallScreen
-            ? SignupDimensions.smallButtonHeight - 8
-            : SignupDimensions.buttonHeight - 14);
-    final iconSize = isTablet ? 34.0 : (isSmallScreen ? 28.0 : 32.0);
-    final spacing = isTablet ? 24.0 : (isSmallScreen ? 15.0 : 20.0);
+            ? screenWidth * 0.128
+            : screenWidth * 0.144); // نسبة من عرض الشاشة
+    final iconSize = isTablet
+        ? screenWidth * 0.057
+        : (isSmallScreen
+            ? screenWidth * 0.078
+            : screenWidth * 0.089); // نسبة من عرض الشاشة
+    final spacing = isTablet
+        ? screenWidth * 0.04
+        : (isSmallScreen
+            ? screenWidth * 0.042
+            : screenWidth * 0.056); // نسبة من عرض الشاشة
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
+      margin: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.015), // 1.5% من ارتفاع الشاشة
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -163,8 +189,11 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
             context: context,
             buttonKey: 'google',
             icon: Icons.g_mobiledata_rounded,
-            color: Colors.red.shade400,
-            onTap: () {/* تنفيذ تسجيل الدخول بواسطة جوجل */},
+            color: AuthColors.googleColor,
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              /* تنفيذ تسجيل الدخول بواسطة جوجل */
+            },
             size: buttonSize,
             iconSize: iconSize,
             tooltip: "Google",
@@ -176,8 +205,11 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
             context: context,
             buttonKey: 'facebook',
             icon: Icons.facebook_rounded,
-            color: Colors.blue.shade600,
-            onTap: () {/* تنفيذ تسجيل الدخول بواسطة فيسبوك */},
+            color: AuthColors.facebookColor,
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              /* تنفيذ تسجيل الدخول بواسطة فيسبوك */
+            },
             size: buttonSize,
             iconSize: iconSize,
             tooltip: "Facebook",
@@ -189,8 +221,11 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
             context: context,
             buttonKey: 'apple',
             icon: Icons.apple_rounded,
-            color: Colors.black87,
-            onTap: () {/* تنفيذ تسجيل الدخول بواسطة آبل */},
+            color: AuthColors.appleColor,
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              /* تنفيذ تسجيل الدخول بواسطة آبل */
+            },
             size: buttonSize,
             iconSize: iconSize,
             tooltip: "Apple",
@@ -215,6 +250,9 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
     required bool isHovered,
     required Function(bool) onHover,
   }) {
+    // استخدام MediaQuery للحصول على حجم الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return MouseRegion(
       onEnter: (_) => onHover(true),
       onExit: (_) => onHover(false),
@@ -228,7 +266,8 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
             height: size,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius:
+                  BorderRadius.circular(screenWidth * 0.04), // 4% من عرض الشاشة
               boxShadow: [
                 BoxShadow(
                   color:
@@ -247,12 +286,13 @@ class _SocialLoginComponentState extends State<SocialLoginComponent>
             child: Container(
               decoration: BoxDecoration(
                 color: isHovered ? color.withOpacity(0.05) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(screenWidth * 0.04),
               ),
               child: Center(
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(8),
+                  padding:
+                      EdgeInsets.all(screenWidth * 0.022), // 2.2% من عرض الشاشة
                   child: Icon(
                     icon,
                     color: color,

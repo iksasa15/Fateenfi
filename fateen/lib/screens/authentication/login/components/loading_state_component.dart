@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/login_colors.dart';
-import '../constants/login_dimensions.dart';
+import '../../shared/constants/auth_colors.dart';
 
 class LoadingStateComponent extends StatefulWidget {
   const LoadingStateComponent({Key? key}) : super(key: key);
@@ -13,6 +12,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
@@ -24,6 +24,13 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
     _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+    _pulseAnimation = TweenSequence([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 1.05), weight: 1),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.05, end: 1.0), weight: 1),
+    ]).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
     _controller.repeat();
   }
 
@@ -36,16 +43,16 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _animation,
+      animation: _controller,
       builder: (context, child) {
         return ShaderMask(
           blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) {
             return LinearGradient(
               colors: [
-                LoginColors.shimmerBase,
-                LoginColors.shimmerHighlight,
-                LoginColors.shimmerBase,
+                AuthColors.shimmerBase,
+                AuthColors.shimmerHighlight,
+                AuthColors.shimmerBase,
               ],
               stops: const [0.1, 0.5, 0.9],
               begin: Alignment(_animation.value - 1, 0),
@@ -60,42 +67,66 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
   }
 
   Widget _buildEnhancedPlaceholders(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // ضبط القيم بناءً على حجم الشاشة
+    final isSmallScreen = screenWidth < 360;
+    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
+    final verticalPadding = screenHeight * 0.0375; // 3.75% من ارتفاع الشاشة
+
     return Column(
       children: [
         // محاكاة الهيدر مع تصميم محسن
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+          padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding, vertical: verticalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // محاكاة العنوان الرئيسي
-              Container(
-                width: 180,
-                height: 32,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              AnimatedBuilder(
+                animation: _pulseAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _pulseAnimation.value,
+                    child: Container(
+                      width: screenWidth * 0.5, // 50% من عرض الشاشة
+                      height: screenHeight * 0.04, // 4% من ارتفاع الشاشة
+                      margin: EdgeInsets.only(
+                          bottom:
+                              screenHeight * 0.015), // 1.5% من ارتفاع الشاشة
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.044), // 4.4% من عرض الشاشة
+                      ),
+                    ),
+                  );
+                },
               ),
               // محاكاة العنوان الفرعي مع إيقونة
               Row(
                 children: [
                   Container(
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.only(right: 8),
+                    width: screenWidth * 0.067, // 6.7% من عرض الشاشة
+                    height: screenWidth * 0.067, // نفس العرض للحفاظ على النسب
+                    margin: EdgeInsets.only(
+                        right: screenWidth * 0.022), // 2.2% من عرض الشاشة
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.033), // 3.3% من عرض الشاشة
                     ),
                   ),
                   Container(
-                    width: 120,
-                    height: 20,
+                    width: screenWidth * 0.333, // 33.3% من عرض الشاشة
+                    height: screenHeight * 0.025, // 2.5% من ارتفاع الشاشة
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.028), // 2.8% من عرض الشاشة
                     ),
                   ),
                 ],
@@ -106,54 +137,72 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
 
         // محاكاة المحتوى الرئيسي مع تجاويف وتأثيرات حديثة
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 10, 24, 30),
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            screenHeight * 0.0125, // 1.25% من ارتفاع الشاشة
+            horizontalPadding,
+            screenHeight * 0.0375, // 3.75% من ارتفاع الشاشة
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // محاكاة حقل البريد الإلكتروني
-              _buildInputFieldPlaceholder(),
-              const SizedBox(height: 16),
+              _buildInputFieldPlaceholder(context),
+              SizedBox(height: screenHeight * 0.02), // 2% من ارتفاع الشاشة
 
               // محاكاة حقل كلمة المرور
-              _buildInputFieldPlaceholder(),
-              const SizedBox(height: 16),
+              _buildInputFieldPlaceholder(context),
+              SizedBox(height: screenHeight * 0.02),
 
               // محاكاة رابط نسيت كلمة المرور
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.centerRight,
                 child: Container(
-                  width: 150,
-                  height: 24,
-                  margin: const EdgeInsets.only(top: 8, bottom: 32),
+                  width: screenWidth * 0.417, // 41.7% من عرض الشاشة
+                  height: screenHeight * 0.03, // 3% من ارتفاع الشاشة
+                  margin: EdgeInsets.only(
+                    top: screenHeight * 0.01, // 1% من ارتفاع الشاشة
+                    bottom: screenHeight * 0.04, // 4% من ارتفاع الشاشة
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(LoginDimensions.mediumRadius),
+                    borderRadius: BorderRadius.circular(
+                        screenWidth * 0.033), // 3.3% من عرض الشاشة
                   ),
                 ),
               ),
 
               // محاكاة زر تسجيل الدخول
-              Container(
-                width: double.infinity,
-                height: LoginDimensions.defaultButtonHeight,
-                margin: const EdgeInsets.only(bottom: 32),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade100,
-                      blurRadius: 10,
-                      spreadRadius: 1,
+              AnimatedBuilder(
+                animation: _pulseAnimation,
+                builder: (context, child) {
+                  return Container(
+                    width: double.infinity,
+                    height: isSmallScreen
+                        ? screenHeight * 0.065
+                        : screenHeight * 0.075, // 6.5% أو 7.5% من ارتفاع الشاشة
+                    margin: EdgeInsets.only(
+                        bottom: screenHeight * 0.04), // 4% من ارتفاع الشاشة
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.044), // 4.4% من عرض الشاشة
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade100,
+                          blurRadius: 10 * _pulseAnimation.value,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
 
               // محاكاة فاصل أو سجل دخول باستخدام
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 20),
+                margin: EdgeInsets.symmetric(
+                    vertical: screenHeight * 0.025), // 2.5% من ارتفاع الشاشة
                 child: Row(
                   children: [
                     Expanded(
@@ -163,12 +212,15 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                       ),
                     ),
                     Container(
-                      width: 160,
-                      height: 30,
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      width: screenWidth * 0.444, // 44.4% من عرض الشاشة
+                      height: screenHeight * 0.0375, // 3.75% من ارتفاع الشاشة
+                      margin: EdgeInsets.symmetric(
+                          horizontal:
+                              screenWidth * 0.044), // 4.4% من عرض الشاشة
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.042), // 4.2% من عرض الشاشة
                       ),
                     ),
                     Expanded(
@@ -185,11 +237,11 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildSocialButtonPlaceholder(),
-                  const SizedBox(width: 20),
-                  _buildSocialButtonPlaceholder(),
-                  const SizedBox(width: 20),
-                  _buildSocialButtonPlaceholder(),
+                  _buildSocialButtonPlaceholder(context),
+                  SizedBox(width: screenWidth * 0.056), // 5.6% من عرض الشاشة
+                  _buildSocialButtonPlaceholder(context),
+                  SizedBox(width: screenWidth * 0.056),
+                  _buildSocialButtonPlaceholder(context),
                 ],
               ),
             ],
@@ -200,12 +252,17 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
   }
 
   // بناء عنصر محاكاة لحقل الإدخال
-  Widget _buildInputFieldPlaceholder() {
+  Widget _buildInputFieldPlaceholder(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: 60,
+      height: screenHeight * 0.075, // 7.5% من ارتفاع الشاشة
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(screenWidth * 0.044), // 4.4% من عرض الشاشة
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade50,
@@ -218,12 +275,13 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
         children: [
           // محاكاة الأيقونة
           Container(
-            width: 50,
-            padding: const EdgeInsets.all(12),
+            width: screenWidth * 0.139, // 13.9% من عرض الشاشة
+            padding: EdgeInsets.all(screenWidth * 0.033), // 3.3% من عرض الشاشة
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    screenWidth * 0.033), // 3.3% من عرض الشاشة
               ),
             ),
           ),
@@ -234,20 +292,23 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 80,
-                  height: 12,
-                  margin: const EdgeInsets.only(bottom: 6),
+                  width: screenWidth * 0.222, // 22.2% من عرض الشاشة
+                  height: screenHeight * 0.015, // 1.5% من ارتفاع الشاشة
+                  margin: EdgeInsets.only(
+                      bottom: screenHeight * 0.0075), // 0.75% من ارتفاع الشاشة
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(
+                        screenWidth * 0.017), // 1.7% من عرض الشاشة
                   ),
                 ),
                 Container(
-                  width: 120,
-                  height: 16,
+                  width: screenWidth * 0.333, // 33.3% من عرض الشاشة
+                  height: screenHeight * 0.02, // 2% من ارتفاع الشاشة
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                        screenWidth * 0.022), // 2.2% من عرض الشاشة
                   ),
                 ),
               ],
@@ -259,21 +320,36 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
   }
 
   // بناء عنصر محاكاة لزر وسائل التواصل الاجتماعي
-  Widget _buildSocialButtonPlaceholder() {
-    return Container(
-      width: LoginDimensions.socialButtonSize,
-      height: LoginDimensions.socialButtonSize,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 5,
-            spreadRadius: 1,
+  Widget _buildSocialButtonPlaceholder(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+
+    // حساب الحجم كنسبة من عرض الشاشة
+    final buttonSize = isSmallScreen
+        ? screenWidth * 0.128 // 12.8% من عرض الشاشة
+        : screenWidth * 0.15; // 15% من عرض الشاشة
+
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Container(
+          width: buttonSize,
+          height: buttonSize,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(
+                screenWidth * 0.044), // 4.4% من عرض الشاشة
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade100,
+                blurRadius: 5 * _pulseAnimation.value,
+                spreadRadius: 1,
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

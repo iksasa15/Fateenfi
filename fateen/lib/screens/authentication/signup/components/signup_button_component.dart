@@ -15,90 +15,115 @@ class SignupButtonComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على حجم الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
+    // استخدام LayoutBuilder للحصول على قيود الحاوية
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // الحصول على أبعاد الشاشة
+        final size = MediaQuery.of(context).size;
+        final screenWidth = size.width;
+        final screenHeight = size.height;
 
-    // تعديل الأحجام والهوامش حسب حجم الشاشة
-    final horizontalPadding = isSmallScreen ? 24.0 : 32.0;
-    final fontSize = isTablet
-        ? SignupDimensions.buttonFontSize + 2
-        : (isSmallScreen
-            ? SignupDimensions.smallButtonFontSize
-            : SignupDimensions.buttonFontSize);
-    final buttonHeight = isSmallScreen
-        ? SignupDimensions.smallButtonHeight
-        : SignupDimensions.buttonHeight;
-    final loaderSize = isSmallScreen ? 20.0 : 24.0;
+        final isSmallScreen = screenWidth < 360;
+        final isTablet = screenWidth > 600;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 24),
-      child: Container(
-        width: double.infinity,
-        height: buttonHeight,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: SignupColors.darkPurple.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-              spreadRadius: -2,
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isLoading ? null : onPressed,
-            borderRadius: BorderRadius.circular(16),
-            splashColor: Colors.white.withOpacity(0.1),
-            highlightColor: Colors.white.withOpacity(0.05),
-            child: Ink(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    SignupColors.mediumPurple,
-                    SignupColors.darkPurple,
-                  ],
+        // تعديل الأحجام والهوامش حسب حجم الشاشة بنسبة مئوية
+        final horizontalPadding = screenWidth * 0.06;
+        final fontSize = isTablet
+            ? screenWidth * 0.03
+            : (isSmallScreen ? screenWidth * 0.04 : screenWidth * 0.035);
+
+        final buttonHeight =
+            isSmallScreen ? screenHeight * 0.064 : screenHeight * 0.07;
+
+        final loaderSize =
+            isSmallScreen ? screenWidth * 0.055 : screenWidth * 0.05;
+
+        // حساب العرض المناسب للزر
+        final buttonWidth = constraints.maxWidth - (horizontalPadding * 2);
+
+        return Padding(
+          padding:
+              EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 24),
+          child: Container(
+            width: buttonWidth,
+            height: buttonHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: SignupColors.darkPurple.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                  spreadRadius: -2,
                 ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: isLoading ? null : onPressed,
                 borderRadius: BorderRadius.circular(16),
-              ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                switchInCurve: Curves.easeInOut,
-                switchOutCurve: Curves.easeInOut,
-                child: isLoading
-                    ? Center(
-                        child: SizedBox(
-                          width: loaderSize,
-                          height: loaderSize,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: isSmallScreen ? 2.0 : 2.5,
+                splashColor: Colors.white.withOpacity(0.1),
+                highlightColor: Colors.white.withOpacity(0.05),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [
+                        SignupColors.mediumPurple,
+                        SignupColors.darkPurple,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeInOut,
+                    switchOutCurve: Curves.easeInOut,
+                    child: isLoading
+                        ? Center(
+                            key: const ValueKey('loading'),
+                            child: SizedBox(
+                              width: loaderSize,
+                              height: loaderSize,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: isSmallScreen ? 2.0 : 2.5,
+                              ),
+                            ),
+                          )
+                        : Center(
+                            key: const ValueKey('text'),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  SignupStrings.signupButtonText,
+                                  style: TextStyle(
+                                    fontSize: fontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontFamily: 'SYMBIOAR+LT',
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                  size: fontSize * 0.8,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          SignupStrings.signupButtonText,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: 'SYMBIOAR+LT',
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
