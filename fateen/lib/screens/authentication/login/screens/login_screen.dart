@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/login_header_component.dart';
 import '../components/login_form_component.dart';
+import '../components/login_footer_component.dart';
 import '../components/social_login_component.dart';
-import '../components/forgot_password_link_component.dart';
-import '../components/login_button_component.dart';
-import '../components/error_message_component.dart';
-import '../../shared/components/auth_toggle_bar.dart';
 import '../controllers/login_controller.dart';
-import '../../shared/constants/auth_colors.dart';
+import '../constants/login_colors.dart';
+import '../../shared/components/auth_toggle_bar.dart';
+import '../../signup/screens/signup_screen.dart';
 import '../../shared/helpers/custom_route_transitions.dart';
-import '../../../authentication/signup/screens/signup_screen.dart';
-import '../../../authentication/reset_password/screens/reset_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final bool showBackButton;
+
+  const LoginScreen({
+    Key? key,
+    this.showBackButton = false,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -22,32 +24,27 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  // وحدة التحكم بمنطق تسجيل الدخول
-  late LoginController _controller;
+  late final LoginController _controller;
+  late final AnimationController _animationController;
+  late final Animation<Offset> _slideAnimation;
 
-  // مفتاح النموذج للتحقق من المدخلات
   final _formKey = GlobalKey<FormState>();
-
-  // تحكم بالرسوم المتحركة للمكونات السفلية فقط
-  late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // تهيئة وحدة التحكم
+    // إعداد وحدة التحكم
     _controller = LoginController();
-    _controller.init(context);
 
-    // إعداد الرسوم المتحركة للمكونات السفلية
+    // إعداد الرسوم المتحركة
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3), // تقليل المسافة للحصول على تأثير أكثر نعومة
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
@@ -55,13 +52,6 @@ class _LoginScreenState extends State<LoginScreen>
     ));
 
     _animationController.forward();
-
-    // تحسين تجربة المستخدم: إضافة رد فعل حسي عند ظهور أخطاء
-    _controller.addListener(() {
-      if (_controller.errorMessage.isNotEmpty) {
-        HapticFeedback.mediumImpact();
-      }
-    });
   }
 
   @override
@@ -71,12 +61,91 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  // الانتقال إلى شاشة إنشاء حساب
+  // معالجة تسجيل الدخول
+  Future<void> _handleLogin() async {
+    // تطبيق تأثير اهتزاز لطيف
+    HapticFeedback.mediumImpact();
+
+    if (_formKey.currentState!.validate()) {
+      // إظهار رسالة التحميل
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Text(
+                  'جاري تسجيل الدخول...',
+                  style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                ),
+              ],
+            ),
+            backgroundColor: LoginColors.mediumPurple,
+            duration: const Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+
+      // إجراء تسجيل الدخول - تعديل التعامل مع القيمة المرجعة
+      final success = await _controller.login(
+        _formKey,
+        context,
+      );
+
+      // لا حاجة لإظهار رسالة النجاح حيث سننتقل مباشرة للصفحة الرئيسية
+      if (mounted && success == false) {
+        // تعديل شرط التحقق
+        // إظهار رسالة الفشل
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    _controller.errorMessage ??
+                        'حدث خطأ في تسجيل الدخول، حاول مرة أخرى',
+                    style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // الانتقال إلى شاشة إنشاء الحساب
   void _navigateToSignup() {
-    // تحسين تجربة المستخدم: إضافة تأثير حسي عند التنقل
+    // تطبيق تأثير اللمس
     HapticFeedback.selectionClick();
 
-    // إخفاء المكونات السفلية للأسفل قبل الانتقال
+    // تطبيق تأثير الاختفاء نحو الأسفل قبل الانتقال
     _animationController.reverse().then((_) {
       Navigator.of(context).pushReplacement(
         NoTransitionRoute(
@@ -86,36 +155,10 @@ class _LoginScreenState extends State<LoginScreen>
     });
   }
 
-  // الانتقال إلى شاشة استعادة كلمة المرور
-  void _navigateToResetPassword() {
-    HapticFeedback.selectionClick();
-
-    // إخفاء المكونات السفلية للأسفل قبل الانتقال
-    _animationController.reverse().then((_) {
-      Navigator.of(context).pushReplacement(
-        NoTransitionRoute(
-          page: const ResetPasswordScreen(),
-        ),
-      );
-    });
-  }
-
-  // معالجة تسجيل الدخول
-  Future<void> _handleLogin() async {
-    HapticFeedback.mediumImpact();
-
-    if (_formKey.currentState!.validate()) {
-      await _controller.login(_formKey);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    // الحصول على أبعاد الشاشة
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
-      backgroundColor: AuthColors.backgroundColor,
+      backgroundColor: LoginColors.backgroundColor,
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -126,25 +169,25 @@ class _LoginScreenState extends State<LoginScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // المكونات العلوية - ثابتة بدون رسوم متحركة
-                  Container(
-                    padding: EdgeInsets.only(bottom: size.height * 0.01),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // رأس الصفحة
-                        const LoginHeaderComponent(),
+                  // المكونات العلوية - تظهر بدون رسوم متحركة
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // رأس الصفحة
+                      const LoginHeaderComponent(),
 
-                        // زر التبديل بين تسجيل الدخول وإنشاء الحساب
-                        AuthToggleBar(
+                      // زر التبديل بين التسجيل وإنشاء الحساب - نضعه هنا ليتطابق مع شاشة التسجيل
+                      Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: AuthToggleBar(
                           currentMode: AuthToggleMode.login,
                           onLoginPressed: () {
-                            /* بالفعل في صفحة تسجيل الدخول */
+                            // بالفعل في شاشة تسجيل الدخول
                           },
                           onSignupPressed: _navigateToSignup,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
                   // المكونات السفلية - تظهر مع رسوم متحركة من الأسفل
@@ -153,30 +196,20 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // عرض رسالة الخطأ إذا وجدت
-                        if (_controller.errorMessage.isNotEmpty)
-                          ErrorMessageComponent(
-                            errorMessage: _controller.errorMessage,
-                          ),
-
-                        // نموذج تسجيل الدخول (البريد الإلكتروني وكلمة المرور)
+                        // نموذج تسجيل الدخول
                         LoginFormComponent(
                           controller: _controller,
+                          onLogin:
+                              _handleLogin, // تمرير دالة معالجة تسجيل الدخول
                         ),
 
-                        // رابط نسيت كلمة المرور
-                        ForgotPasswordLinkComponent(
-                          onPressed: _navigateToResetPassword,
-                        ),
-
-                        // زر تسجيل الدخول
-                        LoginButtonComponent(
-                          isLoading: _controller.isLoggingIn,
-                          onPressed: _handleLogin,
-                        ),
-
-                        // مكون التسجيل بوسائل التواصل الاجتماعي
+                        // مكونات إضافية
                         const SocialLoginComponent(),
+
+                        // تذييل الصفحة
+                        LoginFooterComponent(
+                          onSignup: _navigateToSignup,
+                        ),
                       ],
                     ),
                   ),

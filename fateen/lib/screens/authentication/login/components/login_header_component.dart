@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
+import '../../signup/constants/signup_dimensions.dart'; // استخدام نفس الأبعاد من signup
 
 class LoginHeaderComponent extends StatefulWidget {
   const LoginHeaderComponent({Key? key}) : super(key: key);
@@ -35,33 +36,17 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    // الحصول على حجم الشاشة للتصميم المتجاوب
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
-    // ضبط القيم بناءً على حجم الشاشة
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // حساب الأبعاد كنسبة من حجم الشاشة
-    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
-    final topPadding = screenHeight * 0.05; // 5% من ارتفاع الشاشة
-    final bottomPadding = screenHeight * 0.02; // 2% من ارتفاع الشاشة
-
-    final titleSize = isTablet
-        ? screenWidth * 0.05
-        : (isSmallScreen
-            ? screenWidth * 0.067
-            : screenWidth * 0.078); // نسبة من عرض الشاشة
-    final subtitleSize = isTablet
-        ? screenWidth * 0.03
-        : (isSmallScreen
-            ? screenWidth * 0.039
-            : screenWidth * 0.044); // نسبة من عرض الشاشة
-
+    // استخدام نفس هيكل الهوامش تمامًا كما في signup_header_component
     return Container(
       padding: EdgeInsets.fromLTRB(
-          horizontalPadding, topPadding, horizontalPadding, bottomPadding),
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          SignupDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
+              8,
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -78,7 +63,8 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
             child: Text(
               LoginStrings.loginTitle,
               style: TextStyle(
-                fontSize: titleSize,
+                fontSize: SignupDimensions.getTitleFontSize(context,
+                    small: isSmallScreen),
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // ستتغير بسبب الماسك
                 fontFamily: 'SYMBIOAR+LT',
@@ -86,7 +72,9 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
               ),
             ),
           ),
-          SizedBox(height: screenHeight * 0.015), // 1.5% من ارتفاع الشاشة
+          SizedBox(
+              height: SignupDimensions.getSpacing(context,
+                  size: SpacingSize.small)),
           Row(
             children: [
               // أيقونة ترحيبية متحركة
@@ -98,18 +86,23 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
                     child: Icon(
                       Icons.waving_hand_rounded,
                       color: AuthColors.accentColor.withOpacity(0.7),
-                      size: subtitleSize + 2,
+                      size: SignupDimensions.getSubtitleFontSize(context,
+                              small: isSmallScreen) +
+                          2,
                     ),
                   );
                 },
               ),
-              SizedBox(width: screenWidth * 0.02), // 2% من عرض الشاشة
+              SizedBox(
+                  width: SignupDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2),
               Expanded(
-                // إضافة Expanded لضمان أن النص لا يتجاوز العرض المتاح
                 child: Text(
                   LoginStrings.formInfoText,
                   style: TextStyle(
-                    fontSize: subtitleSize,
+                    fontSize: SignupDimensions.getSubtitleFontSize(context,
+                        small: isSmallScreen),
                     color: AuthColors.hintColor,
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,

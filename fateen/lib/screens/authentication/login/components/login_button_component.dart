@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
+import '../constants/login_dimensions.dart';
 
 class LoginButtonComponent extends StatefulWidget {
   final bool isLoading;
@@ -43,24 +44,14 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // ضبط القيم بناءً على حجم الشاشة
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // حساب الهوامش والأبعاد كنسبة من حجم الشاشة
-    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
-    final fontSize = isTablet ? 18.0 : (isSmallScreen ? 15.0 : 16.0);
-    final buttonHeight = isSmallScreen
-        ? screenHeight * 0.065
-        : screenHeight * 0.075; // 6.5% أو 7.5% من ارتفاع الشاشة
-    final loaderSize = isSmallScreen ? 20.0 : 24.0;
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 24),
+      padding: EdgeInsets.fromLTRB(
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          LoginDimensions.getSpacing(context, size: SpacingSize.small),
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          LoginDimensions.getSpacing(context, size: SpacingSize.large)),
       child: MouseRegion(
         onEnter: (_) {
           setState(() {
@@ -81,10 +72,11 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
               scale: widget.isLoading ? 1.0 : _scaleAnimation.value,
               child: Container(
                 width: double.infinity,
-                height: buttonHeight,
+                height: LoginDimensions.getButtonHeight(context,
+                    small: isSmallScreen),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(
-                      screenWidth * 0.04), // 4% من عرض الشاشة
+                      LoginDimensions.getLargeRadius(context)),
                   boxShadow: [
                     BoxShadow(
                       color: AuthColors.darkPurple
@@ -104,7 +96,8 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                             HapticFeedback.mediumImpact();
                             widget.onPressed?.call();
                           },
-                    borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                    borderRadius: BorderRadius.circular(
+                        LoginDimensions.getLargeRadius(context)),
                     splashColor: Colors.white.withOpacity(0.1),
                     highlightColor: Colors.white.withOpacity(0.05),
                     child: Ink(
@@ -117,7 +110,8 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                             AuthColors.darkPurple,
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                        borderRadius: BorderRadius.circular(
+                            LoginDimensions.getLargeRadius(context)),
                       ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
@@ -126,8 +120,8 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                         child: widget.isLoading
                             ? Center(
                                 child: SizedBox(
-                                  width: loaderSize,
-                                  height: loaderSize,
+                                  width: isSmallScreen ? 20.0 : 24.0,
+                                  height: isSmallScreen ? 20.0 : 24.0,
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
                                     strokeWidth: isSmallScreen ? 2.0 : 2.5,
@@ -141,7 +135,10 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                                     Text(
                                       LoginStrings.loginButtonText,
                                       style: TextStyle(
-                                        fontSize: fontSize,
+                                        fontSize:
+                                            LoginDimensions.getButtonFontSize(
+                                                context,
+                                                small: isSmallScreen),
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                         fontFamily: 'SYMBIOAR+LT',
@@ -149,12 +146,16 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                                       ),
                                     ),
                                     SizedBox(
-                                        width: screenWidth *
-                                            0.02), // 2% من عرض الشاشة
+                                        width: LoginDimensions.getSpacing(
+                                            context,
+                                            size: SpacingSize.small)),
                                     Icon(
                                       Icons.arrow_forward_rounded,
                                       color: Colors.white,
-                                      size: fontSize + 4,
+                                      size: LoginDimensions.getButtonFontSize(
+                                              context,
+                                              small: isSmallScreen) +
+                                          4,
                                     ),
                                   ],
                                 ),

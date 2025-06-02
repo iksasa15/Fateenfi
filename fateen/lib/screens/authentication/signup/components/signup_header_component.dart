@@ -9,26 +9,15 @@ class SignupHeaderComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // الحصول على حجم الشاشة للتصميم المتجاوب
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // تعديل الأحجام والهوامش حسب حجم الشاشة
-    final horizontalPadding = isSmallScreen ? 16.0 : 24.0;
-    final titleSize = isTablet
-        ? SignupDimensions.titleFontSize + 4
-        : (isSmallScreen
-            ? SignupDimensions.smallTitleFontSize
-            : SignupDimensions.titleFontSize);
-    final subtitleSize = isTablet
-        ? SignupDimensions.subtitleFontSize + 2
-        : (isSmallScreen
-            ? SignupDimensions.smallSubtitleFontSize
-            : SignupDimensions.subtitleFontSize);
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
     return Container(
-      padding:
-          EdgeInsets.fromLTRB(horizontalPadding, 40, horizontalPadding, 16),
+      padding: EdgeInsets.fromLTRB(
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          SignupDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
+              8,
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -45,7 +34,8 @@ class SignupHeaderComponent extends StatelessWidget {
             child: Text(
               SignupStrings.signupTitle,
               style: TextStyle(
-                fontSize: titleSize,
+                fontSize: SignupDimensions.getTitleFontSize(context,
+                    small: isSmallScreen),
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // ستتغير بسبب الماسك
                 fontFamily: 'SYMBIOAR+LT',
@@ -53,20 +43,28 @@ class SignupHeaderComponent extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(
+              height: SignupDimensions.getSpacing(context,
+                  size: SpacingSize.small)),
           Row(
             children: [
               // أيقونة ترحيبية لطيفة
               Icon(
                 Icons.app_registration_rounded,
                 color: SignupColors.accentColor.withOpacity(0.7),
-                size: subtitleSize + 2,
+                size: SignupDimensions.getSubtitleFontSize(context,
+                        small: isSmallScreen) +
+                    2,
               ),
-              const SizedBox(width: 8),
+              SizedBox(
+                  width: SignupDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2),
               Text(
                 SignupStrings.formInfoText,
                 style: TextStyle(
-                  fontSize: subtitleSize,
+                  fontSize: SignupDimensions.getSubtitleFontSize(context,
+                      small: isSmallScreen),
                   color: SignupColors.hintColor,
                   fontFamily: 'SYMBIOAR+LT',
                   letterSpacing: 0.2,

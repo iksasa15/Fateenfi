@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../shared/constants/auth_colors.dart';
+import '../constants/login_dimensions.dart';
 
 class ErrorMessageComponent extends StatefulWidget {
   final String errorMessage;
@@ -66,31 +67,8 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // ضبط القيم بناءً على حجم الشاشة
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // حساب الأبعاد كنسبة من حجم الشاشة
-    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
-    final fontSize = isTablet
-        ? screenWidth * 0.025
-        : (isSmallScreen
-            ? screenWidth * 0.033
-            : screenWidth * 0.039); // نسبة من عرض الشاشة
-    final iconSize = isTablet
-        ? screenWidth * 0.037
-        : (isSmallScreen
-            ? screenWidth * 0.05
-            : screenWidth * 0.055); // نسبة من عرض الشاشة
-    final padding = isTablet
-        ? screenWidth * 0.023
-        : (isSmallScreen
-            ? screenWidth * 0.028
-            : screenWidth * 0.033); // نسبة من عرض الشاشة
+    // استخدام دوال الأبعاد الجديدة
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
     return AnimatedBuilder(
       animation: _controller,
@@ -103,15 +81,19 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
               opacity: _fadeAnimation.value,
               child: Container(
                 margin: EdgeInsets.fromLTRB(
-                    horizontalPadding,
+                    LoginDimensions.getSpacing(context,
+                        size: SpacingSize.large),
                     0,
-                    horizontalPadding,
-                    screenHeight * 0.02), // 2% من ارتفاع الشاشة
-                padding: EdgeInsets.all(padding),
+                    LoginDimensions.getSpacing(context,
+                        size: SpacingSize.large),
+                    LoginDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
+                padding: EdgeInsets.all(LoginDimensions.getSpacing(context,
+                    size: SpacingSize.small)),
                 decoration: BoxDecoration(
                   color: AuthColors.accentColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(
-                      screenWidth * 0.04), // 4% من عرض الشاشة
+                      LoginDimensions.getMediumRadius(context)),
                   border: Border.all(
                     color: AuthColors.accentColor.withOpacity(0.2),
                     width: 1,
@@ -129,8 +111,10 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(
-                          screenWidth * 0.015), // 1.5% من عرض الشاشة
+                      padding: EdgeInsets.all(LoginDimensions.getSpacing(
+                              context,
+                              size: SpacingSize.small) /
+                          2),
                       decoration: BoxDecoration(
                         color: AuthColors.accentColor.withOpacity(0.1),
                         shape: BoxShape.circle,
@@ -138,16 +122,21 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
                       child: Icon(
                         Icons.error_outline_rounded,
                         color: AuthColors.accentColor,
-                        size: iconSize,
+                        size: isSmallScreen
+                            ? LoginDimensions.getIconSize(context, small: true)
+                            : LoginDimensions.getIconSize(context),
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.03), // 3% من عرض الشاشة
+                    SizedBox(
+                        width: LoginDimensions.getSpacing(context,
+                            size: SpacingSize.small)),
                     Expanded(
                       child: Text(
                         widget.errorMessage,
                         style: TextStyle(
                           color: AuthColors.accentColor,
-                          fontSize: fontSize,
+                          fontSize: LoginDimensions.getBodyFontSize(context,
+                              small: isSmallScreen),
                           fontFamily: 'SYMBIOAR+LT',
                           fontWeight: FontWeight.w500,
                         ),

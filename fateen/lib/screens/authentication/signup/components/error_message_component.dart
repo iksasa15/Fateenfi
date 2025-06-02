@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/signup_colors.dart';
+import '../constants/signup_dimensions.dart';
 
 class ErrorMessageComponent extends StatelessWidget {
   final String errorMessage;
@@ -11,21 +12,20 @@ class ErrorMessageComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    final horizontalPadding = isSmallScreen ? 24.0 : 32.0;
-    final fontSize = isTablet ? 15.0 : (isSmallScreen ? 12.0 : 14.0);
-    final iconSize = isTablet ? 22.0 : (isSmallScreen ? 18.0 : 20.0);
-    final padding = isTablet ? 14.0 : (isSmallScreen ? 10.0 : 12.0);
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 16),
-      padding: EdgeInsets.all(padding),
+      margin: EdgeInsets.fromLTRB(
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          0,
+          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
+      padding: EdgeInsets.all(
+          SignupDimensions.getSpacing(context, size: SpacingSize.small)),
       decoration: BoxDecoration(
         color: SignupColors.accentColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
         border: Border.all(
           color: SignupColors.accentColor.withOpacity(0.2),
           width: 1,
@@ -35,7 +35,9 @@ class ErrorMessageComponent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(
+                SignupDimensions.getSpacing(context, size: SpacingSize.small) /
+                    2),
             decoration: BoxDecoration(
               color: SignupColors.accentColor.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -43,16 +45,19 @@ class ErrorMessageComponent extends StatelessWidget {
             child: Icon(
               Icons.error_outline_rounded,
               color: SignupColors.accentColor,
-              size: iconSize,
+              size: SignupDimensions.getIconSize(context, small: isSmallScreen),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(
+              width: SignupDimensions.getSpacing(context,
+                  size: SpacingSize.small)),
           Expanded(
             child: Text(
               errorMessage,
               style: TextStyle(
                 color: SignupColors.accentColor,
-                fontSize: fontSize,
+                fontSize: SignupDimensions.getBodyFontSize(context,
+                    small: isSmallScreen),
                 fontFamily: 'SYMBIOAR+LT',
                 fontWeight: FontWeight.w500,
               ),

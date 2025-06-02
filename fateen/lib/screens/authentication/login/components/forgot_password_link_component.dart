@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
+import '../constants/login_dimensions.dart';
 
 class ForgotPasswordLinkComponent extends StatefulWidget {
   final VoidCallback onPressed;
@@ -43,28 +44,14 @@ class _ForgotPasswordLinkComponentState
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // ضبط القيم بناءً على حجم الشاشة
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // حساب الهوامش والأبعاد كنسبة من حجم الشاشة
-    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
-    final fontSize = isTablet
-        ? screenWidth * 0.025
-        : (isSmallScreen
-            ? screenWidth * 0.033
-            : screenWidth * 0.039); // نسبة من عرض الشاشة
-    final bottomMargin = isSmallScreen
-        ? screenHeight * 0.03
-        : screenHeight * 0.035; // نسبة من ارتفاع الشاشة
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
     return Container(
       margin: EdgeInsets.fromLTRB(
-          horizontalPadding, 0, horizontalPadding, bottomMargin),
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          0,
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          LoginDimensions.getSpacing(context, size: SpacingSize.large) - 8),
       child: Align(
         alignment: Alignment.centerRight, // تغيير المحاذاة إلى اليمين
         child: MouseRegion(
@@ -89,15 +76,18 @@ class _ForgotPasswordLinkComponentState
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.025, // 2.5% من عرض الشاشة
-                      vertical: screenHeight * 0.008, // 0.8% من ارتفاع الشاشة
+                      horizontal: LoginDimensions.getSpacing(context,
+                          size: SpacingSize.small),
+                      vertical: LoginDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2,
                     ),
                     decoration: BoxDecoration(
                       color: _isHovered
                           ? AuthColors.lightPurple.withOpacity(0.2)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(
-                          screenWidth * 0.03), // 3% من عرض الشاشة
+                          LoginDimensions.getMediumRadius(context)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -106,7 +96,8 @@ class _ForgotPasswordLinkComponentState
                           LoginStrings.forgotPasswordText,
                           style: TextStyle(
                             color: AuthColors.darkPurple,
-                            fontSize: fontSize,
+                            fontSize: LoginDimensions.getBodyFontSize(context,
+                                small: isSmallScreen),
                             fontWeight: FontWeight.w500,
                             fontFamily: 'SYMBIOAR+LT',
                             decoration: _isHovered
@@ -116,11 +107,15 @@ class _ForgotPasswordLinkComponentState
                           ),
                         ),
                         SizedBox(
-                            width: screenWidth * 0.015), // 1.5% من عرض الشاشة
+                            width: LoginDimensions.getSpacing(context,
+                                    size: SpacingSize.small) /
+                                2),
                         Icon(
                           Icons.lock_reset_rounded,
                           color: AuthColors.darkPurple,
-                          size: fontSize + 2,
+                          size: LoginDimensions.getBodyFontSize(context,
+                                  small: isSmallScreen) +
+                              2,
                         ),
                       ],
                     ),

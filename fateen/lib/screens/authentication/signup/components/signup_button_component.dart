@@ -19,36 +19,25 @@ class SignupButtonComponent extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // الحصول على أبعاد الشاشة
-        final size = MediaQuery.of(context).size;
-        final screenWidth = size.width;
-        final screenHeight = size.height;
-
-        final isSmallScreen = screenWidth < 360;
-        final isTablet = screenWidth > 600;
-
-        // تعديل الأحجام والهوامش حسب حجم الشاشة بنسبة مئوية
-        final horizontalPadding = screenWidth * 0.06;
-        final fontSize = isTablet
-            ? screenWidth * 0.03
-            : (isSmallScreen ? screenWidth * 0.04 : screenWidth * 0.035);
-
-        final buttonHeight =
-            isSmallScreen ? screenHeight * 0.064 : screenHeight * 0.07;
-
-        final loaderSize =
-            isSmallScreen ? screenWidth * 0.055 : screenWidth * 0.05;
+        final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
         // حساب العرض المناسب للزر
-        final buttonWidth = constraints.maxWidth - (horizontalPadding * 2);
+        final buttonWidth = constraints.maxWidth -
+            (SignupDimensions.getSpacing(context, size: SpacingSize.large) * 2);
 
         return Padding(
-          padding:
-              EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 24),
+          padding: EdgeInsets.fromLTRB(
+              SignupDimensions.getSpacing(context, size: SpacingSize.large),
+              SignupDimensions.getSpacing(context, size: SpacingSize.small),
+              SignupDimensions.getSpacing(context, size: SpacingSize.large),
+              SignupDimensions.getSpacing(context, size: SpacingSize.large)),
           child: Container(
             width: buttonWidth,
-            height: buttonHeight,
+            height:
+                SignupDimensions.getButtonHeight(context, small: isSmallScreen),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(
+                  SignupDimensions.getLargeRadius(context)),
               boxShadow: [
                 BoxShadow(
                   color: SignupColors.darkPurple.withOpacity(0.3),
@@ -62,7 +51,8 @@ class SignupButtonComponent extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: isLoading ? null : onPressed,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(
+                    SignupDimensions.getLargeRadius(context)),
                 splashColor: Colors.white.withOpacity(0.1),
                 highlightColor: Colors.white.withOpacity(0.05),
                 child: Ink(
@@ -75,7 +65,8 @@ class SignupButtonComponent extends StatelessWidget {
                         SignupColors.darkPurple,
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(
+                        SignupDimensions.getLargeRadius(context)),
                   ),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
@@ -85,8 +76,10 @@ class SignupButtonComponent extends StatelessWidget {
                         ? Center(
                             key: const ValueKey('loading'),
                             child: SizedBox(
-                              width: loaderSize,
-                              height: loaderSize,
+                              width: SignupDimensions.getIconSize(context,
+                                  small: isSmallScreen),
+                              height: SignupDimensions.getIconSize(context,
+                                  small: isSmallScreen),
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                                 strokeWidth: isSmallScreen ? 2.0 : 2.5,
@@ -101,18 +94,26 @@ class SignupButtonComponent extends StatelessWidget {
                                 Text(
                                   SignupStrings.signupButtonText,
                                   style: TextStyle(
-                                    fontSize: fontSize,
+                                    fontSize:
+                                        SignupDimensions.getButtonFontSize(
+                                            context,
+                                            small: isSmallScreen),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     fontFamily: 'SYMBIOAR+LT',
                                     letterSpacing: 0.5,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(
+                                    width: SignupDimensions.getSpacing(context,
+                                        size: SpacingSize.small)),
                                 Icon(
                                   Icons.arrow_forward_ios,
                                   color: Colors.white,
-                                  size: fontSize * 0.8,
+                                  size: SignupDimensions.getButtonFontSize(
+                                          context,
+                                          small: isSmallScreen) *
+                                      0.8,
                                 ),
                               ],
                             ),

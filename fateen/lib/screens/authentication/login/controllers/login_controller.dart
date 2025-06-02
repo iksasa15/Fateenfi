@@ -152,11 +152,12 @@ class LoginController extends ChangeNotifier {
     }
   }
 
-  // وظيفة تسجيل الدخول
-  Future<void> login(GlobalKey<FormState> formKey) async {
+  // وظيفة تسجيل الدخول معدلة لترجع قيمة boolean
+  Future<bool> login(GlobalKey<FormState> formKey,
+      [BuildContext? context]) async {
     // تحقق من النموذج قبل المتابعة
     if (formKey.currentState == null || !formKey.currentState!.validate()) {
-      return;
+      return false;
     }
 
     // مسح بيانات المستخدم السابق
@@ -172,7 +173,10 @@ class LoginController extends ChangeNotifier {
         password: passwordController.text.trim(),
       );
 
-      if (_context.mounted && result.success) {
+      // استخدام السياق المقدم أو السياق المخزن في المتحكم
+      final ctx = context ?? _context;
+
+      if (ctx.mounted && result.success) {
         // تأثير حسي عند نجاح تسجيل الدخول
         HapticFeedback.heavyImpact();
 
@@ -182,15 +186,22 @@ class LoginController extends ChangeNotifier {
         await prefs.setString('user_password', passwordController.text.trim());
 
         // عرض رسالة نجاح تسجيل الدخول
-        _firebaseService.showLoginSuccessMessage(_context);
+        _firebaseService.showLoginSuccessMessage(ctx);
 
         // انتقل للصفحة الرئيسية
-        _firebaseService.navigateToHomeScreen(_context, result.userInfo!);
+        _firebaseService.navigateToHomeScreen(ctx, result.userInfo!);
+
+        return true;
       } else if (result.errorMessage != null) {
         setErrorMessage(result.errorMessage!);
+        return false;
       }
+
+      // إذا وصلنا هنا، فهناك خطأ غير متوقع
+      return false;
     } catch (e) {
       setErrorMessage('حدث خطأ أثناء تسجيل الدخول');
+      return false;
     } finally {
       setLoggingIn(false);
     }

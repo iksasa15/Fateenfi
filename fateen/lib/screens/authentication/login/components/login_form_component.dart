@@ -3,13 +3,16 @@ import 'package:flutter/services.dart';
 import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
 import '../controllers/login_controller.dart';
+import '../constants/login_dimensions.dart';
 
 class LoginFormComponent extends StatelessWidget {
   final LoginController controller;
+  final VoidCallback onLogin; // إضافة المعلمة الجديدة
 
   const LoginFormComponent({
     Key? key,
     required this.controller,
+    required this.onLogin, // إضافة المعلمة الجديدة
   }) : super(key: key);
 
   @override
@@ -43,8 +46,8 @@ class LoginFormComponent extends StatelessWidget {
             // عند الضغط على زر "تم" على لوحة المفاتيح
             if (controller.isFormValid) {
               final formKey = Form.of(context);
-              if (formKey != null) {
-                controller.login(formKey as GlobalKey<FormState>);
+              if (formKey.currentState?.validate() == true) {
+                onLogin(); // استخدام دالة تسجيل الدخول
               }
             }
           },
@@ -55,23 +58,22 @@ class LoginFormComponent extends StatelessWidget {
 
   // زر إظهار/إخفاء كلمة المرور المحسّن
   Widget _buildPasswordToggleButton(BuildContext context) {
-    // استخدام MediaQuery للحصول على حجم الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-    final iconSize = isTablet ? 24.0 : (isSmallScreen ? 18.0 : 22.0);
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
+    final iconSize = LoginDimensions.getIconSize(context, small: isSmallScreen);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius:
+            BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
         onTap: () {
           controller.togglePasswordVisibility();
           // تطبيق تأثير حسي عند الضغط
           HapticFeedback.selectionClick();
         },
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(
+              LoginDimensions.getSpacing(context, size: SpacingSize.small)),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeInOut,
@@ -109,18 +111,18 @@ class LoginFormComponent extends StatelessWidget {
     TextInputAction? textInputAction,
     void Function(String)? onFieldSubmitted,
   }) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
 
-    // تعديل الأحجام حسب حجم الشاشة
-    final fontSize = isTablet ? 16.0 : (isSmallScreen ? 14.0 : 15.0);
-    final labelSize = isTablet ? 14.0 : (isSmallScreen ? 12.0 : 13.0);
-    final iconSize = isTablet ? 24.0 : (isSmallScreen ? 20.0 : 22.0);
-    final verticalPadding = isTablet ? 20.0 : (isSmallScreen ? 16.0 : 18.0);
+    // استخدام دوال الأبعاد الجديدة
+    final fontSize =
+        LoginDimensions.getBodyFontSize(context, small: isSmallScreen);
+    final labelSize =
+        LoginDimensions.getLabelFontSize(context, small: isSmallScreen);
+    final iconSize = LoginDimensions.getIconSize(context, small: isSmallScreen);
+
     // استخدام النسب المئوية لضبط الهوامش بناءً على عرض الشاشة
-    final horizontalPadding = screenWidth * 0.06; // 6% من عرض الشاشة
+    final horizontalPadding =
+        LoginDimensions.getSpacing(context, size: SpacingSize.large);
 
     // استخدام FocusNode داخلي لتتبع حالة التركيز
     final FocusNode focusNode = FocusNode();
@@ -134,7 +136,10 @@ class LoginFormComponent extends StatelessWidget {
 
         return Padding(
           padding: EdgeInsets.symmetric(
-              vertical: 10.0, horizontal: horizontalPadding),
+              vertical:
+                  LoginDimensions.getSpacing(context, size: SpacingSize.small) +
+                      2,
+              horizontal: horizontalPadding),
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
@@ -178,28 +183,32 @@ class LoginFormComponent extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    LoginDimensions.getMediumRadius(context)),
                 borderSide: BorderSide(
                   color: Colors.grey.shade200,
                   width: 1,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    LoginDimensions.getMediumRadius(context)),
                 borderSide: BorderSide(
                   color: AuthColors.mediumPurple,
                   width: 1.5,
                 ),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    LoginDimensions.getMediumRadius(context)),
                 borderSide: BorderSide(
                   color: AuthColors.accentColor,
                   width: 1,
                 ),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    LoginDimensions.getMediumRadius(context)),
                 borderSide: BorderSide(
                   color: AuthColors.accentColor,
                   width: 1.5,
@@ -211,7 +220,8 @@ class LoginFormComponent extends StatelessWidget {
                 fontFamily: 'SYMBIOAR+LT',
               ),
               contentPadding: EdgeInsets.symmetric(
-                vertical: verticalPadding,
+                vertical: LoginDimensions.getInputFieldPadding(context,
+                    small: isSmallScreen),
                 horizontal: 20,
               ),
             ),
@@ -221,4 +231,8 @@ class LoginFormComponent extends StatelessWidget {
       },
     );
   }
+}
+
+extension on FormState {
+  get currentState => null;
 }

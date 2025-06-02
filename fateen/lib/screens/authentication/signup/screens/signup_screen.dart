@@ -40,19 +40,24 @@ class _SignUpScreenState extends State<SignUpScreen>
     // إعداد الرسوم المتحركة للمكونات السفلية
     _animationController = AnimationController(
       vsync: this,
-      duration:
-          const Duration(milliseconds: 800), // توحيد المدة مع login_screen
+      duration: const Duration(milliseconds: 800),
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3), // توحيد قيمة الإزاحة مع login_screen
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutQuad, // توحيد المنحنى مع login_screen
+      curve: Curves.easeOutQuad,
     ));
 
     _animationController.forward();
+
+    // الاستماع للتغييرات في خطوات التسجيل
+    _controller.addListener(() {
+      // إعادة بناء الواجهة عند تغيير الخطوة لتحديث ظهور شريط التبديل
+      setState(() {});
+    });
   }
 
   @override
@@ -214,9 +219,6 @@ class _SignUpScreenState extends State<SignUpScreen>
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على أبعاد الشاشة
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: SignupColors.backgroundColor,
       body: AnimatedBuilder(
@@ -232,49 +234,35 @@ class _SignUpScreenState extends State<SignUpScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // المكونات العلوية - تظهر بدون رسوم متحركة
+                      // المكونات العلوية
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // رأس الصفحة - يظهر فقط في الخطوة الأولى
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            switchInCurve: Curves.easeOutCubic,
-                            switchOutCurve: Curves.easeInCubic,
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: SizeTransition(
-                                  sizeFactor: animation,
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: _controller.currentStep == SignupStep.name
-                                ? Column(
-                                    key: const ValueKey('header'),
-                                    children: [
-                                      // رأس الصفحة
-                                      const SignupHeaderComponent(),
+                          AnimatedOpacity(
+                            opacity: _controller.currentStep == SignupStep.name
+                                ? 1.0
+                                : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              height: _controller.currentStep == SignupStep.name
+                                  ? null
+                                  : 0,
+                              child: const SignupHeaderComponent(),
+                            ),
+                          ),
 
-                                      // تم حذف الفاصل المرئي هنا
-
-                                      // زر التبديل بين التسجيل وإنشاء الحساب
-                                      Directionality(
-                                        textDirection: TextDirection.rtl,
-                                        child: AuthToggleBar(
-                                          currentMode: AuthToggleMode.signup,
-                                          onLoginPressed: _navigateToLogin,
-                                          onSignupPressed: () {},
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : SizedBox(
-                                    key: const ValueKey('no-header'),
-                                    height: size.height * 0.02,
-                                  ),
+                          // زر التبديل بين التسجيل وإنشاء الحساب - دائمًا مرئي
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: AuthToggleBar(
+                              currentMode: AuthToggleMode.signup,
+                              onLoginPressed: _navigateToLogin,
+                              onSignupPressed: () {
+                                // بالفعل في شاشة إنشاء الحساب
+                              },
+                            ),
                           ),
                         ],
                       ),
