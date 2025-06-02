@@ -67,8 +67,7 @@ class SignupController extends ChangeNotifier {
   bool get isCheckingUsername => _isCheckingUsername;
   bool get isCheckingEmail => _isCheckingEmail;
   String? get emailError => _emailError;
-  String? get usernameError =>
-      _usernameError; // جيتر جديد لرسالة خطأ اسم المستخدم
+  String? get usernameError => _usernameError;
 
   // الحصول على حالات الخطوات
   SignupStep get currentStep => _currentStep;
@@ -100,6 +99,7 @@ class SignupController extends ChangeNotifier {
   // تعيين خطأ اسم المستخدم - دالة جديدة
   void setUsernameError(String? error) {
     _usernameError = error;
+    _validateStepChanges(); // إعادة تقييم حالة الخطوة الحالية
     notifyListeners();
   }
 
@@ -112,6 +112,7 @@ class SignupController extends ChangeNotifier {
   // تعيين خطأ البريد الإلكتروني
   void setEmailError(String? error) {
     _emailError = error;
+    _validateStepChanges(); // إعادة تقييم حالة الخطوة الحالية
     notifyListeners();
   }
 
@@ -244,6 +245,8 @@ class SignupController extends ChangeNotifier {
       if (emailController.text.isEmpty ||
           Student.validateEmail(emailController.text) != null) {
         setEmailError(null); // إزالة أي خطأ سابق
+        _canMoveToNextStep = false;
+        notifyListeners();
         return false;
       }
 
@@ -267,6 +270,8 @@ class SignupController extends ChangeNotifier {
         notifyListeners();
       } else {
         setEmailError(null);
+        // إعادة التحقق من الخطوة الحالية للتأكد من صحة جميع البيانات
+        validateCurrentStep();
       }
 
       return !emailExists; // نعيد true إذا كان البريد غير موجود (صالح للتسجيل)
@@ -274,6 +279,8 @@ class SignupController extends ChangeNotifier {
       setCheckingEmail(false);
       debugPrint("خطأ في التحقق من البريد الإلكتروني: $e");
       setEmailError("حدث خطأ أثناء التحقق من البريد الإلكتروني");
+      _canMoveToNextStep = false;
+      notifyListeners();
       return false; // نفترض أنه موجود في حالة حدوث خطأ للأمان
     }
   }
@@ -285,6 +292,8 @@ class SignupController extends ChangeNotifier {
       if (usernameController.text.isEmpty ||
           Student.validateUsername(usernameController.text) != null) {
         setUsernameError(null); // إزالة أي خطأ سابق
+        _canMoveToNextStep = false;
+        notifyListeners();
         return false;
       }
 
@@ -294,8 +303,8 @@ class SignupController extends ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 300));
 
       // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
-      final bool usernameExists = await Student.isUsernameExists(
-          usernameController.text.trim().toLowerCase());
+      final bool usernameExists =
+          await Student.isUsernameExists(usernameController.text.trim());
 
       setCheckingUsername(false);
 
@@ -307,6 +316,8 @@ class SignupController extends ChangeNotifier {
         notifyListeners();
       } else {
         setUsernameError(null);
+        // إعادة التحقق من الخطوة الحالية للتأكد من صحة جميع البيانات
+        validateCurrentStep();
       }
 
       return !usernameExists; // نعيد true إذا كان اسم المستخدم غير موجود (صالح للتسجيل)
@@ -314,6 +325,8 @@ class SignupController extends ChangeNotifier {
       setCheckingUsername(false);
       debugPrint("خطأ في التحقق من اسم المستخدم: $e");
       setUsernameError("حدث خطأ أثناء التحقق من اسم المستخدم");
+      _canMoveToNextStep = false;
+      notifyListeners();
       return false; // نفترض أنه موجود في حالة حدوث خطأ للأمان
     }
   }
@@ -354,11 +367,13 @@ class SignupController extends ChangeNotifier {
         break;
       case SignupStep.username:
         isValid = validateUsername(usernameController.text) == null &&
-            _usernameError == null;
+            _usernameError == null &&
+            !_isCheckingUsername; // التأكد من عدم وجود تحقق جارٍ
         break;
       case SignupStep.email:
-        isValid =
-            validateEmail(emailController.text) == null && _emailError == null;
+        isValid = validateEmail(emailController.text) == null &&
+            _emailError == null &&
+            !_isCheckingEmail; // التأكد من عدم وجود تحقق جارٍ
         break;
       case SignupStep.password:
         isValid = validatePassword(passwordController.text) == null;
@@ -387,6 +402,33 @@ class SignupController extends ChangeNotifier {
   void moveToNextStep() {
     if (!validateCurrentStep()) return;
 
+    // للخطوات التي تتطلب تحققًا إضافيًا
+    if (_currentStep == SignupStep.username) {
+      if (_isCheckingUsername) return; // إذا كان التحقق جارٍ، ننتظر
+      // التحقق من اسم المستخدم قبل الانتقال
+      validateUsernameExists().then((isValid) {
+        if (isValid) {
+          _processNextStep();
+        }
+      });
+      return;
+    } else if (_currentStep == SignupStep.email) {
+      if (_isCheckingEmail) return; // إذا كان التحقق جارٍ، ننتظر
+      // التحقق من البريد الإلكتروني قبل الانتقال
+      validateEmailExists().then((isValid) {
+        if (isValid) {
+          _processNextStep();
+        }
+      });
+      return;
+    }
+
+    // للخطوات الأخرى
+    _processNextStep();
+  }
+
+  // معالجة الانتقال للخطوة التالية
+  void _processNextStep() {
     switch (_currentStep) {
       case SignupStep.name:
         _currentStep = SignupStep.username;
@@ -488,8 +530,8 @@ class SignupController extends ChangeNotifier {
     try {
       setCheckingUsername(true);
       // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
-      final isUnique = await Student.isUsernameUnique(
-          usernameController.text.trim().toLowerCase());
+      final isUnique =
+          await Student.isUsernameUnique(usernameController.text.trim());
       setCheckingUsername(false);
 
       if (!isUnique) {
@@ -556,40 +598,45 @@ class SignupController extends ChangeNotifier {
     }
 
     try {
-      // التحقق من فرادة اسم المستخدم
-      print("[signup_controller] التحقق من فرادة اسم المستخدم...");
+      // عرض مؤشر التحميل مبكراً
+      setLoading(true);
+      _updateProgress(0.1);
+
+      // التحقق النهائي من فرادة اسم المستخدم
+      print("[signup_controller] التحقق النهائي من فرادة اسم المستخدم...");
       final isUsernameUnique = await checkUsernameUnique();
       if (!isUsernameUnique) {
         print("[signup_controller] اسم المستخدم مستخدم بالفعل");
+        setLoading(false);
         return false;
       }
 
-      // التحقق من البريد الإلكتروني
-      print("[signup_controller] التحقق من البريد الإلكتروني...");
+      _updateProgress(0.2);
+
+      // التحقق النهائي من البريد الإلكتروني
+      print("[signup_controller] التحقق النهائي من البريد الإلكتروني...");
       final isEmailValid = await validateEmailExists();
       if (!isEmailValid) {
         print("[signup_controller] البريد الإلكتروني مستخدم بالفعل");
+        setLoading(false);
         return false;
       }
+
+      _updateProgress(0.3);
 
       // مسح بيانات المستخدم السابق
       await _clearPreviousUserData();
 
-      // بدء التحميل
-      setLoading(true);
       setServerError(null);
-
-      // تحديث التقدم
-      _updateProgress(0.0);
-      await Future.delayed(const Duration(milliseconds: 200));
-      _updateProgress(0.3);
 
       print("[signup_controller] جاري تسجيل المستخدم...");
 
       // استخدام خدمة Firebase للتسجيل
       final result = await _firebaseService.registerUser(
         name: nameController.text.trim(),
-        username: usernameController.text.trim(),
+        username: usernameController.text
+            .trim()
+            .toLowerCase(), // تحويل اسم المستخدم إلى أحرف صغيرة
         universityName: universityNameController.text.trim(),
         email: emailController.text
             .trim()
@@ -645,7 +692,9 @@ class SignupController extends ChangeNotifier {
 
       final userId = currentUser.uid;
       final name = nameController.text.trim();
-      final username = usernameController.text.trim();
+      final username = usernameController.text
+          .trim()
+          .toLowerCase(); // تحويل اسم المستخدم إلى أحرف صغيرة
       final universityName = universityNameController.text.trim();
       final major = majorController.text.trim();
       final email = emailController.text

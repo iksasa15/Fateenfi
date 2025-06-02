@@ -142,12 +142,51 @@ class _StepFormContainerState extends State<StepFormContainer>
     });
   }
 
-  // دالة مخصصة للانتقال إلى الخطوة التالية وتفعيل لوحة المفاتيح
+  // دالة مخصصة للانتقال إلى الخطوة التالية مع تحقق إضافي
   void _navigateToNextStep() {
-    // استدعاء الدالة الأصلية للانتقال
-    widget.onNextPressed();
+    // إذا كان هناك تحقق جارٍ، فلا يتم الانتقال
+    if ((widget.controller.currentStep == SignupStep.username &&
+            widget.controller.isCheckingUsername) ||
+        (widget.controller.currentStep == SignupStep.email &&
+            widget.controller.isCheckingEmail)) {
+      // عرض تلميح للمستخدم بأن التحقق جارٍ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.controller.currentStep == SignupStep.username
+                ? 'جاري التحقق من اسم المستخدم...'
+                : 'جاري التحقق من البريد الإلكتروني...',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
+          ),
+          duration: Duration(milliseconds: 1500),
+          backgroundColor: SignupColors.mediumPurple,
+        ),
+      );
+      return;
+    }
 
-    // لا حاجة لتعيين التركيز هنا لأن didUpdateWidget ستتعامل مع ذلك
+    // للخطوات التي تتطلب تحققًا إضافيًا
+    if (widget.controller.currentStep == SignupStep.username) {
+      // التحقق من فرادة اسم المستخدم قبل الانتقال
+      widget.controller.validateUsernameExists().then((isValid) {
+        if (isValid) {
+          widget.onNextPressed();
+        }
+      });
+    } else if (widget.controller.currentStep == SignupStep.email) {
+      // التحقق من فرادة البريد الإلكتروني قبل الانتقال
+      widget.controller.validateEmailExists().then((isValid) {
+        if (isValid) {
+          widget.onNextPressed();
+        }
+      });
+    } else {
+      // للخطوات الأخرى، التأكد من صحة البيانات
+      if (widget.controller.validateCurrentStep()) {
+        widget.onNextPressed();
+      }
+    }
   }
 
   @override
@@ -417,190 +456,109 @@ class _StepFormContainerState extends State<StepFormContainer>
   }
 
   Widget _buildUsernameField() {
-    return Column(
-      children: [
-        _buildEnhancedInputField(
-          title: 'اسم المستخدم',
-          hintText: 'أدخل اسم المستخدم',
-          controller: widget.controller.usernameController,
-          focusNode: _usernameFocusNode,
-          icon: Icons.alternate_email,
-          validator: widget.controller.validateUsername,
-          textInputAction: TextInputAction.next,
-          onSubmitted: (_) {
-            if (widget.controller.validateCurrentStep()) {
-              _navigateToNextStep();
-            }
-          },
-          suffixIcon: widget.controller.isCheckingUsername
-              ? Container(
-                  width: 20,
-                  height: 20,
-                  margin: const EdgeInsets.all(12),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: SignupColors.mediumPurple,
-                  ),
-                )
-              : null,
-          helperText: 'سيظهر للمستخدمين الآخرين، ويستخدم لتسجيل الدخول',
-          onChanged: (value) {
-            // تحقق فوري من صحة اسم المستخدم
-            if (value.length >= 3) {
-              // تأخير بسيط لتجنب الكثير من الطلبات
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (value == widget.controller.usernameController.text) {
-                  widget.controller.validateUsernameExists();
-                }
-              });
-            }
-          },
-        ),
-        // إضافة رسالة الخطأ إذا كان اسم المستخدم موجوداً
-        if (widget.controller.usernameError != null)
-          Container(
-            margin: EdgeInsets.only(
-              top: 8,
-              right: MediaQuery.of(context).size.width * 0.06,
-              left: MediaQuery.of(context).size.width * 0.06,
-            ),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: SignupColors.accentColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: SignupColors.accentColor.withOpacity(0.5),
-                width: 1,
+    return _buildEnhancedInputField(
+      title: 'اسم المستخدم',
+      hintText: 'أدخل اسم المستخدم',
+      controller: widget.controller.usernameController,
+      focusNode: _usernameFocusNode,
+      icon: Icons.alternate_email,
+      validator: widget.controller.validateUsername,
+      textInputAction: TextInputAction.next,
+      onSubmitted: (_) {
+        if (widget.controller.validateCurrentStep()) {
+          _navigateToNextStep();
+        }
+      },
+      suffixIcon: widget.controller.isCheckingUsername
+          ? Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.all(12),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: SignupColors.mediumPurple,
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
+            )
+          : widget.controller.usernameError != null
+              ? Icon(
                   Icons.error_outline,
                   color: SignupColors.accentColor,
                   size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.controller.usernameError!,
-                    style: TextStyle(
-                      color: SignupColors.accentColor,
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
+                )
+              : null, // إزالة علامة الصح الخضراء
+      helperText: 'سيظهر للمستخدمين الآخرين، ويستخدم لتسجيل الدخول',
+      onChanged: (value) {
+        // إعادة تعيين رسالة الخطأ عند تغيير اسم المستخدم
+        if (widget.controller.usernameError != null) {
+          widget.controller.setUsernameError(null);
+        }
+
+        // تحقق فوري من صحة اسم المستخدم
+        if (value.length >= 3 &&
+            widget.controller.validateUsername(value) == null) {
+          // تأخير بسيط لتجنب الكثير من الطلبات
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (value == widget.controller.usernameController.text) {
+              widget.controller.validateUsernameExists();
+            }
+          });
+        }
+      },
     );
   }
 
   Widget _buildEmailField() {
-    return Column(
-      children: [
-        _buildEnhancedInputField(
-          title: 'البريد الإلكتروني',
-          hintText: 'أدخل بريدك الإلكتروني',
-          controller: widget.controller.emailController,
-          focusNode: _emailFocusNode,
-          icon: Icons.email_outlined,
-          validator: widget.controller.validateEmail,
-          textInputAction: TextInputAction.next,
-          keyboardType: TextInputType.emailAddress,
-          onSubmitted: (_) {
-            if (widget.controller.validateCurrentStep()) {
-              _navigateToNextStep();
+    return _buildEnhancedInputField(
+      title: 'البريد الإلكتروني',
+      hintText: 'أدخل بريدك الإلكتروني',
+      controller: widget.controller.emailController,
+      focusNode: _emailFocusNode,
+      icon: Icons.email_outlined,
+      validator: widget.controller.validateEmail,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
+      onSubmitted: (_) {
+        if (widget.controller.validateCurrentStep()) {
+          _navigateToNextStep();
+        }
+      },
+      helperText: 'سيتم استخدامه للتحقق من حسابك',
+      onChanged: (value) {
+        // إعادة تعيين رسالة الخطأ عند تغيير البريد الإلكتروني
+        if (widget.controller.emailError != null) {
+          widget.controller.setEmailError(null);
+        }
+
+        // تحقق فوري من صحة البريد الإلكتروني
+        if (value.contains('@') &&
+            value.split('@').length == 2 &&
+            widget.controller.validateEmail(value) == null) {
+          // تأخير بسيط لتجنب الكثير من الطلبات
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (value == widget.controller.emailController.text) {
+              widget.controller.validateEmailExists();
             }
-          },
-          helperText: 'سيتم استخدامه للتحقق من حسابك',
-          onChanged: (value) {
-            // تحقق فوري من صحة البريد الإلكتروني
-            if (value.contains('@') && value.split('@').length == 2) {
-              // تأخير بسيط لتجنب الكثير من الطلبات
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (value == widget.controller.emailController.text) {
-                  widget.controller.validateEmailExists();
-                }
-              });
-            }
-          },
-          // إضافة مؤشر تحميل عند التحقق من البريد
-          suffixIcon: widget.controller.isCheckingEmail
-              ? Container(
-                  width: 20,
-                  height: 20,
-                  margin: const EdgeInsets.all(12),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: SignupColors.mediumPurple,
-                  ),
-                )
-              : null,
-        ),
-        // إضافة رسالة الخطأ إذا كان البريد موجوداً
-        if (widget.controller.emailError != null)
-          Container(
-            margin: EdgeInsets.only(
-              top: 8,
-              right: MediaQuery.of(context).size.width * 0.06,
-              left: MediaQuery.of(context).size.width * 0.06,
-            ),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: SignupColors.accentColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: SignupColors.accentColor.withOpacity(0.5),
-                width: 1,
+          });
+        }
+      },
+      // إضافة أيقونة مناسبة للحالة
+      suffixIcon: widget.controller.isCheckingEmail
+          ? Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.all(12),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: SignupColors.mediumPurple,
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
+            )
+          : widget.controller.emailError != null
+              ? Icon(
                   Icons.error_outline,
                   color: SignupColors.accentColor,
                   size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.controller.emailError!,
-                        style: TextStyle(
-                          color: SignupColors.accentColor,
-                          fontFamily: 'SYMBIOAR+LT',
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          // الانتقال إلى صفحة تسجيل الدخول
-                          Navigator.of(context).pushReplacementNamed('/login');
-                        },
-                        child: Text(
-                          'انتقل لتسجيل الدخول',
-                          style: TextStyle(
-                            color: SignupColors.mediumPurple,
-                            fontFamily: 'SYMBIOAR+LT',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
+                )
+              : null, // إزالة علامة الصح الخضراء
     );
   }
 

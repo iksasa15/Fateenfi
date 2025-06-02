@@ -32,10 +32,12 @@ class Student {
     return {
       'userId': userId,
       'name': name,
-      'username': username, // اسم المستخدم
+      'username': username,
+      'usernameSearchable':
+          username?.toLowerCase(), // إضافة حقل للبحث غير الحساس لحالة الأحرف
       'universityName': universityName, // اسم الجامعة
       'major': major,
-      'email': email,
+      'email': email?.toLowerCase(), // تأكيد حفظ البريد بأحرف صغيرة
       'emailVerified': emailVerified ?? false,
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
       'lastLoginAt': lastLoginAt ?? FieldValue.serverTimestamp(),
@@ -284,44 +286,85 @@ class Student {
   // التحقق من فرادة اسم المستخدم
   static Future<bool> isUsernameUnique(String username) async {
     try {
-      final QuerySnapshot result = await FirebaseFirestore.instance
+      // تحويل اسم المستخدم إلى أحرف صغيرة للبحث غير الحساس لحالة الأحرف
+      final String lowercaseUsername = username.trim().toLowerCase();
+
+      // البحث باستخدام حقل usernameSearchable للبحث غير الحساس لحالة الأحرف
+      final QuerySnapshot resultSearchable = await FirebaseFirestore.instance
+          .collection('users')
+          .where('usernameSearchable', isEqualTo: lowercaseUsername)
+          .limit(1)
+          .get();
+
+      if (resultSearchable.docs.isNotEmpty) {
+        return false; // اسم المستخدم موجود
+      }
+
+      // البحث التقليدي في حقل username (للتوافق مع البيانات القديمة)
+      final QuerySnapshot resultFallback = await FirebaseFirestore.instance
           .collection('users')
           .where('username', isEqualTo: username)
           .limit(1)
           .get();
 
-      return result.docs.isEmpty;
+      return resultFallback.docs.isEmpty;
     } catch (e) {
       print("خطأ في التحقق من فرادة اسم المستخدم: $e");
       return false;
     }
   }
 
-  // التحقق من وجود البريد الإلكتروني
+  // التحقق من وجود البريد الإلكتروني - تم تحديث هذه الدالة للتحقق من كل من Firebase Auth و Firestore
   static Future<bool> isEmailAlreadyRegistered(String email) async {
     try {
-      // استخدام Firebase Auth للتحقق من البريد
+      // تحويل البريد إلى أحرف صغيرة وإزالة المسافات
+      email = email.trim().toLowerCase();
+
+      // التحقق من Firebase Auth أولاً
       final methods =
-          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email.trim());
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty) {
+        return true; // البريد موجود في Firebase Auth
+      }
 
-      // إذا كانت المصفوفة غير فارغة، فهذا يعني أن البريد مسجل بالفعل
-      return methods.isNotEmpty;
-    } catch (e) {
-      print("خطأ في التحقق من البريد الإلكتروني: $e");
-      return false;
-    }
-  }
-
-  static Future<bool> isUsernameExists(String lowerCase) async {
-    // Example implementation: check if username exists in Firestore
-    try {
+      // التحقق من Firestore - للتأكد من عدم وجود بريد مكرر
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('users')
-          .where('username', isEqualTo: lowerCase)
+          .where('email', isEqualTo: email)
           .limit(1)
           .get();
 
-      return result.docs.isNotEmpty;
+      return result.docs.isNotEmpty; // إعادة نتيجة التحقق من Firestore
+    } catch (e) {
+      print("خطأ في التحقق من البريد الإلكتروني: $e");
+      return true; // نفترض وجود البريد في حالة الخطأ (للأمان)
+    }
+  }
+
+  static Future<bool> isUsernameExists(String username) async {
+    try {
+      // تحويل اسم المستخدم إلى أحرف صغيرة للبحث غير الحساس لحالة الأحرف
+      final String lowercaseUsername = username.trim().toLowerCase();
+
+      // البحث باستخدام حقل usernameSearchable إذا كان موجودًا
+      final QuerySnapshot resultSearchable = await FirebaseFirestore.instance
+          .collection('users')
+          .where('usernameSearchable', isEqualTo: lowercaseUsername)
+          .limit(1)
+          .get();
+
+      if (resultSearchable.docs.isNotEmpty) {
+        return true; // اسم المستخدم موجود
+      }
+
+      // البحث التقليدي في حقل username (للتوافق مع البيانات القديمة)
+      final QuerySnapshot resultFallback = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      return resultFallback.docs.isNotEmpty;
     } catch (e) {
       print("خطأ في التحقق من وجود اسم المستخدم: $e");
       return false;
