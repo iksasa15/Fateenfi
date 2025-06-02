@@ -38,6 +38,7 @@ class SignupController extends ChangeNotifier {
   String? _serverError;
   double _signupProgress = 0.0;
   bool _isCheckingUsername = false;
+  String? _usernameError; // متغير جديد لتخزين رسالة خطأ اسم المستخدم
 
   // متغيرات التحقق من البريد الإلكتروني
   bool _isCheckingEmail = false;
@@ -66,6 +67,8 @@ class SignupController extends ChangeNotifier {
   bool get isCheckingUsername => _isCheckingUsername;
   bool get isCheckingEmail => _isCheckingEmail;
   String? get emailError => _emailError;
+  String? get usernameError =>
+      _usernameError; // جيتر جديد لرسالة خطأ اسم المستخدم
 
   // الحصول على حالات الخطوات
   SignupStep get currentStep => _currentStep;
@@ -91,6 +94,12 @@ class SignupController extends ChangeNotifier {
   // تعيين حالة التحقق من اسم المستخدم
   void setCheckingUsername(bool checking) {
     _isCheckingUsername = checking;
+    notifyListeners();
+  }
+
+  // تعيين خطأ اسم المستخدم - دالة جديدة
+  void setUsernameError(String? error) {
+    _usernameError = error;
     notifyListeners();
   }
 
@@ -169,7 +178,16 @@ class SignupController extends ChangeNotifier {
       return 'الرجاء إدخال اسم المستخدم';
     }
 
-    return Student.validateUsername(value);
+    // استدعاء التحقق الأساسي من كلاس الطالب
+    String? basicValidation = Student.validateUsername(value);
+
+    // إذا كان هناك خطأ في التحقق الأساسي، نرجع الخطأ
+    if (basicValidation != null) {
+      return basicValidation;
+    }
+
+    // إذا تم تعيين خطأ اسم المستخدم من التحقق المباشر، نرجعه
+    return _usernameError;
   }
 
   // التحقق من البريد الإلكتروني
@@ -178,7 +196,16 @@ class SignupController extends ChangeNotifier {
       return 'الرجاء إدخال البريد الإلكتروني';
     }
 
-    return Student.validateEmail(value);
+    // استدعاء التحقق الأساسي من كلاس الطالب
+    String? basicValidation = Student.validateEmail(value);
+
+    // إذا كان هناك خطأ في التحقق الأساسي، نرجع الخطأ
+    if (basicValidation != null) {
+      return basicValidation;
+    }
+
+    // إذا تم تعيين خطأ البريد الإلكتروني من التحقق المباشر، نرجعه
+    return _emailError;
   }
 
   // التحقق من كلمة المرور
@@ -215,7 +242,7 @@ class SignupController extends ChangeNotifier {
     try {
       // البريد فارغ أو غير صالح
       if (emailController.text.isEmpty ||
-          validateEmail(emailController.text) != null) {
+          Student.validateEmail(emailController.text) != null) {
         setEmailError(null); // إزالة أي خطأ سابق
         return false;
       }
@@ -225,9 +252,9 @@ class SignupController extends ChangeNotifier {
       // تأخير بسيط لإظهار المؤشر
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // استخدام دالة التحقق من كلاس الطالب
-      final bool emailExists =
-          await Student.isEmailAlreadyRegistered(emailController.text.trim());
+      // استخدام دالة التحقق من كلاس الطالب مع تحويل البريد إلى أحرف صغيرة
+      final bool emailExists = await Student.isEmailAlreadyRegistered(
+          emailController.text.trim().toLowerCase());
 
       setCheckingEmail(false);
 
@@ -251,12 +278,54 @@ class SignupController extends ChangeNotifier {
     }
   }
 
+  // دالة جديدة للتحقق المباشر من وجود اسم المستخدم بغض النظر عن حالة الأحرف
+  Future<bool> validateUsernameExists() async {
+    try {
+      // اسم المستخدم فارغ أو غير صالح
+      if (usernameController.text.isEmpty ||
+          Student.validateUsername(usernameController.text) != null) {
+        setUsernameError(null); // إزالة أي خطأ سابق
+        return false;
+      }
+
+      setCheckingUsername(true);
+
+      // تأخير بسيط لإظهار المؤشر
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
+      final bool usernameExists = await Student.isUsernameExists(
+          usernameController.text.trim().toLowerCase());
+
+      setCheckingUsername(false);
+
+      // إذا كان اسم المستخدم موجودًا، نعرض خطأ
+      if (usernameExists) {
+        setUsernameError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
+        // تحديث حالة التحقق
+        _canMoveToNextStep = false;
+        notifyListeners();
+      } else {
+        setUsernameError(null);
+      }
+
+      return !usernameExists; // نعيد true إذا كان اسم المستخدم غير موجود (صالح للتسجيل)
+    } catch (e) {
+      setCheckingUsername(false);
+      debugPrint("خطأ في التحقق من اسم المستخدم: $e");
+      setUsernameError("حدث خطأ أثناء التحقق من اسم المستخدم");
+      return false; // نفترض أنه موجود في حالة حدوث خطأ للأمان
+    }
+  }
+
   // التحقق من صحة النموذج بالكامل
   bool validateForm() {
     final isNameValid = validateName(nameController.text) == null;
-    final isUsernameValid = validateUsername(usernameController.text) == null;
+    final isUsernameValid = validateUsername(usernameController.text) == null &&
+        _usernameError == null;
     final isUniversityValid = validateUniversity();
-    final isEmailValid = validateEmail(emailController.text) == null;
+    final isEmailValid =
+        validateEmail(emailController.text) == null && _emailError == null;
     final isPasswordValid = validatePassword(passwordController.text) == null;
     final isMajorValid = validateMajor();
 
@@ -284,7 +353,8 @@ class SignupController extends ChangeNotifier {
         isValid = validateName(nameController.text) == null;
         break;
       case SignupStep.username:
-        isValid = validateUsername(usernameController.text) == null;
+        isValid = validateUsername(usernameController.text) == null &&
+            _usernameError == null;
         break;
       case SignupStep.email:
         isValid =
@@ -417,21 +487,24 @@ class SignupController extends ChangeNotifier {
   Future<bool> checkUsernameUnique() async {
     try {
       setCheckingUsername(true);
-      // استخدام دالة التحقق من كلاس الطالب
-      final isUnique =
-          await Student.isUsernameUnique(usernameController.text.trim());
+      // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
+      final isUnique = await Student.isUsernameUnique(
+          usernameController.text.trim().toLowerCase());
       setCheckingUsername(false);
 
       if (!isUnique) {
         setServerError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
+        setUsernameError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
       } else {
         setServerError(null);
+        setUsernameError(null);
       }
 
       return isUnique;
     } catch (e) {
       setCheckingUsername(false);
       setServerError("حدث خطأ أثناء التحقق من اسم المستخدم");
+      setUsernameError("حدث خطأ أثناء التحقق من اسم المستخدم");
       return false;
     }
   }
@@ -518,7 +591,9 @@ class SignupController extends ChangeNotifier {
         name: nameController.text.trim(),
         username: usernameController.text.trim(),
         universityName: universityNameController.text.trim(),
-        email: emailController.text.trim(),
+        email: emailController.text
+            .trim()
+            .toLowerCase(), // تحويل البريد إلى أحرف صغيرة
         password: passwordController.text.trim(),
         major: majorController.text.trim(),
       );
@@ -573,13 +648,17 @@ class SignupController extends ChangeNotifier {
       final username = usernameController.text.trim();
       final universityName = universityNameController.text.trim();
       final major = majorController.text.trim();
-      final email = emailController.text.trim();
+      final email = emailController.text
+          .trim()
+          .toLowerCase(); // تحويل البريد إلى أحرف صغيرة
       final password = passwordController.text.trim();
 
       // حفظ البيانات في Firestore
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'name': name,
         'username': username,
+        'usernameSearchable': username
+            .toLowerCase(), // إضافة حقل جديد لتسهيل البحث بغض النظر عن حالة الأحرف
         'universityName': universityName,
         'major': major,
         'email': email,

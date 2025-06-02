@@ -417,31 +417,84 @@ class _StepFormContainerState extends State<StepFormContainer>
   }
 
   Widget _buildUsernameField() {
-    return _buildEnhancedInputField(
-      title: 'اسم المستخدم',
-      hintText: 'أدخل اسم المستخدم',
-      controller: widget.controller.usernameController,
-      focusNode: _usernameFocusNode,
-      icon: Icons.alternate_email,
-      validator: widget.controller.validateUsername,
-      textInputAction: TextInputAction.next,
-      onSubmitted: (_) {
-        if (widget.controller.validateCurrentStep()) {
-          _navigateToNextStep();
-        }
-      },
-      suffixIcon: widget.controller.isCheckingUsername
-          ? Container(
-              width: 20,
-              height: 20,
-              margin: const EdgeInsets.all(12),
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: SignupColors.mediumPurple,
+    return Column(
+      children: [
+        _buildEnhancedInputField(
+          title: 'اسم المستخدم',
+          hintText: 'أدخل اسم المستخدم',
+          controller: widget.controller.usernameController,
+          focusNode: _usernameFocusNode,
+          icon: Icons.alternate_email,
+          validator: widget.controller.validateUsername,
+          textInputAction: TextInputAction.next,
+          onSubmitted: (_) {
+            if (widget.controller.validateCurrentStep()) {
+              _navigateToNextStep();
+            }
+          },
+          suffixIcon: widget.controller.isCheckingUsername
+              ? Container(
+                  width: 20,
+                  height: 20,
+                  margin: const EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: SignupColors.mediumPurple,
+                  ),
+                )
+              : null,
+          helperText: 'سيظهر للمستخدمين الآخرين، ويستخدم لتسجيل الدخول',
+          onChanged: (value) {
+            // تحقق فوري من صحة اسم المستخدم
+            if (value.length >= 3) {
+              // تأخير بسيط لتجنب الكثير من الطلبات
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (value == widget.controller.usernameController.text) {
+                  widget.controller.validateUsernameExists();
+                }
+              });
+            }
+          },
+        ),
+        // إضافة رسالة الخطأ إذا كان اسم المستخدم موجوداً
+        if (widget.controller.usernameError != null)
+          Container(
+            margin: EdgeInsets.only(
+              top: 8,
+              right: MediaQuery.of(context).size.width * 0.06,
+              left: MediaQuery.of(context).size.width * 0.06,
+            ),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: SignupColors.accentColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: SignupColors.accentColor.withOpacity(0.5),
+                width: 1,
               ),
-            )
-          : null,
-      helperText: 'سيظهر للمستخدمين الآخرين، ويستخدم لتسجيل الدخول',
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: SignupColors.accentColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.controller.usernameError!,
+                    style: TextStyle(
+                      color: SignupColors.accentColor,
+                      fontFamily: 'SYMBIOAR+LT',
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 

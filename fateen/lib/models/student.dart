@@ -311,4 +311,20 @@ class Student {
       return false;
     }
   }
+
+  static Future<bool> isUsernameExists(String lowerCase) async {
+    // Example implementation: check if username exists in Firestore
+    try {
+      final QuerySnapshot result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: lowerCase)
+          .limit(1)
+          .get();
+
+      return result.docs.isNotEmpty;
+    } catch (e) {
+      print("خطأ في التحقق من وجود اسم المستخدم: $e");
+      return false;
+    }
+  }
 }
