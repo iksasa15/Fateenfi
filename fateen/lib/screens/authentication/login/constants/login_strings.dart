@@ -40,7 +40,6 @@ class LoginStrings {
   static const String facebookLogin = 'فيسبوك';
   static const String appleLogin = 'آبل';
 
-  static const String orRegisterWith = "أو سجل باستخدام";
   static const String noAccountQuestion = "ليس لديك حساب؟";
   static const String createAccountAction = "إنشاء حساب";
 }

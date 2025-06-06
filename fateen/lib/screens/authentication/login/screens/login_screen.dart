@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../components/login_header_component.dart';
 import '../components/login_form_component.dart';
 import '../components/login_footer_component.dart';
-import '../components/social_login_component.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_colors.dart';
 import '../../shared/components/auth_toggle_bar.dart';
@@ -80,6 +79,8 @@ class _LoginScreenState extends State<LoginScreen>
     HapticFeedback.mediumImpact();
 
     if (_formKey.currentState!.validate()) {
+      debugPrint('بدء عملية تسجيل الدخول');
+
       try {
         // تنفيذ تسجيل الدخول
         final success = await _controller.login(
@@ -87,15 +88,20 @@ class _LoginScreenState extends State<LoginScreen>
           context,
         );
 
+        debugPrint('نتيجة تسجيل الدخول: $success');
+
         // التحقق من أن الشاشة لا تزال مثبتة وعرض رسالة الخطأ إذا لزم الأمر
         if (mounted && !success && _controller.errorMessage.isNotEmpty) {
           _showErrorMessage(_controller.errorMessage);
         }
       } catch (e) {
+        debugPrint('استثناء في معالجة تسجيل الدخول: $e');
         if (mounted) {
           _showErrorMessage("حدث خطأ غير متوقع. حاول مرة أخرى.");
         }
       }
+    } else {
+      debugPrint('النموذج غير صالح');
     }
   }
 
@@ -203,8 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
                           onLogin: _handleLogin,
                         ),
 
-                        // مكونات إضافية
-                        const SocialLoginComponent(),
+                        // تم حذف SocialLoginComponent
 
                         // تذييل الصفحة
                         LoginFooterComponent(

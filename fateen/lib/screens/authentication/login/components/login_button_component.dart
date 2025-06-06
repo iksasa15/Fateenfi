@@ -49,10 +49,11 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.isLoading
-                ? null
+                ? null // تعطيل الزر أثناء التحميل
                 : () {
                     HapticFeedback.mediumImpact();
                     if (widget.onPressed != null) {
+                      debugPrint('تم النقر على زر تسجيل الدخول');
                       widget.onPressed!();
                     }
                   },
@@ -66,17 +67,25 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    AuthColors.mediumPurple,
-                    AuthColors.darkPurple,
+                    widget.isLoading
+                        ? AuthColors.mediumPurple.withOpacity(0.8)
+                        : AuthColors.mediumPurple,
+                    widget.isLoading
+                        ? AuthColors.darkPurple.withOpacity(0.8)
+                        : AuthColors.darkPurple,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(
                     LoginDimensions.getLargeRadius(context)),
               ),
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
                 child: widget.isLoading
                     ? Center(
+                        key: const ValueKey('loading'),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -102,32 +111,36 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
                           ],
                         ),
                       )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            LoginStrings.loginButtonText,
-                            style: TextStyle(
-                              fontSize: LoginDimensions.getButtonFontSize(
-                                  context,
-                                  small: isSmallScreen),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'SYMBIOAR+LT',
-                              letterSpacing: 0.5,
+                    : Center(
+                        key: const ValueKey('normal'),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              LoginStrings.loginButtonText,
+                              style: TextStyle(
+                                fontSize: LoginDimensions.getButtonFontSize(
+                                    context,
+                                    small: isSmallScreen),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: 'SYMBIOAR+LT',
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                              width: LoginDimensions.getSpacing(context,
-                                  size: SpacingSize.small)),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: LoginDimensions.getButtonFontSize(context,
-                                    small: isSmallScreen) +
-                                4,
-                          ),
-                        ],
+                            SizedBox(
+                                width: LoginDimensions.getSpacing(context,
+                                    size: SpacingSize.small)),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: LoginDimensions.getButtonFontSize(context,
+                                      small: isSmallScreen) +
+                                  4,
+                            ),
+                          ],
+                        ),
                       ),
               ),
             ),
@@ -135,5 +148,14 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
         ),
       ),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant LoginButtonComponent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // سجل التغييرات في حالة التحميل للتأكد من أن التغييرات تحدث بشكل صحيح
+    if (oldWidget.isLoading != widget.isLoading) {
+      debugPrint('تغيير حالة زر تسجيل الدخول: ${widget.isLoading}');
+    }
   }
 }

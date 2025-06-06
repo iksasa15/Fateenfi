@@ -74,12 +74,14 @@ class LoginController extends ChangeNotifier {
   // ضبط حالة تسجيل الدخول
   void setLoggingIn(bool value) {
     _isLoggingIn = value;
+    debugPrint('تغيير حالة تسجيل الدخول إلى: $value');
     notifyListeners();
   }
 
   // ضبط رسالة الخطأ
   void setErrorMessage(String message) {
     _errorMessage = message;
+    debugPrint('رسالة الخطأ: $message');
     notifyListeners();
   }
 
@@ -173,6 +175,7 @@ class LoginController extends ChangeNotifier {
     // مسح بيانات المستخدم السابق
     await _clearPreviousUserData();
 
+    // تعيين حالة التحميل
     setLoggingIn(true);
     clearError();
 
@@ -180,6 +183,11 @@ class LoginController extends ChangeNotifier {
       // الحصول على اسم المستخدم أو البريد الإلكتروني وكلمة المرور
       final identifier = emailController.text.trim();
       final password = passwordController.text.trim();
+
+      debugPrint('محاولة تسجيل الدخول باستخدام: $identifier');
+
+      // إضافة تأخير صناعي لإظهار حالة التحميل (للاختبار فقط)
+      await Future.delayed(const Duration(milliseconds: 1500));
 
       // تنفيذ عملية تسجيل الدخول من خلال خدمة Firebase
       final result = await _firebaseService.signIn(
@@ -190,7 +198,7 @@ class LoginController extends ChangeNotifier {
       // استخدام السياق المقدم أو السياق المخزن في المتحكم
       final ctx = context ?? _context;
 
-      if (ctx.mounted && result.success) {
+      if (result.success && ctx.mounted) {
         // تأثير حسي عند نجاح تسجيل الدخول
         HapticFeedback.heavyImpact();
 
@@ -212,17 +220,20 @@ class LoginController extends ChangeNotifier {
 
         return true;
       } else if (result.errorMessage != null) {
+        debugPrint('فشل تسجيل الدخول: ${result.errorMessage}');
         setErrorMessage(result.errorMessage!);
         return false;
+      } else {
+        // إذا وصلنا هنا، فهناك خطأ غير متوقع
+        setErrorMessage('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى');
+        return false;
       }
-
-      // إذا وصلنا هنا، فهناك خطأ غير متوقع
-      setErrorMessage('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى');
-      return false;
     } catch (e) {
+      debugPrint('استثناء أثناء تسجيل الدخول: ${e.toString()}');
       setErrorMessage('حدث خطأ أثناء تسجيل الدخول: ${e.toString()}');
       return false;
     } finally {
+      // تأكد من إعادة تعيين حالة التحميل حتى في حالة الخطأ
       setLoggingIn(false);
     }
   }
