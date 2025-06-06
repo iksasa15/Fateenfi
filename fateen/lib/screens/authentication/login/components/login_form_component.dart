@@ -4,31 +4,54 @@ import '../../shared/constants/auth_colors.dart';
 import '../constants/login_strings.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_dimensions.dart';
+import '../components/login_button_component.dart';
+import '../components/forgot_password_link_component.dart';
 
 class LoginFormComponent extends StatelessWidget {
   final LoginController controller;
-  final VoidCallback onLogin; // إضافة المعلمة الجديدة
+  final VoidCallback onLogin;
 
   const LoginFormComponent({
     Key? key,
     required this.controller,
-    required this.onLogin, // إضافة المعلمة الجديدة
+    required this.onLogin,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // حقل البريد الإلكتروني
+        // حقل البريد الإلكتروني أو اسم المستخدم
         _buildEnhancedInputField(
           context: context,
-          title: LoginStrings.emailLabel,
-          hintText: LoginStrings.emailHint,
+          title: LoginStrings.emailOrUsernameLabel,
+          hintText: LoginStrings.emailOrUsernameHint,
           controller: controller.emailController,
-          icon: Icons.email_outlined,
+          icon: Icons.person_outline_rounded,
           keyboardType: TextInputType.emailAddress,
           validator: controller.validateEmail,
           textInputAction: TextInputAction.next,
+        ),
+
+        // نص توضيحي
+        Padding(
+          padding: EdgeInsets.only(
+            right:
+                LoginDimensions.getSpacing(context, size: SpacingSize.large) +
+                    4,
+            bottom:
+                LoginDimensions.getSpacing(context, size: SpacingSize.small),
+          ),
+          child: Text(
+            "يمكنك تسجيل الدخول باستخدام اسم المستخدم أو البريد الإلكتروني",
+            style: TextStyle(
+              color: AuthColors.hintColor,
+              fontSize:
+                  LoginDimensions.getLabelFontSize(context, small: true) - 1,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+            textAlign: TextAlign.right,
+          ),
         ),
 
         // حقل كلمة المرور
@@ -47,10 +70,24 @@ class LoginFormComponent extends StatelessWidget {
             if (controller.isFormValid) {
               final formKey = Form.of(context);
               if (formKey.currentState?.validate() == true) {
-                onLogin(); // استخدام دالة تسجيل الدخول
+                onLogin();
               }
             }
           },
+        ),
+
+        // رابط نسيت كلمة المرور
+        ForgotPasswordLinkComponent(
+          onPressed: () {
+            // التنفيذ لاحقاً
+            HapticFeedback.selectionClick();
+          },
+        ),
+
+        // زر تسجيل الدخول - تم تعديله للتأكد من عمله
+        LoginButtonComponent(
+          isLoading: controller.isLoggingIn,
+          onPressed: onLogin, // تم إزالة الشرط للتأكد من عمل الزر
         ),
       ],
     );
@@ -97,7 +134,7 @@ class LoginFormComponent extends StatelessWidget {
     );
   }
 
-  // حقل إدخال محسن يتماشى مع حقول صفحة نسيت كلمة المرور
+  // حقل إدخال محسن
   Widget _buildEnhancedInputField({
     required BuildContext context,
     required String title,

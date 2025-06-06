@@ -94,7 +94,9 @@ class _LoginButtonComponentState extends State<LoginButtonComponent>
                         ? null
                         : () {
                             HapticFeedback.mediumImpact();
-                            widget.onPressed?.call();
+                            if (widget.onPressed != null) {
+                              widget.onPressed!(); // تأكد من استدعاء الدالة
+                            }
                           },
                     borderRadius: BorderRadius.circular(
                         LoginDimensions.getLargeRadius(context)),

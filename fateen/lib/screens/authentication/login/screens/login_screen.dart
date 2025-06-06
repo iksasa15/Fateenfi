@@ -4,6 +4,7 @@ import '../components/login_header_component.dart';
 import '../components/login_form_component.dart';
 import '../components/login_footer_component.dart';
 import '../components/social_login_component.dart';
+import '../components/error_message_component.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_colors.dart';
 import '../../shared/components/auth_toggle_bar.dart';
@@ -12,12 +13,12 @@ import '../../shared/helpers/custom_route_transitions.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool showBackButton;
-  final String? initialUsername; // إضافة معلمة لاستقبال اسم المستخدم الأولي
+  final String? initialUsername;
 
   const LoginScreen({
     Key? key,
     this.showBackButton = false,
-    this.initialUsername, // إضافة معلمة جديدة
+    this.initialUsername,
   }) : super(key: key);
 
   @override
@@ -208,11 +209,16 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // عرض رسالة الخطأ إذا كانت موجودة
+                        if (_controller.errorMessage.isNotEmpty)
+                          ErrorMessageComponent(
+                            errorMessage: _controller.errorMessage,
+                          ),
+
                         // نموذج تسجيل الدخول
                         LoginFormComponent(
                           controller: _controller,
-                          onLogin:
-                              _handleLogin, // تمرير دالة معالجة تسجيل الدخول
+                          onLogin: _handleLogin,
                         ),
 
                         // مكونات إضافية
