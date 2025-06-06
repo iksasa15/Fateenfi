@@ -285,6 +285,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                               onNextPressed: _handleNextStep,
                               onPrevPressed: _handlePreviousStep,
                               onSubmitPressed: _handleSignup,
+                              onLoginPressed:
+                                  _navigateToLogin, // إضافة جديدة: تمرير دالة الانتقال إلى شاشة تسجيل الدخول
                             ),
                           ],
                         ),

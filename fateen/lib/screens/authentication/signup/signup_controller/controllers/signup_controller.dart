@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async'; // إضافة لاستخدام Timer
 import '../../constants/signup_strings.dart';
 import '../../firebase_services/services/signup_firebase_service.dart';
-import '../../../../../models/student.dart'; // استخدام فئة Student
+import '../../../../../models/student.dart';
 
 // تعريف خطوات التسجيل
 enum SignupStep { name, username, email, password, university, major, terms }
@@ -38,7 +39,7 @@ class SignupController extends ChangeNotifier {
   String? _serverError;
   double _signupProgress = 0.0;
   bool _isCheckingUsername = false;
-  String? _usernameError; // متغير جديد لتخزين رسالة خطأ اسم المستخدم
+  String? _usernameError;
 
   // متغيرات التحقق من البريد الإلكتروني
   bool _isCheckingEmail = false;
@@ -47,6 +48,10 @@ class SignupController extends ChangeNotifier {
   // متغيرات إدارة الخطوات
   SignupStep _currentStep = SignupStep.name;
   bool _canMoveToNextStep = false;
+
+  // متغيرات جديدة للتحكم في الـ debounce
+  Timer? _emailDebounce;
+  Timer? _usernameDebounce;
 
   // القوائم
   final List<String> _majorsList = SignupStrings.majors;
@@ -96,7 +101,7 @@ class SignupController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // تعيين خطأ اسم المستخدم - دالة جديدة
+  // تعيين خطأ اسم المستخدم
   void setUsernameError(String? error) {
     _usernameError = error;
     _validateStepChanges(); // إعادة تقييم حالة الخطوة الحالية
@@ -238,6 +243,34 @@ class SignupController extends ChangeNotifier {
     }
   }
 
+  // دالة محسنة للتحقق من البريد الإلكتروني مع debounce
+  void debounceCheckEmail(String email) {
+    // إلغاء أي تحقق سابق
+    _emailDebounce?.cancel();
+
+    // إعادة تعيين الخطأ إذا كان البريد فارغًا
+    if (email.isEmpty) {
+      setEmailError(null);
+      return;
+    }
+
+    // التحقق من صحة تنسيق البريد الإلكتروني محليًا
+    String? basicValidation = Student.validateEmail(email);
+    if (basicValidation != null) {
+      // لا داعي للتحقق إذا كان التنسيق غير صالح
+      return;
+    }
+
+    // تأخير التحقق بمقدار 500 مللي ثانية
+    _emailDebounce = Timer(Duration(milliseconds: 500), () {
+      // فقط إذا كنا في خطوة البريد الإلكتروني أو كانت الخطوة التالية
+      if (_currentStep == SignupStep.email ||
+          _currentStep == SignupStep.password) {
+        validateEmailExists();
+      }
+    });
+  }
+
   // التحقق المباشر من وجود البريد الإلكتروني باستخدام كلاس الطالب
   Future<bool> validateEmailExists() async {
     try {
@@ -250,21 +283,22 @@ class SignupController extends ChangeNotifier {
         return false;
       }
 
+      // تحويل البريد إلى أحرف صغيرة
+      final email = emailController.text.trim().toLowerCase();
+
       setCheckingEmail(true);
 
       // تأخير بسيط لإظهار المؤشر
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // استخدام دالة التحقق من كلاس الطالب مع تحويل البريد إلى أحرف صغيرة
-      final bool emailExists = await Student.isEmailAlreadyRegistered(
-          emailController.text.trim().toLowerCase());
+      // استخدام دالة التحقق من كلاس الطالب
+      final bool emailExists = await Student.isEmailAlreadyRegistered(email);
 
       setCheckingEmail(false);
 
-      // إذا كان البريد موجودًا، نعرض خطأ
+      // إذا كان البريد موجودًا، نعرض خطأ مع إشارة لإمكانية تسجيل الدخول
       if (emailExists) {
-        setEmailError(
-            "البريد الإلكتروني مستخدم بالفعل، هل تريد تسجيل الدخول بدلاً من ذلك؟");
+        setEmailError("البريد الإلكتروني مستخدم بالفعل. تسجيل الدخول؟");
         // تحديث حالة التحقق
         _canMoveToNextStep = false;
         notifyListeners();
@@ -285,6 +319,34 @@ class SignupController extends ChangeNotifier {
     }
   }
 
+  // دالة محسنة للتحقق من اسم المستخدم مع debounce
+  void debounceCheckUsername(String username) {
+    // إلغاء أي تحقق سابق
+    _usernameDebounce?.cancel();
+
+    // إعادة تعيين الخطأ إذا كان اسم المستخدم فارغًا
+    if (username.isEmpty) {
+      setUsernameError(null);
+      return;
+    }
+
+    // التحقق من صحة تنسيق اسم المستخدم محليًا
+    String? basicValidation = Student.validateUsername(username);
+    if (basicValidation != null) {
+      // لا داعي للتحقق إذا كان التنسيق غير صالح
+      return;
+    }
+
+    // تأخير التحقق بمقدار 500 مللي ثانية
+    _usernameDebounce = Timer(Duration(milliseconds: 500), () {
+      // فقط إذا كنا في خطوة اسم المستخدم أو كانت الخطوة التالية
+      if (_currentStep == SignupStep.username ||
+          _currentStep == SignupStep.email) {
+        validateUsernameExists();
+      }
+    });
+  }
+
   // دالة جديدة للتحقق المباشر من وجود اسم المستخدم بغض النظر عن حالة الأحرف
   Future<bool> validateUsernameExists() async {
     try {
@@ -297,20 +359,22 @@ class SignupController extends ChangeNotifier {
         return false;
       }
 
+      // تحويل اسم المستخدم إلى أحرف صغيرة
+      final username = usernameController.text.trim().toLowerCase();
+
       setCheckingUsername(true);
 
       // تأخير بسيط لإظهار المؤشر
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
-      final bool usernameExists =
-          await Student.isUsernameExists(usernameController.text.trim());
+      // استخدام دالة التحقق من كلاس الطالب
+      final bool usernameExists = await Student.isUsernameExists(username);
 
       setCheckingUsername(false);
 
-      // إذا كان اسم المستخدم موجودًا، نعرض خطأ
+      // إذا كان اسم المستخدم موجودًا، نعرض خطأ مع إشارة لإمكانية تسجيل الدخول
       if (usernameExists) {
-        setUsernameError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
+        setUsernameError("اسم المستخدم مستخدم بالفعل. تسجيل الدخول؟");
         // تحديث حالة التحقق
         _canMoveToNextStep = false;
         notifyListeners();
@@ -530,13 +594,13 @@ class SignupController extends ChangeNotifier {
     try {
       setCheckingUsername(true);
       // استخدام دالة التحقق من كلاس الطالب مع تحويل اسم المستخدم إلى أحرف صغيرة
-      final isUnique =
-          await Student.isUsernameUnique(usernameController.text.trim());
+      final isUnique = await Student.isUsernameUnique(
+          usernameController.text.trim().toLowerCase());
       setCheckingUsername(false);
 
       if (!isUnique) {
-        setServerError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
-        setUsernameError("اسم المستخدم مستخدم بالفعل، الرجاء اختيار اسم آخر");
+        setServerError("اسم المستخدم مستخدم بالفعل. تسجيل الدخول؟");
+        setUsernameError("اسم المستخدم مستخدم بالفعل. تسجيل الدخول؟");
       } else {
         setServerError(null);
         setUsernameError(null);
@@ -752,6 +816,10 @@ class SignupController extends ChangeNotifier {
   // تنظيف الموارد
   @override
   void dispose() {
+    // إلغاء أي تحقق معلق
+    _emailDebounce?.cancel();
+    _usernameDebounce?.cancel();
+
     nameController.dispose();
     usernameController.dispose();
     universityNameController.dispose();

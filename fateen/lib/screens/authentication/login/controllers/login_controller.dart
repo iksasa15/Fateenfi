@@ -91,15 +91,25 @@ class LoginController extends ChangeNotifier {
     }
   }
 
-  // التحقق من صحة البريد الإلكتروني
+  // التحقق من صحة البريد الإلكتروني أو اسم المستخدم
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'الرجاء إدخال البريد الإلكتروني';
+      return 'الرجاء إدخال البريد الإلكتروني أو اسم المستخدم';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'الرجاء إدخال بريد إلكتروني صحيح';
+
+    // إذا كان المدخل يحتوي على @ نتحقق من أنه بريد إلكتروني صالح
+    if (value.contains('@')) {
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(value)) {
+        return 'الرجاء إدخال بريد إلكتروني صحيح';
+      }
+    } else {
+      // تحقق من صحة اسم المستخدم
+      if (value.length < 3) {
+        return 'اسم المستخدم يجب أن يتكون من 3 أحرف على الأقل';
+      }
     }
+
     return null;
   }
 
@@ -152,7 +162,7 @@ class LoginController extends ChangeNotifier {
     }
   }
 
-  // وظيفة تسجيل الدخول معدلة لترجع قيمة boolean
+  // وظيفة تسجيل الدخول باستخدام اسم المستخدم أو البريد الإلكتروني
   Future<bool> login(GlobalKey<FormState> formKey,
       [BuildContext? context]) async {
     // تحقق من النموذج قبل المتابعة
@@ -167,10 +177,14 @@ class LoginController extends ChangeNotifier {
     clearError();
 
     try {
+      // الحصول على اسم المستخدم أو البريد الإلكتروني وكلمة المرور
+      final identifier = emailController.text.trim();
+      final password = passwordController.text.trim();
+
       // تنفيذ عملية تسجيل الدخول من خلال خدمة Firebase
       final result = await _firebaseService.signIn(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: identifier, // يمكن أن يكون بريد إلكتروني أو اسم مستخدم
+        password: password,
       );
 
       // استخدام السياق المقدم أو السياق المخزن في المتحكم
@@ -182,8 +196,13 @@ class LoginController extends ChangeNotifier {
 
         // حفظ بيانات تسجيل الدخول للاستخدام التلقائي
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_email', emailController.text.trim());
-        await prefs.setString('user_password', passwordController.text.trim());
+        // تحديد إذا كان المعرف هو بريد إلكتروني أو اسم مستخدم
+        if (identifier.contains('@')) {
+          await prefs.setString('user_email', identifier);
+        } else {
+          await prefs.setString('user_username', identifier);
+        }
+        await prefs.setString('user_password', password);
 
         // عرض رسالة نجاح تسجيل الدخول
         _firebaseService.showLoginSuccessMessage(ctx);
@@ -205,5 +224,13 @@ class LoginController extends ChangeNotifier {
     } finally {
       setLoggingIn(false);
     }
+  }
+
+  // إعداد تسجيل الدخول باسم المستخدم
+  void setupLoginWithUsername(String username) {
+    emailController.text = username;
+    // تحديث حالة النموذج
+    _updateFormProgress();
+    notifyListeners();
   }
 }

@@ -12,10 +12,12 @@ import '../../shared/helpers/custom_route_transitions.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool showBackButton;
+  final String? initialUsername; // إضافة معلمة لاستقبال اسم المستخدم الأولي
 
   const LoginScreen({
     Key? key,
     this.showBackButton = false,
+    this.initialUsername, // إضافة معلمة جديدة
   }) : super(key: key);
 
   @override
@@ -52,6 +54,16 @@ class _LoginScreenState extends State<LoginScreen>
     ));
 
     _animationController.forward();
+
+    // تهيئة المتحكم بالسياق
+    _controller.init(context);
+
+    // إذا تم تمرير اسم مستخدم، قم بإعداده في حقل البريد الإلكتروني
+    if (widget.initialUsername != null && widget.initialUsername!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.emailController.text = widget.initialUsername!;
+      });
+    }
   }
 
   @override
@@ -209,6 +221,9 @@ class _LoginScreenState extends State<LoginScreen>
                         // تذييل الصفحة
                         LoginFooterComponent(
                           onSignup: _navigateToSignup,
+                          onForgotPassword: () {
+                            // TODO: إضافة انتقال لصفحة نسيت كلمة المرور
+                          },
                         ),
                       ],
                     ),

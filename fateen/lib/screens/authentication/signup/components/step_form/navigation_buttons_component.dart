@@ -1,0 +1,142 @@
+// lib/features/step_form/components/navigation_buttons_component.dart
+
+import 'package:flutter/material.dart';
+import '../../constants/signup_colors.dart';
+import '../../signup_controller/controllers/signup_controller.dart';
+
+class NavigationButtonsComponent extends StatelessWidget {
+  final SignupController controller;
+  final VoidCallback onPrevPressed;
+  final VoidCallback onNextPressed;
+  final VoidCallback onSubmitPressed;
+
+  const NavigationButtonsComponent({
+    Key? key,
+    required this.controller,
+    required this.onPrevPressed,
+    required this.onNextPressed,
+    required this.onSubmitPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isFirstStep = controller.currentStep == SignupStep.name;
+    final isLastStep = controller.currentStep == SignupStep.terms;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.06,
+        vertical: screenHeight * 0.02,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // زر الرجوع - مع تأثير متحرك عند الظهور والاختفاء
+          _buildBackButton(isFirstStep, screenWidth, screenHeight),
+
+          // زر التالي أو الإنهاء - مع تأثير نبض عندما يكون جاهزًا
+          _buildActionButton(
+              isFirstStep, isLastStep, screenWidth, screenHeight),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton(
+      bool isFirstStep, double screenWidth, double screenHeight) {
+    return AnimatedOpacity(
+      opacity: isFirstStep ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: isFirstStep ? 0 : screenWidth * 0.25,
+        child: isFirstStep
+            ? const SizedBox.shrink()
+            : TextButton(
+                onPressed: onPrevPressed,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    vertical: screenHeight * 0.015,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: SignupColors.hintColor.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.arrow_back_ios,
+                      size: screenWidth * 0.035,
+                      color: SignupColors.hintColor,
+                    ),
+                    SizedBox(width: screenWidth * 0.01),
+                    Text(
+                      'رجوع',
+                      style: TextStyle(
+                        color: SignupColors.hintColor,
+                        fontFamily: 'SYMBIOAR+LT',
+                        fontWeight: FontWeight.w500,
+                        fontSize: screenWidth * 0.035,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(bool isFirstStep, bool isLastStep,
+      double screenWidth, double screenHeight) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: isFirstStep ? screenWidth * 0.88 : screenWidth * 0.6,
+      height: screenHeight * 0.06,
+      child: ElevatedButton(
+        onPressed: controller.canMoveToNextStep
+            ? (isLastStep ? onSubmitPressed : onNextPressed)
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: SignupColors.mediumPurple,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: SignupColors.mediumPurple.withOpacity(0.5),
+          disabledForegroundColor: Colors.white.withOpacity(0.7),
+          elevation: controller.canMoveToNextStep ? 4 : 0,
+          shadowColor: SignupColors.mediumPurple.withOpacity(0.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.04,
+            vertical: screenHeight * 0.015,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              isLastStep ? 'إنشاء الحساب' : 'التالي',
+              style: TextStyle(
+                fontFamily: 'SYMBIOAR+LT',
+                fontWeight: FontWeight.bold,
+                fontSize: screenWidth * 0.04,
+              ),
+            ),
+            SizedBox(width: screenWidth * 0.02),
+            Icon(
+              isLastStep ? Icons.check_circle_outline : Icons.arrow_forward_ios,
+              size: screenWidth * 0.04,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
