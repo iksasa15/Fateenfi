@@ -217,9 +217,10 @@ class LoginController extends ChangeNotifier {
       }
 
       // إذا وصلنا هنا، فهناك خطأ غير متوقع
+      setErrorMessage('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى');
       return false;
     } catch (e) {
-      setErrorMessage('حدث خطأ أثناء تسجيل الدخول');
+      setErrorMessage('حدث خطأ أثناء تسجيل الدخول: ${e.toString()}');
       return false;
     } finally {
       setLoggingIn(false);

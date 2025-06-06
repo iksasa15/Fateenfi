@@ -5,7 +5,7 @@ import '../constants/login_strings.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_dimensions.dart';
 import '../components/login_button_component.dart';
-import '../components/forgot_password_link_component.dart';
+import '../../reset_password/screens/reset_password_screen.dart'; // إضافة استيراد شاشة استعادة كلمة المرور
 
 class LoginFormComponent extends StatelessWidget {
   final LoginController controller;
@@ -33,27 +33,6 @@ class LoginFormComponent extends StatelessWidget {
           textInputAction: TextInputAction.next,
         ),
 
-        // نص توضيحي
-        Padding(
-          padding: EdgeInsets.only(
-            right:
-                LoginDimensions.getSpacing(context, size: SpacingSize.large) +
-                    4,
-            bottom:
-                LoginDimensions.getSpacing(context, size: SpacingSize.small),
-          ),
-          child: Text(
-            "يمكنك تسجيل الدخول باستخدام اسم المستخدم أو البريد الإلكتروني",
-            style: TextStyle(
-              color: AuthColors.hintColor,
-              fontSize:
-                  LoginDimensions.getLabelFontSize(context, small: true) - 1,
-              fontFamily: 'SYMBIOAR+LT',
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ),
-
         // حقل كلمة المرور
         _buildEnhancedInputField(
           context: context,
@@ -76,20 +55,83 @@ class LoginFormComponent extends StatelessWidget {
           },
         ),
 
-        // رابط نسيت كلمة المرور
-        ForgotPasswordLinkComponent(
-          onPressed: () {
-            // التنفيذ لاحقاً
-            HapticFeedback.selectionClick();
-          },
-        ),
+        // رابط نسيت كلمة المرور (مباشر بدون استخدام المكون المنفصل)
+        _buildForgotPasswordLink(context),
 
-        // زر تسجيل الدخول - تم تعديله للتأكد من عمله
+        // زر تسجيل الدخول
         LoginButtonComponent(
           isLoading: controller.isLoggingIn,
-          onPressed: onLogin, // تم إزالة الشرط للتأكد من عمل الزر
+          onPressed: onLogin,
         ),
       ],
+    );
+  }
+
+  // إضافة دالة لبناء رابط نسيت كلمة المرور بشكل مباشر
+  Widget _buildForgotPasswordLink(BuildContext context) {
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
+
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          0,
+          LoginDimensions.getSpacing(context, size: SpacingSize.large),
+          LoginDimensions.getSpacing(context, size: SpacingSize.large) - 8),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius:
+                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
+            onTap: () {
+              HapticFeedback.selectionClick();
+
+              // الانتقال إلى شاشة استعادة كلمة المرور
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ResetPasswordScreen(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: LoginDimensions.getSpacing(context,
+                    size: SpacingSize.small),
+                vertical: LoginDimensions.getSpacing(context,
+                        size: SpacingSize.small) /
+                    2,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    LoginStrings.forgotPasswordText,
+                    style: TextStyle(
+                      color: AuthColors.darkPurple,
+                      fontSize: LoginDimensions.getBodyFontSize(context,
+                          small: isSmallScreen),
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                  ),
+                  SizedBox(
+                      width: LoginDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2),
+                  Icon(
+                    Icons.lock_reset_rounded,
+                    color: AuthColors.darkPurple,
+                    size: LoginDimensions.getBodyFontSize(context,
+                            small: isSmallScreen) +
+                        2,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -134,7 +176,7 @@ class LoginFormComponent extends StatelessWidget {
     );
   }
 
-  // حقل إدخال محسن
+  // حقل إدخال محسن مع إزالة فورية للخطأ عند الكتابة
   Widget _buildEnhancedInputField({
     required BuildContext context,
     required String title,
@@ -164,6 +206,9 @@ class LoginFormComponent extends StatelessWidget {
     // استخدام FocusNode داخلي لتتبع حالة التركيز
     final FocusNode focusNode = FocusNode();
 
+    // استخدام FormFieldState للتحكم في حالة الخطأ
+    final formFieldKey = GlobalKey<FormFieldState>();
+
     return StatefulBuilder(
       builder: (context, setState) {
         // إضافة مستمع لحالة التركيز
@@ -178,6 +223,7 @@ class LoginFormComponent extends StatelessWidget {
                       2,
               horizontal: horizontalPadding),
           child: TextFormField(
+            key: formFieldKey,
             controller: controller,
             focusNode: focusNode,
             keyboardType: keyboardType,
@@ -188,6 +234,16 @@ class LoginFormComponent extends StatelessWidget {
             onTap: () {
               // تطبيق تأثير حسي عند الضغط
               HapticFeedback.selectionClick();
+            },
+            onChanged: (value) {
+              // عند تغيير النص، قم بإعادة التحقق من الحقل وإزالة رسالة الخطأ إذا كان النص صحيحاً
+              if (formFieldKey.currentState != null &&
+                  formFieldKey.currentState!.hasError) {
+                // إعادة التحقق فقط إذا كان هناك خطأ
+                if (validator(value) == null) {
+                  formFieldKey.currentState!.validate();
+                }
+              }
             },
             style: TextStyle(
               color: AuthColors.textColor,

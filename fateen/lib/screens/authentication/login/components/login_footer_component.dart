@@ -27,26 +27,6 @@ class LoginFooterComponent extends StatelessWidget {
 
     return Column(
       children: [
-        // زر استعادة كلمة المرور
-        if (onForgotPassword != null)
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: TextButton(
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                onForgotPassword!();
-              },
-              child: Text(
-                LoginStrings.forgotPasswordText,
-                style: TextStyle(
-                  color: LoginColors.mediumPurple,
-                  fontSize: fontSize - 1,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-              ),
-            ),
-          ),
-
         // فاصل مع أو
         Padding(
           padding: EdgeInsets.symmetric(
@@ -64,7 +44,7 @@ class LoginFooterComponent extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  LoginStrings.orRegisterWith,
+                  LoginStrings.orLoginWith,
                   style: TextStyle(
                     color: LoginColors.hintColor,
                     fontSize: fontSize - 1,
@@ -82,47 +62,7 @@ class LoginFooterComponent extends StatelessWidget {
           ),
         ),
 
-        // سؤال ليس لديك حساب؟
-        Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 32.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                LoginStrings.noAccountQuestion,
-                style: TextStyle(
-                  color: LoginColors.textColor,
-                  fontSize: fontSize,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  onSignup();
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  LoginStrings.createAccountAction,
-                  style: TextStyle(
-                    color: LoginColors.mediumPurple,
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // تم حذف سؤال "ليس لديك حساب؟ إنشاء حساب"
 
         // المساحة السفلية
         SizedBox(height: isTablet ? 40.0 : 24.0),

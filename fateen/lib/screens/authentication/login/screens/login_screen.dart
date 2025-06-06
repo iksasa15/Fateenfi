@@ -1,10 +1,10 @@
+import 'package:fateen/screens/authentication/shared/constants/auth_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/login_header_component.dart';
 import '../components/login_form_component.dart';
 import '../components/login_footer_component.dart';
 import '../components/social_login_component.dart';
-import '../components/error_message_component.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_colors.dart';
 import '../../shared/components/auth_toggle_bar.dart';
@@ -80,47 +80,31 @@ class _LoginScreenState extends State<LoginScreen>
     HapticFeedback.mediumImpact();
 
     if (_formKey.currentState!.validate()) {
-      // إظهار رسالة التحميل
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Text(
-                  'جاري تسجيل الدخول...',
-                  style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
-                ),
-              ],
-            ),
-            backgroundColor: LoginColors.mediumPurple,
-            duration: const Duration(seconds: 1),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+      try {
+        // تنفيذ تسجيل الدخول
+        final success = await _controller.login(
+          _formKey,
+          context,
         );
+
+        // التحقق من أن الشاشة لا تزال مثبتة وعرض رسالة الخطأ إذا لزم الأمر
+        if (mounted && !success && _controller.errorMessage.isNotEmpty) {
+          _showErrorMessage(_controller.errorMessage);
+        }
+      } catch (e) {
+        if (mounted) {
+          _showErrorMessage("حدث خطأ غير متوقع. حاول مرة أخرى.");
+        }
       }
+    }
+  }
 
-      // إجراء تسجيل الدخول - تعديل التعامل مع القيمة المرجعة
-      final success = await _controller.login(
-        _formKey,
-        context,
-      );
-
-      // لا حاجة لإظهار رسالة النجاح حيث سننتقل مباشرة للصفحة الرئيسية
-      if (mounted && success == false) {
-        // تعديل شرط التحقق
-        // إظهار رسالة الفشل
+  // عرض رسالة خطأ بشكل آمن
+  void _showErrorMessage(String message) {
+    // نستخدم WidgetsBinding لضمان أن التنفيذ يحدث بعد انتهاء بناء الإطار الحالي
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -129,28 +113,32 @@ class _LoginScreenState extends State<LoginScreen>
                   Icons.error_outline,
                   color: Colors.white,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    _controller.errorMessage ??
-                        'حدث خطأ في تسجيل الدخول، حاول مرة أخرى',
-                    style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                    message,
+                    style: const TextStyle(
+                      fontFamily: 'SYMBIOAR+LT',
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
                 ),
               ],
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: AuthColors.accentColor,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           ),
         );
       }
-    }
+    });
   }
 
   // الانتقال إلى شاشة إنشاء الحساب
@@ -209,12 +197,6 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // عرض رسالة الخطأ إذا كانت موجودة
-                        if (_controller.errorMessage.isNotEmpty)
-                          ErrorMessageComponent(
-                            errorMessage: _controller.errorMessage,
-                          ),
-
                         // نموذج تسجيل الدخول
                         LoginFormComponent(
                           controller: _controller,
