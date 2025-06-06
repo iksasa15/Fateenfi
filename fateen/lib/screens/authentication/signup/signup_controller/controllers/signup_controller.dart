@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/signup_strings.dart';
-import '../services/signup_firebase_service.dart';
-import '../../../../models/student.dart'; // استخدام فئة Student
+import '../../constants/signup_strings.dart';
+import '../../firebase_services/services/signup_firebase_service.dart';
+import '../../../../../models/student.dart'; // استخدام فئة Student
 
 // تعريف خطوات التسجيل
 enum SignupStep { name, username, email, password, university, major, terms }

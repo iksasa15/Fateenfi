@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/signup_colors.dart';
-import '../constants/signup_strings.dart';
+import '../../constants/signup_colors.dart';
+import '../../constants/signup_strings.dart';
 
 class DirectSignupButton extends StatelessWidget {
   final bool isLoading;

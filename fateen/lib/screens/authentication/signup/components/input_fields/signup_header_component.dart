@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../constants/signup_colors.dart';
-import '../constants/signup_strings.dart';
-import '../constants/signup_dimensions.dart';
+import '../../constants/signup_colors.dart';
+import '../../constants/signup_strings.dart';
+import '../../constants/signup_dimensions.dart';
 
 class SignupHeaderComponent extends StatelessWidget {
   const SignupHeaderComponent({Key? key}) : super(key: key);

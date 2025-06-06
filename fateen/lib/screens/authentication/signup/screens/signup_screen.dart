@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../controllers/signup_controller.dart';
-import '../components/signup_header_component.dart';
-import '../components/error_message_component.dart';
-import '../components/step_form_container.dart';
+import '../signup_controller/controllers/signup_controller.dart';
+import '../components/input_fields/signup_header_component.dart';
+import '../components/input_fields/error_message_component.dart';
+import '../components/step_form/step_form_container.dart';
 import '../../shared/components/auth_toggle_bar.dart';
 import '../constants/signup_colors.dart';
 import '../../verification/screens/verification_screen.dart';

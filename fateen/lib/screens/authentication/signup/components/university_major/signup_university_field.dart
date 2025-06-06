@@ -1,57 +1,65 @@
 import 'package:flutter/material.dart';
-import '../constants/signup_colors.dart';
-import '../constants/signup_strings.dart';
-import '../constants/signup_dimensions.dart';
+import '../../constants/signup_colors.dart';
+import '../../constants/signup_strings.dart';
+import '../../constants/signup_dimensions.dart';
 
-class SignupMajorField extends StatefulWidget {
+class SignupUniversityField extends StatefulWidget {
   final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool isOtherMajor;
+  final FocusNode? focusNode;
+  final bool isOtherUniversity;
   final VoidCallback onTap;
   final String? errorText;
 
-  const SignupMajorField({
+  const SignupUniversityField({
     Key? key,
     required this.controller,
-    required this.focusNode,
-    required this.isOtherMajor,
+    this.focusNode,
+    required this.isOtherUniversity,
     required this.onTap,
     this.errorText,
   }) : super(key: key);
 
   @override
-  State<SignupMajorField> createState() => _SignupMajorFieldState();
+  State<SignupUniversityField> createState() => _SignupUniversityFieldState();
 }
 
-class _SignupMajorFieldState extends State<SignupMajorField> {
+class _SignupUniversityFieldState extends State<SignupUniversityField> {
   bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
-    widget.focusNode.addListener(() {
-      setState(() {
-        _isFocused = widget.focusNode.hasFocus;
+    if (widget.focusNode != null) {
+      widget.focusNode!.addListener(() {
+        setState(() {
+          _isFocused = widget.focusNode!.hasFocus;
+        });
       });
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isSmallScreen = MediaQuery.of(context).size.width < 360;
+        final screenWidth = constraints.maxWidth;
+        final isSmallScreen = screenWidth < 360;
+        final isTablet = screenWidth > 600;
+
+        final fontSize = isTablet
+            ? 17.0
+            : (isSmallScreen
+                ? SignupDimensions.smallBodyFontSize
+                : SignupDimensions.bodyFontSize);
+        final labelSize = isTablet ? 16.0 : (isSmallScreen ? 13.0 : 14.0);
+        final iconSize = isTablet ? 26.0 : (isSmallScreen ? 20.0 : 22.0);
+        final verticalPadding = isTablet ? 24.0 : (isSmallScreen ? 16.0 : 18.0);
 
         return Padding(
-          padding: EdgeInsets.symmetric(
-              vertical:
-                  SignupDimensions.getSpacing(context, size: SpacingSize.small),
-              horizontal: SignupDimensions.getSpacing(context,
-                  size: SpacingSize.large)),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
                   color: SignupColors.shadowColor.withOpacity(0.05),
@@ -61,9 +69,11 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
                 ),
               ],
             ),
-            child: widget.isOtherMajor
-                ? _buildTextField(context, isSmallScreen)
-                : _buildReadOnlyField(context, isSmallScreen),
+            child: widget.isOtherUniversity
+                ? _buildTextField(fontSize, labelSize, iconSize,
+                    verticalPadding, isSmallScreen)
+                : _buildReadOnlyField(fontSize, labelSize, iconSize,
+                    verticalPadding, isSmallScreen),
           ),
         );
       },
@@ -71,70 +81,64 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
   }
 
   // بناء حقل النص في حالة "أخرى"
-  Widget _buildTextField(BuildContext context, bool isSmallScreen) {
+  Widget _buildTextField(double fontSize, double labelSize, double iconSize,
+      double verticalPadding, bool isSmallScreen) {
     return TextFormField(
       controller: widget.controller,
       focusNode: widget.focusNode,
       textAlign: TextAlign.right,
       style: TextStyle(
         color: SignupColors.textColor,
-        fontSize:
-            SignupDimensions.getBodyFontSize(context, small: isSmallScreen),
+        fontSize: fontSize,
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
       ),
       decoration: InputDecoration(
-        hintText: SignupStrings.majorHint,
-        labelText: "التخصص",
+        hintText: SignupStrings.universityNameHint,
+        labelText: SignupStrings.universityNameLabel,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         labelStyle: TextStyle(
           color: SignupColors.textColor.withOpacity(0.7),
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+          fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
           color: SignupColors.hintColor,
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+          fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
-          Icons.school_outlined,
+          Icons.account_balance_outlined,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+          size: iconSize,
         ),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: Colors.grey.shade200,
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.mediumPurple,
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1.5,
@@ -142,16 +146,12 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         errorStyle: TextStyle(
           color: SignupColors.accentColor,
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen) -
-                  1,
+          fontSize: isSmallScreen ? 10 : 12,
           fontFamily: 'SYMBIOAR+LT',
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: SignupDimensions.getInputFieldPadding(context,
-              small: isSmallScreen),
-          horizontal:
-              SignupDimensions.getSpacing(context, size: SpacingSize.medium),
+          vertical: verticalPadding,
+          horizontal: 20,
         ),
         errorText: widget.errorText,
       ),
@@ -159,7 +159,8 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
   }
 
   // بناء حقل للقراءة فقط للاختيار من القائمة المنسدلة
-  Widget _buildReadOnlyField(BuildContext context, bool isSmallScreen) {
+  Widget _buildReadOnlyField(double fontSize, double labelSize, double iconSize,
+      double verticalPadding, bool isSmallScreen) {
     // نستخدم TextFormField عادي مع تعطيل الكتابة فيه ولكن إظهار قيمته
     return TextFormField(
       controller: widget.controller, // استخدام نفس وحدة التحكم الأصلية
@@ -167,14 +168,15 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
       textAlign: TextAlign.right,
       style: TextStyle(
         color: SignupColors.textColor,
-        fontSize:
-            SignupDimensions.getBodyFontSize(context, small: isSmallScreen),
+        fontSize: fontSize,
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
       ),
       decoration: InputDecoration(
-        labelText: "التخصص",
-        hintText: widget.controller.text.isEmpty ? "اختر التخصص" : null,
+        labelText: SignupStrings.universityNameLabel,
+        hintText: widget.controller.text.isEmpty
+            ? SignupStrings.universityNameHint
+            : null,
         floatingLabelBehavior: widget.controller.text.isEmpty
             ? FloatingLabelBehavior.auto
             : FloatingLabelBehavior.always,
@@ -182,58 +184,52 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
           color: _isFocused
               ? SignupColors.mediumPurple
               : SignupColors.textColor.withOpacity(0.7),
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+          fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
           color: SignupColors.hintColor,
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+          fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
-          Icons.school_outlined,
+          Icons.account_balance_outlined,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+          size: iconSize,
         ),
         suffixIcon: Icon(
           Icons.arrow_drop_down,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen) + 4,
+          size: iconSize + 4,
         ),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: Colors.grey.shade200,
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.mediumPurple,
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1.5,
@@ -241,16 +237,12 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         errorStyle: TextStyle(
           color: SignupColors.accentColor,
-          fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen) -
-                  1,
+          fontSize: isSmallScreen ? 10 : 12,
           fontFamily: 'SYMBIOAR+LT',
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: SignupDimensions.getInputFieldPadding(context,
-              small: isSmallScreen),
-          horizontal:
-              SignupDimensions.getSpacing(context, size: SpacingSize.medium),
+          vertical: verticalPadding,
+          horizontal: 20,
         ),
         errorText: widget.errorText,
       ),
@@ -260,7 +252,9 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
 
   @override
   void dispose() {
-    widget.focusNode.removeListener(() {});
+    if (widget.focusNode != null) {
+      widget.focusNode!.removeListener(() {});
+    }
     super.dispose();
   }
 }

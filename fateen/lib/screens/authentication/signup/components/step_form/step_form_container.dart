@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/signup_colors.dart';
-import '../constants/signup_dimensions.dart';
-import '../controllers/signup_controller.dart';
-import '../components/signup_major_field.dart';
-import '../components/signup_university_field.dart';
-import '../components/terms_agreement_component.dart';
-import '../components/social_signup_component.dart';
-import '../components/major_picker_component.dart';
-import '../components/university_picker_component.dart';
+import '../../constants/signup_colors.dart';
+import '../../constants/signup_dimensions.dart';
+import '../../signup_controller/controllers/signup_controller.dart';
+import '../university_major/signup_major_field.dart';
+import '../university_major/signup_university_field.dart';
+import '../social_terms/terms_agreement_component.dart';
+import '../social_terms/social_signup_component.dart';
+import '../university_major/major_picker_component.dart';
+import '../university_major/university_picker_component.dart';
 
 class StepFormContainer extends StatefulWidget {
   final SignupController controller;
