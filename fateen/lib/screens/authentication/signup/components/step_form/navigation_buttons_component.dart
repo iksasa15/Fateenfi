@@ -55,7 +55,7 @@ class NavigationButtonsComponent extends StatelessWidget {
         child: isFirstStep
             ? const SizedBox.shrink()
             : TextButton(
-                onPressed: onPrevPressed,
+                onPressed: controller.isLoading ? null : onPrevPressed,
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(
                     vertical: screenHeight * 0.015,
@@ -67,6 +67,9 @@ class NavigationButtonsComponent extends StatelessWidget {
                       width: 1,
                     ),
                   ),
+                  foregroundColor: SignupColors.hintColor,
+                  disabledForegroundColor:
+                      SignupColors.hintColor.withOpacity(0.4),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -95,20 +98,27 @@ class NavigationButtonsComponent extends StatelessWidget {
 
   Widget _buildActionButton(bool isFirstStep, bool isLastStep,
       double screenWidth, double screenHeight) {
+    // تعطيل الزر أثناء حالة التحميل أو عندما تكون البيانات غير صالحة
+    final isButtonEnabled =
+        controller.canMoveToNextStep && !controller.isLoading;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: isFirstStep ? screenWidth * 0.88 : screenWidth * 0.6,
       height: screenHeight * 0.06,
       child: ElevatedButton(
-        onPressed: controller.canMoveToNextStep
+        onPressed: isButtonEnabled
             ? (isLastStep ? onSubmitPressed : onNextPressed)
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: SignupColors.mediumPurple,
+          backgroundColor:
+              isLastStep ? SignupColors.darkPurple : SignupColors.mediumPurple,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: SignupColors.mediumPurple.withOpacity(0.5),
+          disabledBackgroundColor:
+              (isLastStep ? SignupColors.darkPurple : SignupColors.mediumPurple)
+                  .withOpacity(0.5),
           disabledForegroundColor: Colors.white.withOpacity(0.7),
-          elevation: controller.canMoveToNextStep ? 4 : 0,
+          elevation: isButtonEnabled ? 4 : 0,
           shadowColor: SignupColors.mediumPurple.withOpacity(0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -118,25 +128,58 @@ class NavigationButtonsComponent extends StatelessWidget {
             vertical: screenHeight * 0.015,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              isLastStep ? 'إنشاء الحساب' : 'التالي',
-              style: TextStyle(
-                fontFamily: 'SYMBIOAR+LT',
-                fontWeight: FontWeight.bold,
-                fontSize: screenWidth * 0.04,
-              ),
-            ),
-            SizedBox(width: screenWidth * 0.02),
-            Icon(
-              isLastStep ? Icons.check_circle_outline : Icons.arrow_forward_ios,
-              size: screenWidth * 0.04,
-            ),
-          ],
-        ),
+        child: isLastStep && controller.isLoading
+            ? _buildLoadingContent(screenWidth)
+            : _buildButtonContent(isLastStep, screenWidth),
       ),
+    );
+  }
+
+  // عرض محتوى الزر في حالة التحميل
+  Widget _buildLoadingContent(double screenWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: screenWidth * 0.05,
+          height: screenWidth * 0.05,
+          child: const CircularProgressIndicator(
+            strokeWidth: 2.0,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        ),
+        SizedBox(width: screenWidth * 0.03),
+        Text(
+          'جاري التسجيل...',
+          style: TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontWeight: FontWeight.bold,
+            fontSize: screenWidth * 0.04,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // عرض محتوى الزر العادي
+  Widget _buildButtonContent(bool isLastStep, double screenWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          isLastStep ? 'إنشاء الحساب' : 'التالي',
+          style: TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontWeight: FontWeight.bold,
+            fontSize: screenWidth * 0.04,
+          ),
+        ),
+        SizedBox(width: screenWidth * 0.02),
+        Icon(
+          isLastStep ? Icons.check_circle_outline : Icons.arrow_forward_ios,
+          size: screenWidth * 0.04,
+        ),
+      ],
     );
   }
 }

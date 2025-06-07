@@ -67,27 +67,49 @@ class _SignUpScreenState extends State<SignUpScreen>
     super.dispose();
   }
 
-  // معالجة الانتقال للخطوة التالية مع تأثير اهتزاز
-  void _handleNextStep() {
+  // معالجة الانتقال للخطوة التالية مع تأثير اهتزاز - تم تحويلها إلى async
+  Future<void> _handleNextStep() async {
     // تطبيق تأثير اهتزاز لطيف
     HapticFeedback.selectionClick();
 
     if (_controller.validateCurrentStep()) {
       // للتحقق من اسم المستخدم عند الانتقال من خطوة اسم المستخدم
       if (_controller.currentStep == SignupStep.username) {
-        _controller.checkUsernameUnique().then((isUnique) {
-          if (isUnique) {
-            _controller.moveToNextStep();
-          }
+        // تعيين حالة التحقق إلى true قبل البدء
+        setState(() {
+          _controller.setCheckingUsername(true);
         });
+
+        // استخدام await بدلاً من then
+        final isUnique = await _controller.checkUsernameUnique();
+
+        // إعادة تعيين حالة التحقق بعد الانتهاء
+        setState(() {
+          _controller.setCheckingUsername(false);
+        });
+
+        if (isUnique) {
+          _controller.moveToNextStep();
+        }
       }
       // للتحقق من البريد الإلكتروني
       else if (_controller.currentStep == SignupStep.email) {
-        _controller.validateEmailExists().then((isValid) {
-          if (isValid) {
-            _controller.moveToNextStep();
-          }
+        // تعيين حالة التحقق إلى true قبل البدء
+        setState(() {
+          _controller.setCheckingEmail(true);
         });
+
+        // استخدام await بدلاً من then
+        final isValid = await _controller.validateEmailExists();
+
+        // إعادة تعيين حالة التحقق بعد الانتهاء
+        setState(() {
+          _controller.setCheckingEmail(false);
+        });
+
+        if (isValid) {
+          _controller.moveToNextStep();
+        }
       } else {
         _controller.moveToNextStep();
       }
@@ -103,7 +125,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     _controller.moveToPreviousStep();
   }
 
-  // معالجة التسجيل
+  // معالجة التسجيل - تم إزالة جميع رسائل Snackbar
   Future<void> _handleSignup() async {
     // تأثير اهتزاز عند الضغط على زر التسجيل
     HapticFeedback.mediumImpact();
@@ -111,62 +133,54 @@ class _SignUpScreenState extends State<SignUpScreen>
     if (_formKey.currentState!.validate() &&
         _controller.validateMajor() &&
         _controller.validateUniversity()) {
-      // إظهار رسالة التحميل مع تأثير متحرك
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Text(
-                'جاري تسجيل الحساب...',
-                style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
-              ),
-            ],
-          ),
-          backgroundColor: SignupColors.mediumPurple,
-          duration: const Duration(seconds: 1),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      // تعيين حالة التحميل للكونترولر
+      setState(() {
+        _controller.setLoading(true);
+      });
 
       // إجراء التسجيل
-      final success = await _controller.signup(_formKey);
+      bool success = false;
+      try {
+        success = await _controller.signup(_formKey);
+      } catch (e) {
+        print("خطأ في عملية التسجيل: $e");
+      } finally {
+        // إنهاء حالة التحميل بغض النظر عن النتيجة
+        if (mounted) {
+          setState(() {
+            _controller.setLoading(false);
+          });
+        }
+      }
 
-      if (mounted) {
-        // إظهار رسالة النجاح أو الفشل
+      // في حالة النجاح، انتقل مباشرة إلى صفحة التحقق
+      if (mounted && success) {
+        // تطبيق تأثير سحب للأسفل قبل الانتقال
+        _animationController.reverse().then((_) {
+          _navigateToVerification();
+        });
+      } else if (mounted && !success) {
+        // في حالة الفشل فقط، عرض رسالة خطأ
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
-              children: [
+              children: const [
                 Icon(
-                  success ? Icons.check_circle : Icons.error_outline,
+                  Icons.error_outline,
                   color: Colors.white,
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    success
-                        ? 'تم التسجيل بنجاح، جاري الانتقال لصفحة التحقق...'
-                        : 'حدث خطأ في التسجيل، حاول مرة أخرى',
-                    style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                    'حدث خطأ في التسجيل، حاول مرة أخرى',
+                    style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
                 ),
               ],
             ),
-            backgroundColor: success ? Colors.green : Colors.orange,
+            backgroundColor: Colors.orange,
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -174,19 +188,37 @@ class _SignUpScreenState extends State<SignUpScreen>
             ),
           ),
         );
-
-        if (success) {
-          // تأخير بسيط قبل الانتقال
-          await Future.delayed(const Duration(milliseconds: 1500));
-
-          if (mounted) {
-            // تطبيق تأثير سحب للأسفل قبل الانتقال
-            _animationController.reverse().then((_) {
-              _navigateToVerification();
-            });
-          }
-        }
       }
+    } else {
+      // إذا كان التحقق من الصحة فاشلاً، نطبق تأثير اهتزاز قوي
+      HapticFeedback.heavyImpact();
+
+      // عرض رسالة خطأ للمستخدم
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(
+                Icons.error_outline,
+                color: Colors.white,
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  'يرجى التحقق من صحة البيانات المدخلة',
+                  style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
     }
   }
 
@@ -253,15 +285,27 @@ class _SignUpScreenState extends State<SignUpScreen>
                             ),
                           ),
 
-                          // زر التبديل بين التسجيل وإنشاء الحساب - دائمًا مرئي
-                          Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: AuthToggleBar(
-                              currentMode: AuthToggleMode.signup,
-                              onLoginPressed: _navigateToLogin,
-                              onSignupPressed: () {
-                                // بالفعل في شاشة إنشاء الحساب
-                              },
+                          // زر التبديل بين التسجيل وإنشاء الحساب - يظهر فقط في الخطوة الأولى
+                          AnimatedOpacity(
+                            opacity: _controller.currentStep == SignupStep.name
+                                ? 1.0
+                                : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              height: _controller.currentStep == SignupStep.name
+                                  ? null
+                                  : 0,
+                              child: Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: AuthToggleBar(
+                                  currentMode: AuthToggleMode.signup,
+                                  onLoginPressed: _navigateToLogin,
+                                  onSignupPressed: () {
+                                    // بالفعل في شاشة إنشاء الحساب
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -285,8 +329,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                               onNextPressed: _handleNextStep,
                               onPrevPressed: _handlePreviousStep,
                               onSubmitPressed: _handleSignup,
-                              onLoginPressed:
-                                  _navigateToLogin, // إضافة جديدة: تمرير دالة الانتقال إلى شاشة تسجيل الدخول
+                              onLoginPressed: _navigateToLogin,
                             ),
                           ],
                         ),

@@ -52,6 +52,10 @@ class _StepFormContainerState extends State<StepFormContainer>
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
+  // متغيرات لتتبع محاولات التحقق
+  bool _hasAttemptedUniversityValidation = false;
+  bool _hasAttemptedMajorValidation = false;
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +140,11 @@ class _StepFormContainerState extends State<StepFormContainer>
   }
 
   void _handleUniversityStep() {
+    // إعادة تعيين متغير محاولة التحقق عند تغيير الخطوة
+    setState(() {
+      _hasAttemptedUniversityValidation = false;
+    });
+
     // إظهار منتقي الجامعة تلقائياً إذا كان الحقل فارغاً
     if (widget.controller.universityNameController.text.isEmpty) {
       Future.delayed(const Duration(milliseconds: 200), () {
@@ -150,6 +159,11 @@ class _StepFormContainerState extends State<StepFormContainer>
   }
 
   void _handleMajorStep() {
+    // إعادة تعيين متغير محاولة التحقق عند تغيير الخطوة
+    setState(() {
+      _hasAttemptedMajorValidation = false;
+    });
+
     // إظهار منتقي التخصص تلقائياً إذا كان الحقل فارغاً
     if (widget.controller.majorController.text.isEmpty) {
       Future.delayed(const Duration(milliseconds: 200), () {
@@ -162,17 +176,69 @@ class _StepFormContainerState extends State<StepFormContainer>
     }
   }
 
-  // دالة مخصصة للانتقال إلى الخطوة التالية مع تحقق إضافي
-  void _navigateToNextStep() {
+  // دالة مخصصة للانتقال إلى الخطوة التالية مع تحقق إضافي - تم تحويلها إلى async
+  Future<void> _navigateToNextStep() async {
     if (_isVerificationInProgress()) {
       _showVerificationSnackbar();
       return;
     }
 
     if (widget.controller.currentStep == SignupStep.username) {
-      _handleUsernameVerification();
+      // تحديث واجهة المستخدم لإظهار أننا نتحقق
+      setState(() {
+        widget.controller.setCheckingUsername(true);
+      });
+
+      // استخدام await بدلاً من then للانتظار حتى اكتمال التحقق
+      final isValid = await widget.controller.validateUsernameExists();
+
+      // تحديث الواجهة بعد اكتمال التحقق
+      setState(() {
+        widget.controller.setCheckingUsername(false);
+      });
+
+      // إذا كان اسم المستخدم صالحاً، انتقل للخطوة التالية
+      if (isValid) {
+        widget.onNextPressed();
+      }
     } else if (widget.controller.currentStep == SignupStep.email) {
-      _handleEmailVerification();
+      // تحديث واجهة المستخدم لإظهار أننا نتحقق
+      setState(() {
+        widget.controller.setCheckingEmail(true);
+      });
+
+      // استخدام await بدلاً من then للانتظار حتى اكتمال التحقق
+      final isValid = await widget.controller.validateEmailExists();
+
+      // تحديث الواجهة بعد اكتمال التحقق
+      setState(() {
+        widget.controller.setCheckingEmail(false);
+      });
+
+      // إذا كان البريد الإلكتروني صالحاً، انتقل للخطوة التالية
+      if (isValid) {
+        widget.onNextPressed();
+      }
+    } else if (widget.controller.currentStep == SignupStep.university) {
+      // تحديث متغير محاولة التحقق من الجامعة
+      setState(() {
+        _hasAttemptedUniversityValidation = true;
+      });
+
+      // للخطوات الأخرى، التأكد من صحة البيانات
+      if (widget.controller.validateCurrentStep()) {
+        widget.onNextPressed();
+      }
+    } else if (widget.controller.currentStep == SignupStep.major) {
+      // تحديث متغير محاولة التحقق من التخصص
+      setState(() {
+        _hasAttemptedMajorValidation = true;
+      });
+
+      // للخطوات الأخرى، التأكد من صحة البيانات
+      if (widget.controller.validateCurrentStep()) {
+        widget.onNextPressed();
+      }
     } else {
       // للخطوات الأخرى، التأكد من صحة البيانات
       if (widget.controller.validateCurrentStep()) {
@@ -202,22 +268,6 @@ class _StepFormContainerState extends State<StepFormContainer>
         backgroundColor: SignupColors.mediumPurple,
       ),
     );
-  }
-
-  void _handleUsernameVerification() {
-    widget.controller.validateUsernameExists().then((isValid) {
-      if (isValid) {
-        widget.onNextPressed();
-      }
-    });
-  }
-
-  void _handleEmailVerification() {
-    widget.controller.validateEmailExists().then((isValid) {
-      if (isValid) {
-        widget.onNextPressed();
-      }
-    });
   }
 
   // دالة تعامل مع تغيير اسم المستخدم مع دعم debounce
@@ -451,9 +501,10 @@ class _StepFormContainerState extends State<StepFormContainer>
     return originalError;
   }
 
-  void _attemptNextStep() {
+  // تحديث هذه الدالة لتصبح async لتتوافق مع _navigateToNextStep
+  Future<void> _attemptNextStep() async {
     if (widget.controller.validateCurrentStep()) {
-      _navigateToNextStep();
+      await _navigateToNextStep();
     }
   }
 
@@ -463,7 +514,8 @@ class _StepFormContainerState extends State<StepFormContainer>
       focusNode: widget.controller.universityFocusNode,
       isOtherUniversity: widget.controller.isOtherUniversity,
       onTap: () => _showUniversityPicker(context),
-      errorText: !widget.controller.validateUniversity()
+      errorText: (_hasAttemptedUniversityValidation &&
+              !widget.controller.validateUniversity())
           ? 'الرجاء اختيار الجامعة'
           : null,
     );
@@ -476,7 +528,9 @@ class _StepFormContainerState extends State<StepFormContainer>
       isOtherMajor: widget.controller.isOtherMajor,
       onTap: () => _showMajorPicker(context),
       errorText:
-          !widget.controller.validateMajor() ? 'الرجاء اختيار التخصص' : null,
+          (_hasAttemptedMajorValidation && !widget.controller.validateMajor())
+              ? 'الرجاء اختيار التخصص'
+              : null,
     );
   }
 
