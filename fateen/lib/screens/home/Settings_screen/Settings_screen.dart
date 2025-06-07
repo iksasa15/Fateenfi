@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fateen/screens/authentication/login/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fateen/main.dart'; // استيراد AuthChecker و ThemeProvider
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -29,26 +29,51 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // الحصول على مزود الثيم
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       body: Container(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'الإعدادات',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF221291),
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
                 const SizedBox(height: 30),
 
-                // إضافة خيار تواصل معنا فقط
+                // خيار الوضع الليلي/الفاتح
+                _buildSettingItem(
+                  context,
+                  icon: themeProvider.isDarkMode
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  title: 'الوضع الليلي',
+                  subtitle: themeProvider.isDarkMode ? 'مفعل' : 'غير مفعل',
+                  trailing: Switch(
+                    value: themeProvider.isDarkMode,
+                    onChanged: (_) {
+                      themeProvider.toggleTheme();
+                    },
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                  ),
+                  onTap: () {
+                    themeProvider.toggleTheme();
+                  },
+                ),
+
+                const SizedBox(height: 12),
+
+                // خيار تواصل معنا
                 _buildSettingItem(
                   context,
                   icon: Icons.email_outlined,
@@ -85,16 +110,9 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     );
 
+                    // استخدام دالة AuthChecker.signOut المتكاملة
                     if (result == true) {
-                      await FirebaseAuth.instance.signOut();
-                      if (context.mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
-                      }
+                      await AuthChecker.signOut(context);
                     }
                   },
                   child: Container(
@@ -123,12 +141,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  // تم تعديل هذه الدالة لدعم إضافة عناصر مخصصة (مثل Switch) بدلاً من السهم
   Widget _buildSettingItem(
     BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    Widget? trailing,
   }) {
     return InkWell(
       onTap: onTap,
@@ -140,12 +160,12 @@ class SettingsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF221291).withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF221291),
+                color: Theme.of(context).primaryColor,
                 size: 24,
               ),
             ),
@@ -156,26 +176,33 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withOpacity(0.7),
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.grey,
-            ),
+            // استخدام العنصر المخصص إذا كان موجودًا، وإلا استخدام السهم الافتراضي
+            trailing ??
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                ),
           ],
         ),
       ),

@@ -318,6 +318,59 @@ class MyApp extends StatelessWidget {
 class AuthChecker extends StatelessWidget {
   const AuthChecker({super.key});
 
+  /// دالة تسجيل الخروج المتكاملة - تستخدم في جميع أنحاء التطبيق
+  static Future<void> signOut(BuildContext context) async {
+    try {
+      debugPrint('بدء عملية تسجيل الخروج...');
+
+      // 1. تسجيل الخروج من Firebase Auth
+      await FirebaseAuth.instance.signOut();
+
+      // 2. مسح بيانات الاعتماد وبيانات المستخدم من التخزين المحلي
+      final prefs = await SharedPreferences.getInstance();
+
+      // تعيين علامة تسجيل الخروج الصريح
+      await prefs.setBool('explicit_logout', true);
+
+      // مسح بيانات تسجيل الدخول التلقائي
+      await prefs.remove('user_email');
+      await prefs.remove('user_password');
+
+      // مسح وقت آخر محاولات التحقق من الحساب
+      await prefs.remove('last_auto_login_attempt');
+      await prefs.remove('last_login_attempt');
+      await prefs.remove('last_signin_attempt');
+      await prefs.remove('last_email_check');
+      await prefs.remove('last_resend_attempt');
+
+      // مسح بيانات المستخدم المحلية
+      await prefs.remove(TabsConstants.prefUserNameKey);
+      await prefs.remove(TabsConstants.prefUserMajorKey);
+      await prefs.remove(TabsConstants.prefUserIdKey);
+
+      // تسجيل نجاح العملية
+      debugPrint('تم تسجيل الخروج ومسح البيانات المحلية بنجاح');
+
+      // 3. التوجيه إلى شاشة تسجيل الدخول
+      if (context.mounted) {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    } catch (e) {
+      debugPrint('خطأ في تسجيل الخروج: $e');
+
+      // إظهار رسالة خطأ للمستخدم
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ أثناء تسجيل الخروج: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // التحقق من حالة تسجيل الدخول مع دعم الدخول التلقائي
@@ -414,6 +467,18 @@ class AuthChecker extends StatelessWidget {
   /// التحقق مما إذا كان المستخدم مسجل الدخول بالفعل
   Future<bool> _isUserLoggedIn() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // التحقق مما إذا كان المستخدم قد سجل الخروج صراحة
+      final explicitLogout = prefs.getBool('explicit_logout') ?? false;
+      if (explicitLogout) {
+        // إعادة تعيين العلامة لجلسة جديدة محتملة
+        await prefs.setBool('explicit_logout', false);
+        debugPrint(
+            'تم اكتشاف تسجيل خروج صريح، تخطي محاولة تسجيل الدخول التلقائي');
+        return false;
+      }
+
       // التحقق من FirebaseAuth أولاً
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -422,7 +487,6 @@ class AuthChecker extends StatelessWidget {
       }
 
       // تقييد محاولات تسجيل الدخول التلقائي
-      final prefs = await SharedPreferences.getInstance();
       final lastAutoLogin = prefs.getInt('last_auto_login_attempt');
       final now = DateTime.now().millisecondsSinceEpoch;
 
