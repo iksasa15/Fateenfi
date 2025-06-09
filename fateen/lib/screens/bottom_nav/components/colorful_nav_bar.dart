@@ -14,6 +14,9 @@ class ColorfulNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // الحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+
     // لون القسم الحالي
     final Color currentSectionColor =
         BottomNavConstants.sectionColors[selectedIndex];
@@ -21,8 +24,11 @@ class ColorfulNavBar extends StatelessWidget {
     // تحديد ارتفاع الشريط المناسب للجهاز
     final barHeight = BottomNavConstants.getBarHeight(context);
 
+    // الحصول على الهامش السفلي المناسب للشريط
+    final padding = BottomNavConstants.getNavBarPadding(context);
+
     return Container(
-      height: barHeight,
+      height: barHeight + padding.bottom,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -41,7 +47,7 @@ class ColorfulNavBar extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-              height: 2,
+              height: screenSize.height * 0.0025, // 0.25% من ارتفاع الشاشة
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -56,12 +62,15 @@ class ColorfulNavBar extends StatelessWidget {
           ),
 
           // عناصر التنقل
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(BottomNavConstants.navigationLabels.length,
-                (index) {
-              return _buildNavItem(context, index);
-            }),
+          Padding(
+            padding: padding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                  BottomNavConstants.navigationLabels.length, (index) {
+                return _buildNavItem(context, index);
+              }),
+            ),
           ),
         ],
       ),
@@ -70,6 +79,9 @@ class ColorfulNavBar extends StatelessWidget {
 
   /// بناء عنصر التنقل
   Widget _buildNavItem(BuildContext context, int index) {
+    // الحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+
     // تحديد ما إذا كان هذا العنصر مختاراً
     final bool isSelected = index == selectedIndex;
 
@@ -81,62 +93,81 @@ class ColorfulNavBar extends StatelessWidget {
 
     // حجم الأيقونة
     final double iconSize = isSelected
-        ? BottomNavConstants.activeIconSize
-        : BottomNavConstants.inactiveIconSize;
+        ? BottomNavConstants.getActiveIconSize(context)
+        : BottomNavConstants.getInactiveIconSize(context);
+
+    // هل الشاشة صغيرة؟
+    final bool isSmallScreen = screenSize.width < 360;
 
     return Expanded(
-      child: InkWell(
-        onTap: () => onItemTapped(index),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: BottomNavConstants.verticalPadding),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onItemTapped(index),
+          splashColor: itemColor.withOpacity(0.1),
+          highlightColor: itemColor.withOpacity(0.05),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: BottomNavConstants.getVerticalPadding(context)),
 
-            // الأيقونة
-            Icon(
-              BottomNavConstants.navigationIcons[index],
-              color: textIconColor,
-              size: iconSize,
-            ),
-
-            const SizedBox(height: BottomNavConstants.labelTopPadding),
-
-            // النص
-            Text(
-              BottomNavConstants.navigationLabels[index],
-              style: TextStyle(
-                color: textIconColor,
-                fontSize: BottomNavConstants.labelFontSize,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              // الأيقونة
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: Icon(
+                  BottomNavConstants.navigationIcons[index],
+                  color: textIconColor,
+                  size: iconSize,
+                ),
               ),
-            ),
 
-            // شريط المؤشر
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.only(
-                  top: BottomNavConstants.indicatorTopMargin),
-              height: BottomNavConstants.indicatorHeight,
-              width: isSelected ? BottomNavConstants.indicatorWidth : 0,
-              decoration: BoxDecoration(
-                color: itemColor,
-                borderRadius:
-                    BorderRadius.circular(BottomNavConstants.indicatorRadius),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: itemColor.withOpacity(0.5),
-                          blurRadius: 3,
-                          spreadRadius: -1,
-                          offset: const Offset(0, 0),
-                        )
-                      ]
-                    : null,
+              SizedBox(height: BottomNavConstants.getLabelTopPadding(context)),
+
+              // النص
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: TextStyle(
+                  color: textIconColor,
+                  fontSize: BottomNavConstants.getLabelFontSize(context),
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+                child: Text(
+                  BottomNavConstants.navigationLabels[index],
+                ),
               ),
-            ),
 
-            const SizedBox(height: BottomNavConstants.verticalPadding),
-          ],
+              // شريط المؤشر
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutQuart,
+                margin: EdgeInsets.only(
+                    top: BottomNavConstants.getIndicatorTopMargin(context)),
+                height: BottomNavConstants.getIndicatorHeight(context),
+                width: isSelected
+                    ? BottomNavConstants.getIndicatorWidth(context)
+                    : 0,
+                decoration: BoxDecoration(
+                  color: itemColor,
+                  borderRadius: BorderRadius.circular(
+                      BottomNavConstants.getIndicatorRadius(context)),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: itemColor.withOpacity(0.5),
+                            blurRadius: 3,
+                            spreadRadius: -1,
+                            offset: const Offset(0, 0),
+                          )
+                        ]
+                      : null,
+                ),
+              ),
+
+              SizedBox(height: BottomNavConstants.getVerticalPadding(context)),
+            ],
+          ),
         ),
       ),
     );

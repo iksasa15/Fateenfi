@@ -18,6 +18,10 @@ class NextLectureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+
     // الألوان المستخدمة في التطبيق
     const Color kMediumPurple = Color(0xFF6366F1);
     const Color kDarkPurple = Color(0xFF4338CA);
@@ -34,6 +38,14 @@ class NextLectureCard extends StatelessWidget {
       timeDisplay = '$diffMinutes د';
     }
 
+    // حساب أحجام العناصر بناءً على حجم الشاشة
+    final double cardHeight = screenSize.height * 0.12; // 12% من ارتفاع الشاشة
+    final double titleSize = isSmallScreen ? 14.0 : 16.0;
+    final double subtitleSize = isSmallScreen ? 11.0 : 12.0;
+    final double iconSize = isSmallScreen ? 12.0 : 14.0;
+    final double timeCircleSize = screenSize.width * 0.14; // 14% من عرض الشاشة
+    final double timeTextSize = isSmallScreen ? 11.0 : 12.0;
+
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
@@ -47,8 +59,7 @@ class NextLectureCard extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        // تقليل الارتفاع لتجنب التجاوز
-        height: 100,
+        height: cardHeight,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topRight,
@@ -59,8 +70,8 @@ class NextLectureCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: kMediumPurple.withOpacity(0.25),
-              blurRadius: 6, // تقليل قيمة الـ blur
-              offset: const Offset(0, 2), // تقليل قيمة الإزاحة
+              blurRadius: 6,
+              offset: const Offset(0, 2),
               spreadRadius: 0,
             ),
           ],
@@ -75,8 +86,8 @@ class NextLectureCard extends StatelessWidget {
                 left: -25,
                 top: -10,
                 child: Container(
-                  width: 60,
-                  height: 60,
+                  width: screenSize.width * 0.15, // 15% من عرض الشاشة
+                  height: screenSize.width * 0.15, // 15% من عرض الشاشة
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white.withOpacity(0.07),
@@ -86,8 +97,10 @@ class NextLectureCard extends StatelessWidget {
 
               // المحتوى الرئيسي - تصميم أفقي وأكثر تركيزًا
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
+                  vertical: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+                ),
                 child: Row(
                   children: [
                     // المعلومات الرئيسية (اسم المقرر + القاعة)
@@ -99,9 +112,9 @@ class NextLectureCard extends StatelessWidget {
                           // اسم المقرر
                           Text(
                             courseName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: titleSize,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
@@ -109,23 +122,27 @@ class NextLectureCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
 
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: screenSize.height *
+                                  0.01), // 1% من ارتفاع الشاشة
 
                           // القاعة
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on,
                                 color: Colors.white,
-                                size: 14,
+                                size: iconSize,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(
+                                  width: screenSize.width *
+                                      0.01), // 1% من عرض الشاشة
                               Expanded(
                                 child: Text(
                                   '${NextLectureConstants.classroomPrefix}$classroom',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.9),
-                                    fontSize: 12,
+                                    fontSize: subtitleSize,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'SYMBIOAR+LT',
                                   ),
@@ -139,12 +156,13 @@ class NextLectureCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    SizedBox(
+                        width: screenSize.width * 0.03), // 3% من عرض الشاشة
 
                     // دائرة الوقت المتبقي
                     Container(
-                      width: 55,
-                      height: 55,
+                      width: timeCircleSize,
+                      height: timeCircleSize,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -156,17 +174,19 @@ class NextLectureCard extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.timer_outlined,
                               color: Colors.white,
-                              size: 14,
+                              size: iconSize,
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(
+                                height: screenSize.height *
+                                    0.0025), // 0.25% من ارتفاع الشاشة
                             Text(
                               timeDisplay,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: timeTextSize,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
@@ -191,110 +211,140 @@ class NextLectureCard extends StatelessWidget {
 class NextLectureComponents {
   /// بناء عنوان قسم المحاضرة القادمة
   static Widget buildSectionTitle() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // العنوان مع خط تزييني تحته
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
+        final double titleSize = isSmallScreen ? 16.0 : 18.0;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+            top: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                NextLectureConstants.nextLectureTitle,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF4338CA),
-                  letterSpacing: 0.3,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-              ),
-              const SizedBox(height: 3),
-              Container(
-                width: 28,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1),
-                  borderRadius: BorderRadius.circular(1),
-                ),
+              // العنوان مع خط تزييني تحته
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    NextLectureConstants.nextLectureTitle,
+                    style: TextStyle(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF4338CA),
+                      letterSpacing: 0.3,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                  ),
+                  SizedBox(
+                      height:
+                          screenSize.height * 0.004), // 0.4% من ارتفاع الشاشة
+                  Container(
+                    width: screenSize.width * 0.07, // 7% من عرض الشاشة
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   /// رسالة فارغة عندما لا توجد محاضرات قادمة
   static Widget buildEmptyLectureState() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8), // تقليل الهوامش
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      height: 100, // نفس ارتفاع البطاقة الرئيسية بعد التعديل
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade50,
-            spreadRadius: 0,
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // أيقونة
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: const Color(0xFF6366F1).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.event_note_rounded,
-              color: Color(0xFF6366F1),
-              size: 26,
-            ),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
+        final double titleSize = isSmallScreen ? 13.0 : 14.0;
+        final double subtitleSize = isSmallScreen ? 10.0 : 11.0;
+        final double iconSize = isSmallScreen ? 48.0 : 52.0;
 
-          const SizedBox(width: 16),
-
-          // النص
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  NextLectureConstants.noLecturesMessage,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF4338CA),
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'يمكنك إضافة محاضراتك من قسم الجدول الدراسي',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[600],
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+        return Container(
+          margin: EdgeInsets.symmetric(
+            vertical: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
           ),
-        ],
-      ),
+          padding: EdgeInsets.symmetric(
+            vertical: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+            horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
+          ),
+          height: screenSize.height * 0.12, // 12% من ارتفاع الشاشة
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade50,
+                spreadRadius: 0,
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // أيقونة
+              Container(
+                width: iconSize,
+                height: iconSize,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.event_note_rounded,
+                  color: const Color(0xFF6366F1),
+                  size: iconSize * 0.5, // 50% من حجم الحاوية
+                ),
+              ),
+
+              SizedBox(width: screenSize.width * 0.04), // 4% من عرض الشاشة
+
+              // النص
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      NextLectureConstants.noLecturesMessage,
+                      style: TextStyle(
+                        fontSize: titleSize,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF4338CA),
+                        fontFamily: 'SYMBIOAR+LT',
+                      ),
+                    ),
+                    SizedBox(
+                        height: screenSize.height *
+                            0.0025), // 0.25% من ارتفاع الشاشة
+                    Text(
+                      'يمكنك إضافة محاضراتك من قسم الجدول الدراسي',
+                      style: TextStyle(
+                        fontSize: subtitleSize,
+                        color: Colors.grey[600],
+                        fontFamily: 'SYMBIOAR+LT',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

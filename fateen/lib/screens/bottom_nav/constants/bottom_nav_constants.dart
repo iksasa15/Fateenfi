@@ -32,20 +32,72 @@ class BottomNavConstants {
     Icons.settings_rounded,
   ];
 
-  // تفاصيل التنسيق
-  static const double activeIconSize = 26;
-  static const double inactiveIconSize = 22;
-  static const double labelFontSize = 13;
-  static const double indicatorHeight = 3;
-  static const double indicatorWidth = 24;
-  static const double indicatorRadius = 1.5;
-  static const double verticalPadding = 2;
-  static const double labelTopPadding = 5;
-  static const double indicatorTopMargin = 4;
+  // الحصول على تفاصيل التنسيق بناءً على حجم الشاشة
+  static double getActiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 360 ? 24.0 : 26.0;
+  }
+
+  static double getInactiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 360 ? 20.0 : 22.0;
+  }
+
+  static double getLabelFontSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 360 ? 11.0 : 13.0;
+  }
+
+  static double getIndicatorHeight(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 360 ? 2.5 : 3.0;
+  }
+
+  static double getIndicatorWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 360 ? 20.0 : 24.0;
+  }
+
+  static double getIndicatorRadius(BuildContext context) {
+    return 1.5;
+  }
+
+  static double getVerticalPadding(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return screenHeight * 0.0025; // 0.25% من ارتفاع الشاشة
+  }
+
+  static double getLabelTopPadding(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return screenHeight * 0.006; // 0.6% من ارتفاع الشاشة
+  }
+
+  static double getIndicatorTopMargin(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return screenHeight * 0.005; // 0.5% من ارتفاع الشاشة
+  }
 
   // أرتفاع شريط التنقل (مع تعديله لأجهزة iPhone)
   static double getBarHeight(BuildContext context) {
     final isiPhone = Theme.of(context).platform == TargetPlatform.iOS;
-    return isiPhone ? 68.0 : 62.0;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // استخدام نسبة من ارتفاع الشاشة مع حد أدنى
+    final baseHeight = screenHeight * 0.08; // 8% من ارتفاع الشاشة
+    final minHeight = isiPhone ? 68.0 : 62.0;
+
+    return baseHeight > minHeight ? baseHeight : minHeight;
+  }
+
+  // معرفة ما إذا كان الجهاز به notch (مثل iPhone X وما بعده)
+  static bool hasNotch(BuildContext context) {
+    final EdgeInsets padding = MediaQuery.of(context).padding;
+    return padding.bottom > 0;
+  }
+
+  // الحصول على الهامش السفلي المناسب لشريط التنقل
+  static EdgeInsets getNavBarPadding(BuildContext context) {
+    final EdgeInsets padding = MediaQuery.of(context).padding;
+    return EdgeInsets.only(bottom: padding.bottom > 0 ? padding.bottom : 0);
   }
 }

@@ -67,6 +67,10 @@ class _HeaderComponentState extends State<HeaderComponent> {
 
   @override
   Widget build(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+
     // تحديد أيقونة النهار/الليل حسب الوقت الحالي
     final currentHour = DateTime.now().hour;
     final isEvening = currentHour >= 17 ||
@@ -80,8 +84,15 @@ class _HeaderComponentState extends State<HeaderComponent> {
 
     // إظهار مؤشر التحميل إذا كان التطبيق أو المتحكم في حالة تحميل
     if (_isLoading || isControllerLoading) {
-      return _buildLoadingWidget();
+      return _buildLoadingWidget(screenSize);
     }
+
+    // تعديل أحجام النصوص والأيقونات بناءً على حجم الشاشة
+    final double nameSize = isSmallScreen ? 20.0 : 24.0;
+    final double majorSize = isSmallScreen ? 14.0 : 15.0;
+    final double badgeTextSize = isSmallScreen ? 12.0 : 13.0;
+    final double iconSize = isSmallScreen ? 14.0 : 16.0;
+    final double editIconSize = isSmallScreen ? 14.0 : 16.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,11 +107,10 @@ class _HeaderComponentState extends State<HeaderComponent> {
               Expanded(
                 child: Text(
                   _getMorningOrEveningGreeting(userName),
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: nameSize,
                     fontWeight: FontWeight.bold,
-                    color: Color(
-                        0xFF4338CA), // استخدام لون darkPurple من صفحات التسجيل
+                    color: const Color(0xFF4338CA),
                     letterSpacing: 0.3,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
@@ -108,21 +118,20 @@ class _HeaderComponentState extends State<HeaderComponent> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenSize.width * 0.02), // 2% من عرض الشاشة
               // أيقونة تعديل الملف الشخصي
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(
+                    screenSize.width * 0.015), // 1.5% من عرض الشاشة
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(
-                      12), // استخدام نفس borderRadius من الصفحات الأخرى
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade200),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.edit_outlined,
-                  color: Color(
-                      0xFF4338CA), // استخدام لون darkPurple من صفحات التسجيل
-                  size: 16,
+                  color: const Color(0xFF4338CA),
+                  size: editIconSize,
                 ),
               ),
             ],
@@ -131,14 +140,16 @@ class _HeaderComponentState extends State<HeaderComponent> {
 
         // التخصص بتباعد أكبر وتنسيق محسن
         Padding(
-          padding: const EdgeInsets.only(top: 6, bottom: 12),
+          padding: EdgeInsets.only(
+            top: screenSize.height * 0.0075, // 0.75% من ارتفاع الشاشة
+            bottom: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+          ),
           child: Text(
             userMajor,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: majorSize,
               letterSpacing: 0.5,
-              color: const Color(
-                  0xFF9CA3AF), // استخدام لون hintColor من صفحات التسجيل
+              color: const Color(0xFF9CA3AF),
               fontWeight: FontWeight.w500,
               fontFamily: 'SYMBIOAR+LT',
             ),
@@ -162,7 +173,7 @@ class _HeaderComponentState extends State<HeaderComponent> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
 
         // الرسالة والتاريخ في صف واحد مع تأثيرات محسنة
         Row(
@@ -170,15 +181,17 @@ class _HeaderComponentState extends State<HeaderComponent> {
           children: [
             // الرسالة الترحيبية محسنة
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenSize.width * 0.025, // 2.5% من عرض الشاشة
+                vertical: screenSize.height * 0.0075, // 0.75% من ارتفاع الشاشة
+              ),
               decoration: BoxDecoration(
                 color: (isEvening
                         ? const Color(0xFF6366F1) // استخدام mediumPurple لليل
                         : const Color(0xFFEC4899) // استخدام accentColor للنهار
                     )
                     .withOpacity(0.08),
-                borderRadius: BorderRadius.circular(
-                    12), // استخدام نفس borderRadius من الصفحات الأخرى
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: (isEvening
                           ? const Color(0xFF6366F1) // استخدام mediumPurple لليل
@@ -197,22 +210,21 @@ class _HeaderComponentState extends State<HeaderComponent> {
                           transform: Matrix4.rotationY(3.14)..rotateZ(-0.4),
                           child: Icon(
                             Icons.nightlight_round,
-                            color: const Color(
-                                0xFF6366F1), // استخدام mediumPurple لليل
-                            size: 14,
+                            color: const Color(0xFF6366F1),
+                            size: iconSize,
                           ),
                         )
                       : Icon(
                           Icons.wb_sunny_outlined,
-                          color: const Color(
-                              0xFFEC4899), // استخدام accentColor للنهار
-                          size: 14,
+                          color: const Color(0xFFEC4899),
+                          size: iconSize,
                         ),
-                  const SizedBox(width: 6),
+                  SizedBox(
+                      width: screenSize.width * 0.015), // 1.5% من عرض الشاشة
                   Text(
                     HeaderConstants.wishText,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: badgeTextSize,
                       fontWeight: FontWeight.w600,
                       color: isEvening
                           ? const Color(0xFF6366F1) // استخدام mediumPurple لليل
@@ -227,30 +239,30 @@ class _HeaderComponentState extends State<HeaderComponent> {
 
             // التاريخ بتصميم محسن
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenSize.width * 0.025, // 2.5% من عرض الشاشة
+                vertical: screenSize.height * 0.0075, // 0.75% من ارتفاع الشاشة
+              ),
               decoration: BoxDecoration(
-                color: const Color(0xFF4338CA)
-                    .withOpacity(0.08), // استخدام darkPurple
-                borderRadius: BorderRadius.circular(
-                    12), // استخدام نفس borderRadius من الصفحات الأخرى
+                color: const Color(0xFF4338CA).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: const Color(0xFF4338CA)
-                        .withOpacity(0.15)), // استخدام darkPurple
+                    color: const Color(0xFF4338CA).withOpacity(0.15)),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.calendar_today_outlined,
-                    size: 12,
-                    color: Color(0xFF4338CA), // استخدام darkPurple
+                    size: iconSize - 2, // أصغر قليلاً من الأيقونة الأخرى
+                    color: const Color(0xFF4338CA),
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: screenSize.width * 0.01), // 1% من عرض الشاشة
                   Text(
                     currentDate,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: badgeTextSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF4338CA), // استخدام darkPurple
+                      color: const Color(0xFF4338CA),
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -264,31 +276,43 @@ class _HeaderComponentState extends State<HeaderComponent> {
   }
 
   // بناء واجهة التحميل
-  Widget _buildLoadingWidget() {
+  Widget _buildLoadingWidget(Size screenSize) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // عنصر تحميل للاسم
-        const _ShimmerLoadingText(width: 200, height: 28),
-        const SizedBox(height: 8),
+        _ShimmerLoadingText(
+          width: screenSize.width * 0.5, // 50% من عرض الشاشة
+          height: screenSize.height * 0.035, // 3.5% من ارتفاع الشاشة
+        ),
+        SizedBox(height: screenSize.height * 0.01), // 1% من ارتفاع الشاشة
 
         // عنصر تحميل للتخصص
-        const _ShimmerLoadingText(width: 150, height: 20),
-        const SizedBox(height: 12),
+        _ShimmerLoadingText(
+          width: screenSize.width * 0.375, // 37.5% من عرض الشاشة
+          height: screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
+        ),
+        SizedBox(height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
 
         // خط فاصل
         Container(
           height: 1,
           color: Colors.grey.shade200,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
 
         // عناصر التحميل للتاريخ والرسالة
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            _ShimmerLoadingText(width: 120, height: 30),
-            _ShimmerLoadingText(width: 120, height: 30),
+          children: [
+            _ShimmerLoadingText(
+              width: screenSize.width * 0.3, // 30% من عرض الشاشة
+              height: screenSize.height * 0.035, // 3.5% من ارتفاع الشاشة
+            ),
+            _ShimmerLoadingText(
+              width: screenSize.width * 0.3, // 30% من عرض الشاشة
+              height: screenSize.height * 0.035, // 3.5% من ارتفاع الشاشة
+            ),
           ],
         ),
       ],

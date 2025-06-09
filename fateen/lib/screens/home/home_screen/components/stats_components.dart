@@ -23,269 +23,326 @@ class StatsComponents {
     required int completedTasks, // عدد المهام المكتملة
     required int totalTasks, // إجمالي عدد المهام
   }) {
-    // ضبط ارتفاع البطاقة
-    final double cardHeight = height ?? 120;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // استخدام MediaQuery للحصول على أبعاد الشاشة
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
 
-    return Container(
-      width: cardWidth,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, 2),
+        // ضبط ارتفاع البطاقة
+        final double cardHeight = height ??
+            (isSmallScreen
+                ? screenSize.height *
+                    0.14 // 14% من ارتفاع الشاشة للأجهزة الصغيرة
+                : screenSize.height *
+                    0.15); // 15% من ارتفاع الشاشة للأجهزة العادية
+
+        // ضبط أحجام النصوص والأيقونات
+        final double iconSize = isSmallScreen ? 14.0 : 16.0;
+        final double titleSize = isSmallScreen ? 11.0 : 12.0;
+        final double valueSize = isSmallScreen ? 13.0 : 14.0;
+        final double messageSize = isSmallScreen ? 10.0 : 11.0;
+
+        return Container(
+          width: cardWidth,
+          padding: EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                spreadRadius: 0,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // قسم العنوان والمعلومات العامة
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // الجزء التحفيزي الجديد المميز
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [kDarkPurple, kMediumPurple],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      // أيقونة صاروخ للتحفيز
-                      Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.rocket_launch_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
+          child: Row(
+            children: [
+              // قسم العنوان والمعلومات العامة
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // الجزء التحفيزي الجديد المميز
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal:
+                            screenSize.width * 0.025, // 2.5% من عرض الشاشة
+                        vertical:
+                            screenSize.height * 0.01, // 1% من ارتفاع الشاشة
                       ),
-                      const SizedBox(width: 8),
-                      // نص تحفيزي
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "نحو التميز",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontFamily: 'SYMBIOAR+LT',
-                              ),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [kDarkPurple, kMediumPurple],
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          // أيقونة صاروخ للتحفيز
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              shape: BoxShape.circle,
                             ),
-                            SizedBox(height: 2),
-                            Text(
-                              "خطواتك اليوم تصنع نجاحك غداً",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
-                                fontFamily: 'SYMBIOAR+LT',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // نص تحفيزي إضافي بتصميم أنيق
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Row(
-                    children: [
-                      // أيقونة النجمة للتميز
-                      const Icon(
-                        Icons.emoji_events_outlined,
-                        color: kAccentPink,
-                        size: 15,
-                      ),
-                      const SizedBox(width: 6),
-                      // رسالة تحفيزية
-                      const Expanded(
-                        child: Text(
-                          "استمر، أنت قادر على تحقيق طموحاتك!",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF555555),
-                            fontFamily: 'SYMBIOAR+LT',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // خط فاصل عمودي
-          Container(
-            height: cardHeight * 0.7,
-            width: 1,
-            color: Colors.grey.shade200,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-
-          // قسم المهام والكورسات
-          Expanded(
-            flex: 2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // قسم المهام - الأعلى
-                InkWell(
-                  onTap: onTasksTap,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    child: Row(
-                      children: [
-                        // أيقونة المهام
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: kTaskColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Center(
                             child: Icon(
-                              Icons.assignment_outlined,
-                              color: kTaskColor,
-                              size: 20,
+                              Icons.rocket_launch_rounded,
+                              color: Colors.white,
+                              size: iconSize,
                             ),
                           ),
-                        ),
+                          SizedBox(
+                              width:
+                                  screenSize.width * 0.02), // 2% من عرض الشاشة
+                          // نص تحفيزي
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "نحو التميز",
+                                  style: TextStyle(
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                                SizedBox(
+                                    height: screenSize.height *
+                                        0.0025), // 0.25% من ارتفاع الشاشة
+                                Text(
+                                  "خطواتك اليوم تصنع نجاحك غداً",
+                                  style: TextStyle(
+                                    fontSize: messageSize,
+                                    color: Colors.white,
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                        const SizedBox(width: 10),
+                    SizedBox(
+                        height: screenSize.height *
+                            0.0175), // 1.75% من ارتفاع الشاشة
 
-                        // عدد المهام والنص
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "المهام",
+                    // نص تحفيزي إضافي بتصميم أنيق
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenSize.width * 0.02, // 2% من عرض الشاشة
+                        vertical: screenSize.height *
+                            0.0075, // 0.75% من ارتفاع الشاشة
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          // أيقونة النجمة للتميز
+                          Icon(
+                            Icons.emoji_events_outlined,
+                            color: kAccentPink,
+                            size: iconSize,
+                          ),
+                          SizedBox(
+                              width: screenSize.width *
+                                  0.015), // 1.5% من عرض الشاشة
+                          // رسالة تحفيزية
+                          Expanded(
+                            child: Text(
+                              "استمر، أنت قادر على تحقيق طموحاتك!",
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF555555),
+                                fontSize: messageSize,
+                                color: const Color(0xFF555555),
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
-                            Text(
-                              "$tasksCount مهمة",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: kTaskColor,
-                                fontFamily: 'SYMBIOAR+LT',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // خط فاصل عمودي
+              Container(
+                height: cardHeight * 0.7,
+                width: 1,
+                color: Colors.grey.shade200,
+                margin: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
+                ),
+              ),
+
+              // قسم المهام والكورسات
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // قسم المهام - الأعلى
+                    InkWell(
+                      onTap: onTasksTap,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              screenSize.width * 0.02, // 2% من عرض الشاشة
+                          vertical: screenSize.height *
+                              0.0075, // 0.75% من ارتفاع الشاشة
+                        ),
+                        child: Row(
+                          children: [
+                            // أيقونة المهام
+                            Container(
+                              width:
+                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              height:
+                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              decoration: BoxDecoration(
+                                color: kTaskColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
                               ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.assignment_outlined,
+                                  color: kTaskColor,
+                                  size: iconSize +
+                                      2, // أكبر قليلاً من الأيقونات الأخرى
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(
+                                width: screenSize.width *
+                                    0.025), // 2.5% من عرض الشاشة
+
+                            // عدد المهام والنص
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "المهام",
+                                  style: TextStyle(
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF555555),
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                                Text(
+                                  "$tasksCount مهمة",
+                                  style: TextStyle(
+                                    fontSize: valueSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: kTaskColor,
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
 
-                // خط فاصل أفقي
-                Container(
-                  height: 1,
-                  width: double.infinity,
-                  color: Colors.grey.shade200,
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                ),
+                    // خط فاصل أفقي
+                    Container(
+                      height: 1,
+                      width: double.infinity,
+                      color: Colors.grey.shade200,
+                      margin: EdgeInsets.symmetric(
+                        vertical:
+                            screenSize.height * 0.005, // 0.5% من ارتفاع الشاشة
+                      ),
+                    ),
 
-                // قسم الكورسات - الأسفل
-                InkWell(
-                  onTap: onCoursesTap,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    child: Row(
-                      children: [
-                        // أيقونة الكورسات
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: kMaterialsColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.menu_book_outlined,
-                              color: kMaterialsColor,
-                              size: 20,
-                            ),
-                          ),
+                    // قسم الكورسات - الأسفل
+                    InkWell(
+                      onTap: onCoursesTap,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              screenSize.width * 0.02, // 2% من عرض الشاشة
+                          vertical: screenSize.height *
+                              0.0075, // 0.75% من ارتفاع الشاشة
                         ),
-
-                        const SizedBox(width: 10),
-
-                        // عدد الكورسات والنص
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            const Text(
-                              "المواد",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF555555),
-                                fontFamily: 'SYMBIOAR+LT',
+                            // أيقونة الكورسات
+                            Container(
+                              width:
+                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              height:
+                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              decoration: BoxDecoration(
+                                color: kMaterialsColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.menu_book_outlined,
+                                  color: kMaterialsColor,
+                                  size: iconSize +
+                                      2, // أكبر قليلاً من الأيقونات الأخرى
+                                ),
                               ),
                             ),
-                            Text(
-                              "$coursesCount مادة",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: kMaterialsColor,
-                                fontFamily: 'SYMBIOAR+LT',
-                              ),
+
+                            SizedBox(
+                                width: screenSize.width *
+                                    0.025), // 2.5% من عرض الشاشة
+
+                            // عدد الكورسات والنص
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "المواد",
+                                  style: TextStyle(
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF555555),
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                                Text(
+                                  "$coursesCount مادة",
+                                  style: TextStyle(
+                                    fontSize: valueSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: kMaterialsColor,
+                                    fontFamily: 'SYMBIOAR+LT',
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -302,7 +359,10 @@ class StatsComponents {
       builder: (context, constraints) {
         final availableWidth = constraints.maxWidth;
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height *
+                0.01, // 1% من ارتفاع الشاشة
+          ),
           child: buildCombinedStatsCard(
             tasksCount: tasksCount,
             coursesCount: coursesCount,
@@ -338,105 +398,124 @@ class StatsComponents {
     bool isTaskCard = false,
     required double cardWidth,
   }) {
-    // تعديل اللون بناء على نوع البطاقة
-    final cardColor = isTaskCard ? kTaskColor : kMaterialsColor;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // استخدام MediaQuery للحصول على أبعاد الشاشة
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
 
-    // ضبط ارتفاع أصغر للبطاقة
-    const double cardHeight = 100;
-    const double iconSize = 28;
+        // تعديل اللون بناء على نوع البطاقة
+        final cardColor = isTaskCard ? kTaskColor : kMaterialsColor;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: cardWidth,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        height: cardHeight,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: cardColor.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: cardColor.withOpacity(0.1),
-              blurRadius: 4,
-              spreadRadius: 0,
-              offset: const Offset(0, 2),
+        // ضبط أحجام تعتمد على الشاشة
+        final double cardHeight =
+            height ?? (screenSize.height * 0.12); // 12% من ارتفاع الشاشة
+        final double iconSize = isSmallScreen ? 14.0 : 16.0;
+        final double titleSize = isSmallScreen ? 10.0 : 11.0;
+        final double valueSize = isSmallScreen ? 16.0 : 18.0;
+        final double subtitleSize = isSmallScreen ? 9.0 : 10.0;
+
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: cardWidth,
+            padding: EdgeInsets.symmetric(
+              horizontal: screenSize.width * 0.025, // 2.5% من عرض الشاشة
+              vertical: screenSize.height * 0.0125, // 1.25% من ارتفاع الشاشة
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // الأيقونة على يمين البطاقة
-            Container(
-              width: iconSize,
-              height: iconSize,
-              decoration: BoxDecoration(
-                color: cardColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
-                  color: cardColor,
-                  size: 16,
+            height: cardHeight,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: cardColor.withOpacity(0.3)),
+              boxShadow: [
+                BoxShadow(
+                  color: cardColor.withOpacity(0.1),
+                  blurRadius: 4,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 2),
                 ),
-              ),
+              ],
             ),
-
-            const SizedBox(width: 10),
-
-            // المحتوى: ثلاثة أسطر (العنوان، القيمة، الحالة)
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // السطر الأول: عنوان البطاقة
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF555555),
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
+            child: Row(
+              children: [
+                // الأيقونة على يمين البطاقة
+                Container(
+                  width: screenSize.width * 0.07, // 7% من عرض الشاشة
+                  height: screenSize.width * 0.07, // 7% من عرض الشاشة
+                  decoration: BoxDecoration(
+                    color: cardColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-
-                  // السطر الثاني: القيمة
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  child: Center(
+                    child: Icon(
+                      icon,
                       color: cardColor,
-                      fontFamily: 'SYMBIOAR+LT',
+                      size: iconSize,
                     ),
                   ),
+                ),
 
-                  // السطر الثالث: النص الفرعي
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: cardColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: cardColor,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'SYMBIOAR+LT',
+                SizedBox(width: screenSize.width * 0.025), // 2.5% من عرض الشاشة
+
+                // المحتوى: ثلاثة أسطر (العنوان، القيمة، الحالة)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // السطر الأول: عنوان البطاقة
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF555555),
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
                       ),
-                    ),
+
+                      // السطر الثاني: القيمة
+                      Text(
+                        value,
+                        style: TextStyle(
+                          fontSize: valueSize,
+                          fontWeight: FontWeight.bold,
+                          color: cardColor,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
+
+                      // السطر الثالث: النص الفرعي
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              screenSize.width * 0.015, // 1.5% من عرض الشاشة
+                          vertical: screenSize.height *
+                              0.0025, // 0.25% من ارتفاع الشاشة
+                        ),
+                        decoration: BoxDecoration(
+                          color: cardColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: subtitleSize,
+                            color: cardColor,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SYMBIOAR+LT',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -447,52 +526,56 @@ class StatsComponents {
     int completedTasks = 0,
     int totalTasks = 0,
   }) {
-    // استخدام البطاقة المدمجة الجديدة بدلاً من البطاقات المنفصلة
-    if (statsCards.length >= 2) {
-      String tasksCount = "0";
-      String coursesCount = "0";
-      VoidCallback? onTasksTap;
-      VoidCallback? onCoursesTap;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // استخدام البطاقة المدمجة الجديدة بدلاً من البطاقات المنفصلة
+        if (statsCards.length >= 2) {
+          String tasksCount = "0";
+          String coursesCount = "0";
+          VoidCallback? onTasksTap;
+          VoidCallback? onCoursesTap;
 
-      // استخراج البيانات من statsCards
-      for (var card in statsCards) {
-        if (card['title'] == "المهام") {
-          tasksCount = card['value'].toString();
-          onTasksTap = card['onTap'];
+          // استخراج البيانات من statsCards
+          for (var card in statsCards) {
+            if (card['title'] == "المهام") {
+              tasksCount = card['value'].toString();
+              onTasksTap = card['onTap'];
 
-          // محاولة استخراج المهام المكتملة/الإجمالية من البطاقة
-          // إذا كانت البيانات المضمنة متاحة
-          if (card.containsKey('completedTasks')) {
-            completedTasks = card['completedTasks'];
+              // محاولة استخراج المهام المكتملة/الإجمالية من البطاقة
+              // إذا كانت البيانات المضمنة متاحة
+              if (card.containsKey('completedTasks')) {
+                completedTasks = card['completedTasks'];
+              }
+              if (card.containsKey('totalTasks')) {
+                totalTasks = card['totalTasks'];
+              }
+            } else if (card['title'] == "المواد") {
+              coursesCount = card['value'].toString();
+              onCoursesTap = card['onTap'];
+            }
           }
-          if (card.containsKey('totalTasks')) {
-            totalTasks = card['totalTasks'];
+
+          // إذا لم يتم تحديد إجمالي المهام، استخدم عدد المهام
+          if (totalTasks == 0 && tasksCount != "0") {
+            totalTasks = int.tryParse(tasksCount) ?? 0;
           }
-        } else if (card['title'] == "المواد") {
-          coursesCount = card['value'].toString();
-          onCoursesTap = card['onTap'];
+
+          // عرض البطاقة المدمجة
+          return buildCombinedStatsCard(
+            tasksCount: tasksCount,
+            coursesCount: coursesCount,
+            onTasksTap: onTasksTap,
+            onCoursesTap: onCoursesTap,
+            cardWidth: totalWidth,
+            completedTasks: completedTasks,
+            totalTasks: totalTasks,
+          );
         }
-      }
 
-      // إذا لم يتم تحديد إجمالي المهام، استخدم عدد المهام
-      if (totalTasks == 0 && tasksCount != "0") {
-        totalTasks = int.tryParse(tasksCount) ?? 0;
-      }
-
-      // عرض البطاقة المدمجة
-      return buildCombinedStatsCard(
-        tasksCount: tasksCount,
-        coursesCount: coursesCount,
-        onTasksTap: onTasksTap,
-        onCoursesTap: onCoursesTap,
-        cardWidth: totalWidth,
-        completedTasks: completedTasks,
-        totalTasks: totalTasks,
-      );
-    }
-
-    // في حالة عدم وجود بطاقات كافية، عرض رسالة
-    return buildEmptyStats(message: "لا توجد إحصائيات متاحة");
+        // في حالة عدم وجود بطاقات كافية، عرض رسالة
+        return buildEmptyStats(message: "لا توجد إحصائيات متاحة");
+      },
+    );
   }
 
   // طريقة استخدام جديدة للصف مع LayoutBuilder (للتوافق الخلفي)
@@ -516,60 +599,80 @@ class StatsComponents {
 
   // باقي الدوال
   static Widget buildSectionTitle(String title, {Widget? trailing}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
+        final double fontSize = isSmallScreen ? 15.0 : 16.0;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+            top: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: kDarkPurple,
-                  letterSpacing: 0.3,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: kDarkPurple,
+                      letterSpacing: 0.3,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                  ),
+                  SizedBox(
+                      height:
+                          screenSize.height * 0.004), // 0.4% من ارتفاع الشاشة
+                  Container(
+                    width: screenSize.width * 0.06, // 6% من عرض الشاشة
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: kMediumPurple,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 3),
-              Container(
-                width: 24,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: kMediumPurple,
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
+              if (trailing != null) trailing,
             ],
           ),
-          if (trailing != null) trailing,
-        ],
-      ),
+        );
+      },
     );
   }
 
   static Widget buildStatsContainer({
     required Widget child,
-    EdgeInsetsGeometry padding = const EdgeInsets.all(12.0),
+    EdgeInsetsGeometry? padding,
   }) {
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-            blurRadius: 6,
-            spreadRadius: 1,
-            offset: const Offset(0, 1),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Size screenSize = MediaQuery.of(context).size;
+
+        return Container(
+          padding: padding ??
+              EdgeInsets.all(screenSize.width * 0.03), // 3% من عرض الشاشة
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade100,
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: child,
+          child: child,
+        );
+      },
     );
   }
 
@@ -577,30 +680,43 @@ class StatsComponents {
     required String message,
     IconData icon = Icons.bar_chart_outlined,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 40,
-            color: Colors.grey[300],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Size screenSize = MediaQuery.of(context).size;
+        final bool isSmallScreen = screenSize.width < 360;
+        final double iconSize = isSmallScreen ? 35.0 : 40.0;
+        final double fontSize = isSmallScreen ? 13.0 : 14.0;
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
+            horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
           ),
-          const SizedBox(height: 12),
-          Text(
-            message,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-              fontFamily: 'SYMBIOAR+LT',
-            ),
-            textAlign: TextAlign.center,
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: iconSize,
+                color: Colors.grey[300],
+              ),
+              SizedBox(
+                  height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

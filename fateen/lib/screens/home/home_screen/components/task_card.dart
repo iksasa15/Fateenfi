@@ -19,6 +19,10 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+
     // تحديد لون البطاقة بناءً على اللون المخصص أو نوع المهمة
     final cardColor = color ??
         (isOverdue
@@ -44,9 +48,17 @@ class TaskCard extends StatelessWidget {
       }
     }
 
+    // حساب أحجام العناصر بناءً على حجم الشاشة
+    final double cardHeight =
+        screenSize.height * 0.085; // 8.5% من ارتفاع الشاشة
+    final double iconSize = isSmallScreen ? 9.0 : 10.0;
+    final double textSize = isSmallScreen ? 13.0 : 14.0;
+    final double smallTextSize = isSmallScreen ? 9.0 : 10.0;
+    final double timeCircleSize = screenSize.width * 0.09; // 9% من عرض الشاشة
+
     Widget cardContent = Container(
       width: double.infinity,
-      height: 70, // تقليل ارتفاع البطاقة
+      height: cardHeight,
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -68,8 +80,8 @@ class TaskCard extends StatelessWidget {
               left: -25,
               top: -15,
               child: Container(
-                width: 60,
-                height: 60,
+                width: screenSize.width * 0.15, // 15% من عرض الشاشة
+                height: screenSize.width * 0.15, // 15% من عرض الشاشة
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.07),
@@ -79,7 +91,10 @@ class TaskCard extends StatelessWidget {
 
             // المحتوى الرئيسي
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenSize.width * 0.03, // 3% من عرض الشاشة
+                vertical: screenSize.height * 0.0125, // 1.25% من ارتفاع الشاشة
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -92,9 +107,9 @@ class TaskCard extends StatelessWidget {
                         // عنوان المهمة
                         Text(
                           task.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: textSize,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
@@ -102,7 +117,9 @@ class TaskCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
 
-                        const SizedBox(height: 3),
+                        SizedBox(
+                            height: screenSize.height *
+                                0.004), // 0.4% من ارتفاع الشاشة
 
                         // معلومات إضافية (موعد التسليم أو متأخرة منذ)
                         Row(
@@ -112,24 +129,28 @@ class TaskCard extends StatelessWidget {
                                   ? Icons.warning_amber_outlined
                                   : Icons.calendar_today_outlined,
                               color: Colors.white,
-                              size: 10,
+                              size: iconSize,
                             ),
-                            const SizedBox(width: 3),
+                            SizedBox(
+                                width: screenSize.width *
+                                    0.0075), // 0.75% من عرض الشاشة
                             Text(
                               isOverdue ? 'متأخرة منذ:' : 'موعد التسليم:',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: smallTextSize,
                                 fontWeight: FontWeight.w400,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
-                            const SizedBox(width: 2),
+                            SizedBox(
+                                width: screenSize.width *
+                                    0.005), // 0.5% من عرض الشاشة
                             Text(
                               task.dueDateFormatted,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: smallTextSize,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
@@ -142,8 +163,8 @@ class TaskCard extends StatelessWidget {
 
                   // مؤشر الوقت
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: timeCircleSize,
+                    height: timeCircleSize,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -158,13 +179,13 @@ class TaskCard extends StatelessWidget {
                           Icon(
                             isOverdue ? Icons.timer_off : Icons.timer,
                             color: Colors.white,
-                            size: 10,
+                            size: iconSize,
                           ),
                           Text(
                             timeText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: smallTextSize,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
@@ -183,8 +204,8 @@ class TaskCard extends StatelessWidget {
                 top: 0,
                 right: 0,
                 child: Container(
-                  width: 12,
-                  height: 5,
+                  width: screenSize.width * 0.03, // 3% من عرض الشاشة
+                  height: screenSize.height * 0.006, // 0.6% من ارتفاع الشاشة
                   decoration: BoxDecoration(
                     color: Colors.amber,
                     borderRadius: const BorderRadius.only(

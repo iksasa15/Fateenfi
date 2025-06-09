@@ -146,31 +146,36 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
 
   @override
   Widget build(BuildContext context) {
+    // استخدام MediaQuery للحصول على أبعاد الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // عنوان القسم
-        _buildSectionTitle('إحصائيات المهام'),
+        _buildSectionTitle('إحصائيات المهام', screenSize, isSmallScreen),
 
         // حالة التحميل
         if (_isLoading)
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(color: kMediumPurple),
+              padding:
+                  EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
+              child: const CircularProgressIndicator(color: kMediumPurple),
             ),
           )
 
         // حالة الخطأ
         else if (_errorMessage != null)
-          _buildErrorMessage(_errorMessage!)
+          _buildErrorMessage(_errorMessage!, screenSize)
 
         // عرض البطاقات والمهام
         else
           Column(
             children: [
               // بطاقة الإحصائيات
-              _buildTasksStatsCard(),
+              _buildTasksStatsCard(screenSize, isSmallScreen),
 
               // قائمة المهام
               if (_overdueTasks.isNotEmpty)
@@ -179,6 +184,8 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                   _overdueTasks,
                   kRed,
                   Icons.warning_rounded,
+                  screenSize,
+                  isSmallScreen,
                 ),
 
               if (_todayTasks.isNotEmpty)
@@ -187,6 +194,8 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                   _todayTasks,
                   kMediumPurple, // تم تغيير اللون ليطابق الإحصائيات
                   Icons.today_rounded,
+                  screenSize,
+                  isSmallScreen,
                 ),
 
               if (_upcomingTasks.isNotEmpty)
@@ -195,13 +204,15 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                   _upcomingTasks,
                   kGreen,
                   Icons.upcoming_rounded,
+                  screenSize,
+                  isSmallScreen,
                 ),
 
               // حالة عدم وجود مهام
               if (_overdueTasks.isEmpty &&
                   _todayTasks.isEmpty &&
                   _upcomingTasks.isEmpty)
-                _buildEmptyState(),
+                _buildEmptyState(screenSize),
             ],
           ),
       ],
@@ -209,9 +220,12 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء عنوان القسم
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, Size screenSize, bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 16),
+      padding: EdgeInsets.only(
+        bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+        top: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -220,17 +234,18 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 15 : 16,
                   fontWeight: FontWeight.bold,
                   color: kDarkPurple,
                   letterSpacing: 0.3,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
-              const SizedBox(height: 3),
+              SizedBox(
+                  height: screenSize.height * 0.003), // 0.3% من ارتفاع الشاشة
               Container(
-                width: 24,
+                width: screenSize.width * 0.06, // 6% من عرض الشاشة
                 height: 2,
                 decoration: BoxDecoration(
                   color: kMediumPurple,
@@ -245,7 +260,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء بطاقة إحصائيات المهام
-  Widget _buildTasksStatsCard() {
+  Widget _buildTasksStatsCard(Size screenSize, bool isSmallScreen) {
     // حالة عدم وجود مهام
     if (_overdueTasks.isEmpty &&
         _todayTasks.isEmpty &&
@@ -257,11 +272,18 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
     final int totalTasks =
         _overdueTasks.length + _todayTasks.length + _upcomingTasks.length;
 
+    // حساب أحجام العناصر حسب حجم الشاشة
+    final double iconSize = isSmallScreen ? 16.0 : 18.0;
+    final double fontSize = isSmallScreen ? 12.0 : 13.0;
+    final double statItemSize = isSmallScreen ? 50.0 : 55.0;
+
     return FadeTransition(
       opacity: widget.animation,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.symmetric(
+          vertical: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+        ),
+        padding: EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -287,6 +309,9 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     count: _overdueTasks.length.toString(),
                     icon: Icons.warning_rounded,
                     color: kRed,
+                    size: statItemSize,
+                    fontSize: fontSize,
+                    iconSize: iconSize,
                   ),
 
                 // مهام اليوم
@@ -295,8 +320,10 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     title: 'اليوم',
                     count: _todayTasks.length.toString(),
                     icon: Icons.today_rounded,
-                    color:
-                        kMediumPurple, // تغيير لون مهام اليوم ليطابق الإحصائيات
+                    color: kMediumPurple,
+                    size: statItemSize,
+                    fontSize: fontSize,
+                    iconSize: iconSize,
                   ),
 
                 // المهام القادمة
@@ -306,13 +333,18 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     count: _upcomingTasks.length.toString(),
                     icon: Icons.upcoming_rounded,
                     color: kGreen,
+                    size: statItemSize,
+                    fontSize: fontSize,
+                    iconSize: iconSize,
                   ),
               ],
             ),
 
             // خط فاصل
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(
+                vertical: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+              ),
               child: Divider(
                 height: 1,
                 thickness: 1,
@@ -324,20 +356,20 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
             Row(
               children: [
                 // أيقونة الوقت
-                const Icon(
+                Icon(
                   Icons.schedule,
                   color: kMediumPurple,
-                  size: 18,
+                  size: iconSize,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: screenSize.width * 0.02), // 2% من عرض الشاشة
                 // رسالة تحفيزية
                 Expanded(
                   child: Text(
                     "لديك $totalTasks مهام تنتظر إنجازك!",
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: fontSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF555555),
+                      color: const Color(0xFF555555),
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -346,26 +378,31 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                 TextButton(
                   onPressed: widget.onTaskTap,
                   style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenSize.width * 0.02, // 2% من عرض الشاشة
+                      vertical:
+                          screenSize.height * 0.005, // 0.5% من ارتفاع الشاشة
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Row(
                     children: [
-                      const Text(
+                      Text(
                         'عرض الكل',
                         style: TextStyle(
                           color: kMediumPurple,
-                          fontSize: 12,
+                          fontSize: fontSize - 1, // حجم أصغر للنص
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                       ),
-                      const SizedBox(width: 2),
+                      SizedBox(
+                          width:
+                              screenSize.width * 0.005), // 0.5% من عرض الشاشة
                       Icon(
                         Icons.arrow_forward_ios,
-                        size: 10,
+                        size: iconSize - 8, // أصغر من الأيقونة العادية
                         color: kMediumPurple,
                       ),
                     ],
@@ -385,17 +422,19 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
     required String count,
     required IconData icon,
     required Color color,
+    required double size,
+    required double fontSize,
+    required double iconSize,
   }) {
     return Column(
       children: [
         // أيقونة الإحصائية في مربع بزوايا ناعمة
         Container(
-          width: 55,
-          height: 55,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius:
-                BorderRadius.circular(12), // زوايا ناعمة بدلاً من الشكل الدائري
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: color.withOpacity(0.3), width: 1),
           ),
           child: Center(
@@ -405,13 +444,13 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                 Icon(
                   icon,
                   color: color,
-                  size: 18,
+                  size: iconSize,
                 ),
                 const SizedBox(height: 3),
                 Text(
                   count,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: fontSize + 2, // زيادة قليلة للعدد
                     fontWeight: FontWeight.bold,
                     color: color,
                     fontFamily: 'SYMBIOAR+LT',
@@ -428,9 +467,9 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
         Text(
           title,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: fontSize - 1, // تقليل قليل للعنوان
             fontWeight: FontWeight.w500,
-            color: Color(0xFF555555),
+            color: const Color(0xFF555555),
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -439,21 +478,27 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء قسم المهام (عنوان + قائمة بالمهام)
-  Widget _buildTasksSection(
-      String title, List<Task> tasks, Color color, IconData icon) {
+  Widget _buildTasksSection(String title, List<Task> tasks, Color color,
+      IconData icon, Size screenSize, bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16),
+      padding: EdgeInsets.only(
+        top: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 8, right: 4, left: 4),
+            padding: EdgeInsets.only(
+              bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+              right: screenSize.width * 0.01, // 1% من عرض الشاشة
+              left: screenSize.width * 0.01, // 1% من عرض الشاشة
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: screenSize.width * 0.06, // 6% من عرض الشاشة
+                  height: screenSize.width * 0.06, // 6% من عرض الشاشة
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -462,24 +507,27 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     child: Icon(
                       icon,
                       color: color,
-                      size: 14,
+                      size: isSmallScreen ? 12 : 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: screenSize.width * 0.02), // 2% من عرض الشاشة
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: isSmallScreen ? 13 : 14,
                     fontWeight: FontWeight.bold,
                     color: color,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: screenSize.width * 0.015), // 1.5% من عرض الشاشة
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenSize.width * 0.015, // 1.5% من عرض الشاشة
+                    vertical:
+                        screenSize.height * 0.0025, // 0.25% من ارتفاع الشاشة
+                  ),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
@@ -487,7 +535,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                   child: Text(
                     "${tasks.length}",
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: isSmallScreen ? 9 : 10,
                       fontWeight: FontWeight.bold,
                       color: color,
                       fontFamily: 'SYMBIOAR+LT',
@@ -509,7 +557,9 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
               final isOverdue = task.dueDate.isBefore(DateTime.now());
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.only(
+                  bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+                ),
                 child: TaskCard(
                   task: task,
                   isOverdue: isOverdue,
@@ -524,14 +574,21 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           // زر عرض المزيد إذا كان عدد المهام أكثر من 3
           if (tasks.length > 3)
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+              padding: EdgeInsets.fromLTRB(
+                screenSize.width * 0.02, // 2% من عرض الشاشة
+                0,
+                screenSize.width * 0.02, // 2% من عرض الشاشة
+                screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+              ),
               child: InkWell(
                 onTap: widget.onTaskTap,
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding: EdgeInsets.symmetric(
+                    vertical: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+                    horizontal: screenSize.width * 0.03, // 3% من عرض الشاشة
+                  ),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.08),
@@ -544,16 +601,17 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                       Text(
                         'عرض المزيد',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: isSmallScreen ? 11 : 12,
                           color: color.withOpacity(0.9),
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(
+                          width: screenSize.width * 0.01), // 1% من عرض الشاشة
                       Icon(
                         Icons.arrow_forward,
-                        size: 12,
+                        size: isSmallScreen ? 10 : 12,
                         color: color.withOpacity(0.9),
                       ),
                     ],
@@ -567,10 +625,17 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // رسالة خطأ - مُصغّرة
-  Widget _buildErrorMessage(String message) {
+  Widget _buildErrorMessage(String message, Size screenSize) {
+    // تعديل الأحجام للشاشات المختلفة
+    final bool isSmallScreen = screenSize.width < 360;
+    final double fontSize = isSmallScreen ? 11 : 12;
+    final double iconSize = isSmallScreen ? 14 : 16;
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.symmetric(
+        vertical: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+      ),
+      padding: EdgeInsets.all(screenSize.width * 0.03), // 3% من عرض الشاشة
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
@@ -581,14 +646,14 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 16),
-              const SizedBox(width: 6),
+              Icon(Icons.error_outline, color: Colors.red, size: iconSize),
+              SizedBox(width: screenSize.width * 0.015), // 1.5% من عرض الشاشة
               Expanded(
                 child: Text(
                   'حدث خطأ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: fontSize + 1, // أكبر قليلاً من النص العادي
                     color: Colors.red[800],
                     fontFamily: 'SYMBIOAR+LT',
                   ),
@@ -596,27 +661,35 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(
+              height: screenSize.height * 0.0075), // 0.75% من ارتفاع الشاشة
           Text(
             message,
-            style: const TextStyle(
-              fontSize: 12,
+            style: TextStyle(
+              fontSize: fontSize,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: screenSize.height * 0.01), // 1% من ارتفاع الشاشة
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: _loadTasks,
-              icon: const Icon(Icons.refresh, size: 14),
-              label: const Text(
+              icon: Icon(Icons.refresh,
+                  size: iconSize - 2), // أصغر من الأيقونة العادية
+              label: Text(
                 'إعادة المحاولة',
-                style: TextStyle(fontFamily: 'SYMBIOAR+LT', fontSize: 12),
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: fontSize,
+                ),
               ),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red[800],
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.02, // 2% من عرض الشاشة
+                  vertical: screenSize.height * 0.005, // 0.5% من ارتفاع الشاشة
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -628,10 +701,17 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // حالة فارغة - مُصغّرة
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(Size screenSize) {
+    // تعديل الأحجام للشاشات المختلفة
+    final bool isSmallScreen = screenSize.width < 360;
+    final double iconSize = isSmallScreen ? 55 : 60;
+    final double fontSize = isSmallScreen ? 14 : 15;
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(
+        vertical: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+      ),
+      padding: EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -650,8 +730,8 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: iconSize,
+              height: iconSize,
               decoration: BoxDecoration(
                 color: kMediumPurple.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -659,43 +739,52 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
               child: Icon(
                 Icons.task_alt,
                 color: kMediumPurple,
-                size: 30,
+                size: iconSize * 0.5, // 50% من حجم الحاوية
               ),
             ),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(
+                height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
+            Text(
               'لا توجد مهام حاليًا',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: fontSize,
                 fontWeight: FontWeight.bold,
                 color: kDarkPurple,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(
+                height: screenSize.height * 0.0075), // 0.75% من ارتفاع الشاشة
             Text(
               'عند إضافة مهام جديدة، ستظهر هنا',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: fontSize - 3, // أصغر من العنوان
                 color: Colors.grey[700],
                 fontFamily: 'SYMBIOAR+LT',
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            SizedBox(
+                height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
             // زر إضافة مهمة جديدة
             ElevatedButton.icon(
               onPressed: widget.onTaskTap,
-              icon: const Icon(Icons.add_circle_outline, size: 14),
-              label: const Text(
+              icon:
+                  Icon(Icons.add_circle_outline, size: isSmallScreen ? 12 : 14),
+              label: Text(
                 'إضافة مهمة جديدة',
-                style: TextStyle(fontFamily: 'SYMBIOAR+LT', fontSize: 12),
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: isSmallScreen ? 11 : 12,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: kMediumPurple,
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenSize.width * 0.03, // 3% من عرض الشاشة
+                  vertical: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
