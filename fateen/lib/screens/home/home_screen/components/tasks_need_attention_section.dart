@@ -119,9 +119,8 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
   Widget _buildSectionTitle(bool isSmallScreen) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom:
-            MediaQuery.of(context).size.height * 0.01, // 1% من ارتفاع الشاشة
-        top: MediaQuery.of(context).size.height * 0.02, // 2% من ارتفاع الشاشة
+        bottom: MediaQuery.of(context).size.height * 0.01,
+        top: MediaQuery.of(context).size.height * 0.02,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,20 +132,18 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
               Text(
                 TasksConstants.tasksNeedAttentionTitle,
                 style: TextStyle(
-                  fontSize: isSmallScreen
-                      ? 16.0
-                      : 18.0, // تعديل الحجم للشاشات الصغيرة
+                  fontSize: isSmallScreen ? 17.0 : 19.0, // زيادة حجم النص
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF4338CA),
                   letterSpacing: 0.3,
                   fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2, // تحسين المسافة بين السطور
                 ),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4), // زيادة المسافة
               Container(
-                width: MediaQuery.of(context).size.width *
-                    0.07, // 7% من عرض الشاشة
-                height: 2,
+                width: MediaQuery.of(context).size.width * 0.07,
+                height: 2.5, // زيادة سمك الخط
                 decoration: BoxDecoration(
                   color: const Color(0xFF6366F1),
                   borderRadius: BorderRadius.circular(1),
@@ -226,9 +223,13 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
 
   // حالة الخطأ
   Widget _buildErrorState() {
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final double fontSize = isSmallScreen ? 13.0 : 14.0;
+    final double iconSize = isSmallScreen ? 18.0 : 20.0;
+
     return Container(
-      padding: EdgeInsets.all(
-          MediaQuery.of(context).size.width * 0.04), // 4% من عرض الشاشة
+      padding: EdgeInsets.all(screenSize.width * 0.04),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -239,43 +240,43 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
         children: [
           Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.red),
-              SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.02), // 2% من عرض الشاشة
+              Icon(Icons.error_outline, color: Colors.red, size: iconSize),
+              SizedBox(width: screenSize.width * 0.02),
               Expanded(
                 child: Text(
                   'حدث خطأ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    fontSize: fontSize + 1,
                     color: Colors.red[800],
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(
-              height: MediaQuery.of(context).size.height *
-                  0.01), // 1% من ارتفاع الشاشة
+          SizedBox(height: screenSize.height * 0.01),
           Text(
             _controller.errorMessage,
-            style: const TextStyle(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: fontSize,
               fontFamily: 'SYMBIOAR+LT',
+              height: 1.2,
             ),
           ),
-          SizedBox(
-              height: MediaQuery.of(context).size.height *
-                  0.015), // 1.5% من ارتفاع الشاشة
+          SizedBox(height: screenSize.height * 0.015),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: _loadData,
-              icon: const Icon(Icons.refresh, size: 16),
+              icon: Icon(Icons.refresh, size: iconSize - 2),
               label: Text(
                 TasksConstants.retryButtonText,
-                style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: fontSize,
+                ),
               ),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red[800],
@@ -289,17 +290,14 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
 
   // حالة فارغة
   Widget _buildEmptyState(Size screenSize) {
-    // تعديل أحجام العناصر حسب حجم الشاشة
     final bool isSmallScreen = screenSize.width < 360;
-    final double iconSize = isSmallScreen
-        ? screenSize.width * 0.14 // للشاشات الصغيرة
-        : screenSize.width * 0.16; // للشاشات العادية
+    final double iconSize =
+        isSmallScreen ? screenSize.width * 0.14 : screenSize.width * 0.16;
 
     return Padding(
-      padding: EdgeInsets.only(
-          bottom: screenSize.height * 0.02), // 2% من ارتفاع الشاشة
+      padding: EdgeInsets.only(bottom: screenSize.height * 0.02),
       child: Container(
-        padding: EdgeInsets.all(screenSize.width * 0.05), // 5% من عرض الشاشة
+        padding: EdgeInsets.all(screenSize.width * 0.05),
         decoration: BoxDecoration(
           color: Colors.grey[50],
           borderRadius: BorderRadius.circular(16),
@@ -319,26 +317,28 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
                 child: Icon(
                   TasksConstants.emptyTasksIcon,
                   color: Colors.grey[400],
-                  size: iconSize * 0.5, // 50% من حجم الحاوية
+                  size: iconSize * 0.5,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.02), // 2% من ارتفاع الشاشة
+              SizedBox(height: screenSize.height * 0.02),
               Text(
                 TasksConstants.noTasksTitle,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 16.0 : 18.0,
+                  fontSize: isSmallScreen ? 17.0 : 19.0, // زيادة حجم النص
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF4338CA),
                   fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.01), // 1% من ارتفاع الشاشة
+              SizedBox(height: screenSize.height * 0.01),
               Text(
                 TasksConstants.noTasksMessage,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 12.0 : 14.0,
+                  fontSize: isSmallScreen ? 13.0 : 15.0, // زيادة حجم النص
                   color: Colors.grey[700],
                   fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2,
                 ),
                 textAlign: TextAlign.center,
               ),

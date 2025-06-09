@@ -22,6 +22,8 @@ class TaskCard extends StatelessWidget {
     // استخدام MediaQuery للحصول على أبعاد الشاشة
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
 
     // تحديد لون البطاقة بناءً على اللون المخصص أو نوع المهمة
     final cardColor = color ??
@@ -48,13 +50,18 @@ class TaskCard extends StatelessWidget {
       }
     }
 
-    // حساب أحجام العناصر بناءً على حجم الشاشة
+    // حساب أحجام العناصر بناءً على حجم الشاشة - تحسين الأحجام
     final double cardHeight =
-        screenSize.height * 0.085; // 8.5% من ارتفاع الشاشة
-    final double iconSize = isSmallScreen ? 9.0 : 10.0;
-    final double textSize = isSmallScreen ? 13.0 : 14.0;
-    final double smallTextSize = isSmallScreen ? 9.0 : 10.0;
-    final double timeCircleSize = screenSize.width * 0.09; // 9% من عرض الشاشة
+        screenSize.height * 0.09; // زيادة ارتفاع البطاقة قليلاً
+
+    // تحسين أحجام النصوص والأيقونات
+    final double iconSize =
+        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
+    final double textSize =
+        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    final double smallTextSize =
+        isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 13.0);
+    final double timeCircleSize = screenSize.width * 0.10; // 10% من عرض الشاشة
 
     Widget cardContent = Container(
       width: double.infinity,
@@ -75,13 +82,13 @@ class TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Stack(
           children: [
-            // دائرة زخرفية في الخلفية (أصغر)
+            // دائرة زخرفية في الخلفية
             Positioned(
               left: -25,
               top: -15,
               child: Container(
-                width: screenSize.width * 0.15, // 15% من عرض الشاشة
-                height: screenSize.width * 0.15, // 15% من عرض الشاشة
+                width: screenSize.width * 0.15,
+                height: screenSize.width * 0.15,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.07),
@@ -92,8 +99,8 @@ class TaskCard extends StatelessWidget {
             // المحتوى الرئيسي
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: screenSize.width * 0.03, // 3% من عرض الشاشة
-                vertical: screenSize.height * 0.0125, // 1.25% من ارتفاع الشاشة
+                horizontal: screenSize.width * 0.03,
+                vertical: screenSize.height * 0.015, // زيادة المسافة العمودية
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,14 +119,13 @@ class TaskCard extends StatelessWidget {
                             fontSize: textSize,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'SYMBIOAR+LT',
+                            height: 1.2, // تحسين المسافة بين السطور
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
 
-                        SizedBox(
-                            height: screenSize.height *
-                                0.004), // 0.4% من ارتفاع الشاشة
+                        SizedBox(height: screenSize.height * 0.006),
 
                         // معلومات إضافية (موعد التسليم أو متأخرة منذ)
                         Row(
@@ -131,9 +137,7 @@ class TaskCard extends StatelessWidget {
                               color: Colors.white,
                               size: iconSize,
                             ),
-                            SizedBox(
-                                width: screenSize.width *
-                                    0.0075), // 0.75% من عرض الشاشة
+                            SizedBox(width: screenSize.width * 0.01),
                             Text(
                               isOverdue ? 'متأخرة منذ:' : 'موعد التسليم:',
                               style: TextStyle(
@@ -141,11 +145,10 @@ class TaskCard extends StatelessWidget {
                                 fontSize: smallTextSize,
                                 fontWeight: FontWeight.w400,
                                 fontFamily: 'SYMBIOAR+LT',
+                                height: 1.2,
                               ),
                             ),
-                            SizedBox(
-                                width: screenSize.width *
-                                    0.005), // 0.5% من عرض الشاشة
+                            SizedBox(width: screenSize.width * 0.01),
                             Text(
                               task.dueDateFormatted,
                               style: TextStyle(
@@ -153,6 +156,7 @@ class TaskCard extends StatelessWidget {
                                 fontSize: smallTextSize,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SYMBIOAR+LT',
+                                height: 1.2,
                               ),
                             ),
                           ],
@@ -181,6 +185,7 @@ class TaskCard extends StatelessWidget {
                             color: Colors.white,
                             size: iconSize,
                           ),
+                          SizedBox(height: 2),
                           Text(
                             timeText,
                             style: TextStyle(
@@ -204,8 +209,9 @@ class TaskCard extends StatelessWidget {
                 top: 0,
                 right: 0,
                 child: Container(
-                  width: screenSize.width * 0.03, // 3% من عرض الشاشة
-                  height: screenSize.height * 0.006, // 0.6% من ارتفاع الشاشة
+                  width: screenSize.width * 0.03,
+                  height:
+                      screenSize.height * 0.008, // زيادة ارتفاع الشريط قليلاً
                   decoration: BoxDecoration(
                     color: Colors.amber,
                     borderRadius: const BorderRadius.only(

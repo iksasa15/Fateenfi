@@ -28,24 +28,28 @@ class StatsComponents {
         // استخدام MediaQuery للحصول على أبعاد الشاشة
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
 
         // ضبط ارتفاع البطاقة
         final double cardHeight = height ??
             (isSmallScreen
-                ? screenSize.height *
-                    0.14 // 14% من ارتفاع الشاشة للأجهزة الصغيرة
-                : screenSize.height *
-                    0.15); // 15% من ارتفاع الشاشة للأجهزة العادية
+                ? screenSize.height * 0.14
+                : screenSize.height * 0.15);
 
-        // ضبط أحجام النصوص والأيقونات
-        final double iconSize = isSmallScreen ? 14.0 : 16.0;
-        final double titleSize = isSmallScreen ? 11.0 : 12.0;
-        final double valueSize = isSmallScreen ? 13.0 : 14.0;
-        final double messageSize = isSmallScreen ? 10.0 : 11.0;
+        // ضبط أحجام النصوص والأيقونات - تحسين الأحجام
+        final double iconSize =
+            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
+        final double titleSize =
+            isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
+        final double valueSize =
+            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+        final double messageSize =
+            isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 13.0);
 
         return Container(
           width: cardWidth,
-          padding: EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
+          padding: EdgeInsets.all(screenSize.width * 0.04),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -70,10 +74,8 @@ class StatsComponents {
                     // الجزء التحفيزي الجديد المميز
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal:
-                            screenSize.width * 0.025, // 2.5% من عرض الشاشة
-                        vertical:
-                            screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+                        horizontal: screenSize.width * 0.025,
+                        vertical: screenSize.height * 0.01,
                       ),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
@@ -98,9 +100,7 @@ class StatsComponents {
                               size: iconSize,
                             ),
                           ),
-                          SizedBox(
-                              width:
-                                  screenSize.width * 0.02), // 2% من عرض الشاشة
+                          SizedBox(width: screenSize.width * 0.02),
                           // نص تحفيزي
                           Expanded(
                             child: Column(
@@ -113,17 +113,17 @@ class StatsComponents {
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
-                                SizedBox(
-                                    height: screenSize.height *
-                                        0.0025), // 0.25% من ارتفاع الشاشة
+                                SizedBox(height: screenSize.height * 0.0025),
                                 Text(
                                   "خطواتك اليوم تصنع نجاحك غداً",
                                   style: TextStyle(
                                     fontSize: messageSize,
                                     color: Colors.white,
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
                               ],
@@ -133,16 +133,13 @@ class StatsComponents {
                       ),
                     ),
 
-                    SizedBox(
-                        height: screenSize.height *
-                            0.0175), // 1.75% من ارتفاع الشاشة
+                    SizedBox(height: screenSize.height * 0.0175),
 
                     // نص تحفيزي إضافي بتصميم أنيق
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: screenSize.width * 0.02, // 2% من عرض الشاشة
-                        vertical: screenSize.height *
-                            0.0075, // 0.75% من ارتفاع الشاشة
+                        horizontal: screenSize.width * 0.02,
+                        vertical: screenSize.height * 0.0075,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade50,
@@ -157,9 +154,7 @@ class StatsComponents {
                             color: kAccentPink,
                             size: iconSize,
                           ),
-                          SizedBox(
-                              width: screenSize.width *
-                                  0.015), // 1.5% من عرض الشاشة
+                          SizedBox(width: screenSize.width * 0.015),
                           // رسالة تحفيزية
                           Expanded(
                             child: Text(
@@ -168,6 +163,7 @@ class StatsComponents {
                                 fontSize: messageSize,
                                 color: const Color(0xFF555555),
                                 fontFamily: 'SYMBIOAR+LT',
+                                height: 1.2,
                               ),
                             ),
                           ),
@@ -184,7 +180,7 @@ class StatsComponents {
                 width: 1,
                 color: Colors.grey.shade200,
                 margin: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
+                  horizontal: screenSize.width * 0.04,
                 ),
               ),
 
@@ -200,19 +196,15 @@ class StatsComponents {
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal:
-                              screenSize.width * 0.02, // 2% من عرض الشاشة
-                          vertical: screenSize.height *
-                              0.0075, // 0.75% من ارتفاع الشاشة
+                          horizontal: screenSize.width * 0.02,
+                          vertical: screenSize.height * 0.0075,
                         ),
                         child: Row(
                           children: [
                             // أيقونة المهام
                             Container(
-                              width:
-                                  screenSize.width * 0.08, // 8% من عرض الشاشة
-                              height:
-                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              width: screenSize.width * 0.08,
+                              height: screenSize.width * 0.08,
                               decoration: BoxDecoration(
                                 color: kTaskColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
@@ -221,15 +213,12 @@ class StatsComponents {
                                 child: Icon(
                                   Icons.assignment_outlined,
                                   color: kTaskColor,
-                                  size: iconSize +
-                                      2, // أكبر قليلاً من الأيقونات الأخرى
+                                  size: iconSize + 2,
                                 ),
                               ),
                             ),
 
-                            SizedBox(
-                                width: screenSize.width *
-                                    0.025), // 2.5% من عرض الشاشة
+                            SizedBox(width: screenSize.width * 0.025),
 
                             // عدد المهام والنص
                             Column(
@@ -242,6 +231,7 @@ class StatsComponents {
                                     fontWeight: FontWeight.w500,
                                     color: const Color(0xFF555555),
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
                                 Text(
@@ -251,6 +241,7 @@ class StatsComponents {
                                     fontWeight: FontWeight.bold,
                                     color: kTaskColor,
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
                               ],
@@ -266,8 +257,7 @@ class StatsComponents {
                       width: double.infinity,
                       color: Colors.grey.shade200,
                       margin: EdgeInsets.symmetric(
-                        vertical:
-                            screenSize.height * 0.005, // 0.5% من ارتفاع الشاشة
+                        vertical: screenSize.height * 0.005,
                       ),
                     ),
 
@@ -277,19 +267,15 @@ class StatsComponents {
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal:
-                              screenSize.width * 0.02, // 2% من عرض الشاشة
-                          vertical: screenSize.height *
-                              0.0075, // 0.75% من ارتفاع الشاشة
+                          horizontal: screenSize.width * 0.02,
+                          vertical: screenSize.height * 0.0075,
                         ),
                         child: Row(
                           children: [
                             // أيقونة الكورسات
                             Container(
-                              width:
-                                  screenSize.width * 0.08, // 8% من عرض الشاشة
-                              height:
-                                  screenSize.width * 0.08, // 8% من عرض الشاشة
+                              width: screenSize.width * 0.08,
+                              height: screenSize.width * 0.08,
                               decoration: BoxDecoration(
                                 color: kMaterialsColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
@@ -298,15 +284,12 @@ class StatsComponents {
                                 child: Icon(
                                   Icons.menu_book_outlined,
                                   color: kMaterialsColor,
-                                  size: iconSize +
-                                      2, // أكبر قليلاً من الأيقونات الأخرى
+                                  size: iconSize + 2,
                                 ),
                               ),
                             ),
 
-                            SizedBox(
-                                width: screenSize.width *
-                                    0.025), // 2.5% من عرض الشاشة
+                            SizedBox(width: screenSize.width * 0.025),
 
                             // عدد الكورسات والنص
                             Column(
@@ -319,6 +302,7 @@ class StatsComponents {
                                     fontWeight: FontWeight.w500,
                                     color: const Color(0xFF555555),
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
                                 Text(
@@ -328,6 +312,7 @@ class StatsComponents {
                                     fontWeight: FontWeight.bold,
                                     color: kMaterialsColor,
                                     fontFamily: 'SYMBIOAR+LT',
+                                    height: 1.2,
                                   ),
                                 ),
                               ],
@@ -360,8 +345,7 @@ class StatsComponents {
         final availableWidth = constraints.maxWidth;
         return Padding(
           padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height *
-                0.01, // 1% من ارتفاع الشاشة
+            vertical: MediaQuery.of(context).size.height * 0.01,
           ),
           child: buildCombinedStatsCard(
             tasksCount: tasksCount,
@@ -403,25 +387,30 @@ class StatsComponents {
         // استخدام MediaQuery للحصول على أبعاد الشاشة
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
 
         // تعديل اللون بناء على نوع البطاقة
         final cardColor = isTaskCard ? kTaskColor : kMaterialsColor;
 
         // ضبط أحجام تعتمد على الشاشة
-        final double cardHeight =
-            height ?? (screenSize.height * 0.12); // 12% من ارتفاع الشاشة
-        final double iconSize = isSmallScreen ? 14.0 : 16.0;
-        final double titleSize = isSmallScreen ? 10.0 : 11.0;
-        final double valueSize = isSmallScreen ? 16.0 : 18.0;
-        final double subtitleSize = isSmallScreen ? 9.0 : 10.0;
+        final double cardHeight = height ?? (screenSize.height * 0.12);
+        final double iconSize =
+            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+        final double titleSize =
+            isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 13.0);
+        final double valueSize =
+            isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
+        final double subtitleSize =
+            isSmallScreen ? 10.0 : (isMediumScreen ? 11.0 : 12.0);
 
         return GestureDetector(
           onTap: onTap,
           child: Container(
             width: cardWidth,
             padding: EdgeInsets.symmetric(
-              horizontal: screenSize.width * 0.025, // 2.5% من عرض الشاشة
-              vertical: screenSize.height * 0.0125, // 1.25% من ارتفاع الشاشة
+              horizontal: screenSize.width * 0.025,
+              vertical: screenSize.height * 0.0125,
             ),
             height: cardHeight,
             decoration: BoxDecoration(
@@ -441,8 +430,8 @@ class StatsComponents {
               children: [
                 // الأيقونة على يمين البطاقة
                 Container(
-                  width: screenSize.width * 0.07, // 7% من عرض الشاشة
-                  height: screenSize.width * 0.07, // 7% من عرض الشاشة
+                  width: screenSize.width * 0.07,
+                  height: screenSize.width * 0.07,
                   decoration: BoxDecoration(
                     color: cardColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -456,7 +445,7 @@ class StatsComponents {
                   ),
                 ),
 
-                SizedBox(width: screenSize.width * 0.025), // 2.5% من عرض الشاشة
+                SizedBox(width: screenSize.width * 0.025),
 
                 // المحتوى: ثلاثة أسطر (العنوان، القيمة، الحالة)
                 Expanded(
@@ -472,6 +461,7 @@ class StatsComponents {
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF555555),
                           fontFamily: 'SYMBIOAR+LT',
+                          height: 1.2,
                         ),
                       ),
 
@@ -483,16 +473,15 @@ class StatsComponents {
                           fontWeight: FontWeight.bold,
                           color: cardColor,
                           fontFamily: 'SYMBIOAR+LT',
+                          height: 1.2,
                         ),
                       ),
 
                       // السطر الثالث: النص الفرعي
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal:
-                              screenSize.width * 0.015, // 1.5% من عرض الشاشة
-                          vertical: screenSize.height *
-                              0.0025, // 0.25% من ارتفاع الشاشة
+                          horizontal: screenSize.width * 0.015,
+                          vertical: screenSize.height * 0.0025,
                         ),
                         decoration: BoxDecoration(
                           color: cardColor.withOpacity(0.1),
@@ -505,6 +494,7 @@ class StatsComponents {
                             color: cardColor,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'SYMBIOAR+LT',
+                            height: 1.2,
                           ),
                         ),
                       ),
@@ -597,18 +587,22 @@ class StatsComponents {
     );
   }
 
-  // باقي الدوال
+  // بناء عنوان القسم
   static Widget buildSectionTitle(String title, {Widget? trailing}) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double fontSize = isSmallScreen ? 15.0 : 16.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double fontSize =
+            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
 
         return Padding(
           padding: EdgeInsets.only(
-            bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
-            top: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
+            bottom: screenSize.height * 0.01,
+            top: screenSize.height * 0.02,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -624,14 +618,13 @@ class StatsComponents {
                       color: kDarkPurple,
                       letterSpacing: 0.3,
                       fontFamily: 'SYMBIOAR+LT',
+                      height: 1.2,
                     ),
                   ),
-                  SizedBox(
-                      height:
-                          screenSize.height * 0.004), // 0.4% من ارتفاع الشاشة
+                  SizedBox(height: screenSize.height * 0.004),
                   Container(
-                    width: screenSize.width * 0.06, // 6% من عرض الشاشة
-                    height: 2,
+                    width: screenSize.width * 0.06,
+                    height: 2.5, // زيادة سمك الخط
                     decoration: BoxDecoration(
                       color: kMediumPurple,
                       borderRadius: BorderRadius.circular(1),
@@ -656,8 +649,7 @@ class StatsComponents {
         final Size screenSize = MediaQuery.of(context).size;
 
         return Container(
-          padding: padding ??
-              EdgeInsets.all(screenSize.width * 0.03), // 3% من عرض الشاشة
+          padding: padding ?? EdgeInsets.all(screenSize.width * 0.03),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -684,13 +676,18 @@ class StatsComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double iconSize = isSmallScreen ? 35.0 : 40.0;
-        final double fontSize = isSmallScreen ? 13.0 : 14.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double iconSize =
+            isSmallScreen ? 38.0 : (isMediumScreen ? 42.0 : 45.0);
+        final double fontSize =
+            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
 
         return Container(
           padding: EdgeInsets.symmetric(
-            vertical: screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
-            horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
+            vertical: screenSize.height * 0.025,
+            horizontal: screenSize.width * 0.04,
           ),
           alignment: Alignment.center,
           child: Column(
@@ -701,8 +698,7 @@ class StatsComponents {
                 size: iconSize,
                 color: Colors.grey[300],
               ),
-              SizedBox(
-                  height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
+              SizedBox(height: screenSize.height * 0.015),
               Text(
                 message,
                 style: TextStyle(
@@ -710,6 +706,7 @@ class StatsComponents {
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
                   fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2,
                 ),
                 textAlign: TextAlign.center,
               ),

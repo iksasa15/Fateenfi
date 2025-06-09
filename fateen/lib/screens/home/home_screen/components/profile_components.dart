@@ -15,12 +15,18 @@ class ProfileComponents {
         // استخدام MediaQuery للحصول على أبعاد الشاشة
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
 
         // تعديل الأحجام بناءً على حجم الشاشة
-        final double iconSize = isSmallScreen ? 50.0 : 60.0;
-        final double nameSize = isSmallScreen ? 20.0 : 22.0;
-        final double majorSize = isSmallScreen ? 14.0 : 16.0;
-        final double emailSize = isSmallScreen ? 13.0 : 14.0;
+        final double iconSize =
+            isSmallScreen ? 55.0 : (isMediumScreen ? 60.0 : 65.0);
+        final double nameSize =
+            isSmallScreen ? 22.0 : (isMediumScreen ? 24.0 : 26.0);
+        final double majorSize =
+            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
+        final double emailSize =
+            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
 
         return Card(
           elevation: 2,
@@ -28,14 +34,12 @@ class ProfileComponents {
             borderRadius: BorderRadius.circular(15),
           ),
           child: Padding(
-            padding:
-                EdgeInsets.all(screenSize.width * 0.04), // 4% من عرض الشاشة
+            padding: EdgeInsets.all(screenSize.width * 0.04),
             child: Column(
               children: [
                 // أيقونة المستخدم
                 Container(
-                  padding: EdgeInsets.all(
-                      screenSize.width * 0.03), // 3% من عرض الشاشة
+                  padding: EdgeInsets.all(screenSize.width * 0.03),
                   decoration: BoxDecoration(
                     color: ProfileConstants.kDarkPurple.withOpacity(0.1),
                     shape: BoxShape.circle,
@@ -47,8 +51,7 @@ class ProfileComponents {
                   ),
                 ),
 
-                SizedBox(
-                    height: screenSize.height * 0.02), // 2% من ارتفاع الشاشة
+                SizedBox(height: screenSize.height * 0.02),
 
                 // اسم المستخدم
                 Text(
@@ -58,19 +61,18 @@ class ProfileComponents {
                     fontWeight: FontWeight.bold,
                     color: ProfileConstants.kDarkPurple,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                   textAlign: TextAlign.center,
                 ),
 
-                SizedBox(
-                    height: screenSize.height * 0.01), // 1% من ارتفاع الشاشة
+                SizedBox(height: screenSize.height * 0.01),
 
                 // التخصص
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.03, // 3% من عرض الشاشة
-                    vertical:
-                        screenSize.height * 0.0075, // 0.75% من ارتفاع الشاشة
+                    horizontal: screenSize.width * 0.03,
+                    vertical: screenSize.height * 0.0075,
                   ),
                   decoration: BoxDecoration(
                     color: ProfileConstants.kLightPurple,
@@ -83,12 +85,12 @@ class ProfileComponents {
                       color: ProfileConstants.kMediumPurple,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'SYMBIOAR+LT',
+                      height: 1.2,
                     ),
                   ),
                 ),
 
-                SizedBox(
-                    height: screenSize.height * 0.015), // 1.5% من ارتفاع الشاشة
+                SizedBox(height: screenSize.height * 0.015),
 
                 // البريد الإلكتروني
                 if (email.isNotEmpty)
@@ -97,17 +99,17 @@ class ProfileComponents {
                     children: [
                       Icon(
                         Icons.email_outlined,
-                        size: emailSize + 4, // أكبر قليلاً من حجم النص
+                        size: emailSize + 4,
                         color: ProfileConstants.kHintColor,
                       ),
-                      SizedBox(
-                          width: screenSize.width * 0.02), // 2% من عرض الشاشة
+                      SizedBox(width: screenSize.width * 0.02),
                       Text(
                         email,
                         style: TextStyle(
                           fontSize: emailSize,
                           color: ProfileConstants.kHintColor,
                           fontFamily: 'SYMBIOAR+LT',
+                          height: 1.2,
                         ),
                       ),
                     ],
@@ -130,14 +132,16 @@ class ProfileComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double titleSize = isSmallScreen ? 16.0 : 18.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double titleSize =
+            isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
 
         return Container(
           margin: EdgeInsets.only(
-            top: isFirst
-                ? 0
-                : screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
-            bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
+            top: isFirst ? 0 : screenSize.height * 0.025,
+            bottom: screenSize.height * 0.01,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,9 +149,9 @@ class ProfileComponents {
               // عنوان القسم
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
-                  right: screenSize.width * 0.04, // 4% من عرض الشاشة
-                  left: screenSize.width * 0.04, // 4% من عرض الشاشة
+                  bottom: screenSize.height * 0.015,
+                  right: screenSize.width * 0.04,
+                  left: screenSize.width * 0.04,
                 ),
                 child: Text(
                   title,
@@ -156,6 +160,7 @@ class ProfileComponents {
                     fontWeight: FontWeight.bold,
                     color: ProfileConstants.kDarkPurple,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                 ),
               ),
@@ -199,9 +204,15 @@ class ProfileComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double titleSize = isSmallScreen ? 15.0 : 16.0;
-        final double subtitleSize = isSmallScreen ? 13.0 : 14.0;
-        final double iconSize = isSmallScreen ? 20.0 : 22.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double titleSize =
+            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
+        final double subtitleSize =
+            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+        final double iconSize =
+            isSmallScreen ? 22.0 : (isMediumScreen ? 23.0 : 24.0);
 
         return InkWell(
           onTap: onTap,
@@ -209,15 +220,14 @@ class ProfileComponents {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.04, // 4% من عرض الشاشة
-                  vertical: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+                  horizontal: screenSize.width * 0.04,
+                  vertical: screenSize.height * 0.015,
                 ),
                 child: Row(
                   children: [
                     // أيقونة العنصر
                     Container(
-                      padding: EdgeInsets.all(
-                          screenSize.width * 0.02), // 2% من عرض الشاشة
+                      padding: EdgeInsets.all(screenSize.width * 0.02),
                       decoration: BoxDecoration(
                         color: (iconColor ?? ProfileConstants.kDarkPurple)
                             .withOpacity(0.1),
@@ -233,8 +243,7 @@ class ProfileComponents {
                       ),
                     ),
 
-                    SizedBox(
-                        width: screenSize.width * 0.04), // 4% من عرض الشاشة
+                    SizedBox(width: screenSize.width * 0.04),
 
                     // النص والوصف
                     Expanded(
@@ -250,13 +259,13 @@ class ProfileComponents {
                                   ? ProfileConstants.dangerColor
                                   : ProfileConstants.kTextColor,
                               fontFamily: 'SYMBIOAR+LT',
+                              height: 1.2,
                             ),
                           ),
                           if (subtitle != null)
                             Padding(
                               padding: EdgeInsets.only(
-                                top: screenSize.height *
-                                    0.005, // 0.5% من ارتفاع الشاشة
+                                top: screenSize.height * 0.005,
                               ),
                               child: Text(
                                 subtitle,
@@ -264,6 +273,7 @@ class ProfileComponents {
                                   fontSize: subtitleSize,
                                   color: ProfileConstants.kHintColor,
                                   fontFamily: 'SYMBIOAR+LT',
+                                  height: 1.2,
                                 ),
                               ),
                             ),
@@ -275,7 +285,7 @@ class ProfileComponents {
                     Icon(
                       Icons.arrow_forward_ios,
                       color: ProfileConstants.kHintColor,
-                      size: iconSize - 6, // أصغر من الأيقونة الأساسية
+                      size: iconSize - 6,
                     ),
                   ],
                 ),
@@ -286,7 +296,7 @@ class ProfileComponents {
                 Divider(
                   height: 1,
                   thickness: 1,
-                  indent: screenSize.width * 0.14, // 14% من عرض الشاشة
+                  indent: screenSize.width * 0.14,
                   endIndent: 0,
                   color: Colors.grey[100],
                 ),
@@ -315,14 +325,21 @@ class ProfileComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double labelSize = isSmallScreen ? 14.0 : 15.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double labelSize =
+            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
         final double inputSize =
-            isSmallScreen ? 14.0 : ProfileConstants.inputTextFontSize;
-        final double hintSize = isSmallScreen ? 13.0 : 14.0;
+            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+        final double hintSize =
+            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+        final double iconSize =
+            isSmallScreen ? 22.0 : (isMediumScreen ? 23.0 : 24.0);
 
         return Container(
           margin: EdgeInsets.only(
-            bottom: screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
+            bottom: screenSize.height * 0.025,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,8 +347,8 @@ class ProfileComponents {
               // تسمية الحقل
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: screenSize.height * 0.01, // 1% من ارتفاع الشاشة
-                  right: screenSize.width * 0.01, // 1% من عرض الشاشة
+                  bottom: screenSize.height * 0.01,
+                  right: screenSize.width * 0.01,
                 ),
                 child: Text(
                   label,
@@ -340,6 +357,7 @@ class ProfileComponents {
                     fontWeight: FontWeight.w500,
                     color: ProfileConstants.kTextColor,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                 ),
               ),
@@ -354,6 +372,7 @@ class ProfileComponents {
                   color: ProfileConstants.kTextColor,
                   fontSize: inputSize,
                   fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2,
                 ),
                 decoration: InputDecoration(
                   hintText: hint,
@@ -361,13 +380,14 @@ class ProfileComponents {
                     color: ProfileConstants.kHintColor,
                     fontSize: hintSize,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                   prefixIcon: Icon(
                     icon,
                     color: controller.text.isEmpty
                         ? ProfileConstants.kHintColor
                         : ProfileConstants.kMediumPurple,
-                    size: 22,
+                    size: iconSize,
                   ),
                   suffixIcon: suffix,
                   filled: true,
@@ -402,12 +422,13 @@ class ProfileComponents {
                   ),
                   errorStyle: TextStyle(
                     color: ProfileConstants.kAccentColorPink,
-                    fontSize: hintSize - 2, // أصغر من حجم النص العادي
+                    fontSize: hintSize - 2,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: screenSize.height * 0.02, // 2% من ارتفاع الشاشة
-                    horizontal: screenSize.width * 0.05, // 5% من عرض الشاشة
+                    vertical: screenSize.height * 0.02,
+                    horizontal: screenSize.width * 0.05,
                   ),
                 ),
                 maxLines: obscureText ? 1 : maxLines,
@@ -435,11 +456,19 @@ class ProfileComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
         final double buttonHeight = isSmallScreen
-            ? screenSize.height * 0.055 // 5.5% من ارتفاع الشاشة للأجهزة الصغيرة
-            : ProfileConstants.buttonHeight;
+            ? screenSize.height * 0.055
+            : (isMediumScreen
+                ? screenSize.height * 0.06
+                : screenSize.height * 0.065);
+
         final double textSize =
-            isSmallScreen ? 14.0 : ProfileConstants.buttonTextFontSize;
+            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+
+        final double iconSize = textSize + 6;
 
         final Color buttonColor = isDanger
             ? ProfileConstants.dangerColor
@@ -461,7 +490,7 @@ class ProfileComponents {
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: EdgeInsets.symmetric(
-                vertical: screenSize.height * 0.015, // 1.5% من ارتفاع الشاشة
+                vertical: screenSize.height * 0.015,
               ),
             ),
             child: isLoading
@@ -480,10 +509,9 @@ class ProfileComponents {
                       if (icon != null)
                         Padding(
                           padding: EdgeInsets.only(
-                            left: screenSize.width * 0.02, // 2% من عرض الشاشة
+                            left: screenSize.width * 0.02,
                           ),
-                          child: Icon(icon,
-                              size: textSize + 6), // أكبر قليلاً من حجم النص
+                          child: Icon(icon, size: iconSize),
                         ),
                       Text(
                         text,
@@ -491,6 +519,7 @@ class ProfileComponents {
                           fontSize: textSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'SYMBIOAR+LT',
+                          height: 1.2,
                         ),
                       ),
                     ],
@@ -512,9 +541,15 @@ class ProfileComponents {
   }) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 360;
-    final double titleSize = isSmallScreen ? 16.0 : 18.0;
-    final double messageSize = isSmallScreen ? 14.0 : 16.0;
-    final double buttonTextSize = isSmallScreen ? 13.0 : 14.0;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
+
+    final double titleSize =
+        isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
+    final double messageSize =
+        isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+    final double buttonTextSize =
+        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
 
     return showDialog<bool>(
       context: context,
@@ -528,6 +563,7 @@ class ProfileComponents {
             fontWeight: FontWeight.bold,
             fontSize: titleSize,
             fontFamily: 'SYMBIOAR+LT',
+            height: 1.2,
           ),
           textAlign: TextAlign.right,
         ),
@@ -536,6 +572,7 @@ class ProfileComponents {
           style: TextStyle(
             fontSize: messageSize,
             fontFamily: 'SYMBIOAR+LT',
+            height: 1.2,
           ),
           textAlign: TextAlign.right,
         ),
@@ -549,6 +586,7 @@ class ProfileComponents {
                 color: Colors.grey[700],
                 fontSize: buttonTextSize,
                 fontFamily: 'SYMBIOAR+LT',
+                height: 1.2,
               ),
             ),
           ),
@@ -567,6 +605,7 @@ class ProfileComponents {
                 fontWeight: FontWeight.bold,
                 fontSize: buttonTextSize,
                 fontFamily: 'SYMBIOAR+LT',
+                height: 1.2,
               ),
             ),
           ),
@@ -580,13 +619,19 @@ class ProfileComponents {
     // تعديل الأحجام حسب حجم الشاشة
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 360;
-    final double fontSize = isSmallScreen ? 12.0 : 14.0;
-    final double iconSize = isSmallScreen ? 18.0 : 20.0;
-    final double padding = isSmallScreen ? 10.0 : 12.0;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
+
+    final double fontSize =
+        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
+    final double iconSize =
+        isSmallScreen ? 19.0 : (isMediumScreen ? 20.0 : 22.0);
+    final double padding =
+        isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 14.0);
 
     return Container(
       margin: EdgeInsets.only(
-        bottom: screenSize.height * 0.025, // 2.5% من ارتفاع الشاشة
+        bottom: screenSize.height * 0.025,
       ),
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
@@ -601,7 +646,7 @@ class ProfileComponents {
             color: ProfileConstants.kAccentColorPink,
             size: iconSize,
           ),
-          SizedBox(width: screenSize.width * 0.025), // 2.5% من عرض الشاشة
+          SizedBox(width: screenSize.width * 0.025),
           Expanded(
             child: Text(
               errorMessage,
@@ -609,6 +654,7 @@ class ProfileComponents {
                 color: ProfileConstants.kAccentColorPink,
                 fontSize: fontSize,
                 fontFamily: 'SYMBIOAR+LT',
+                height: 1.2,
               ),
               textAlign: TextAlign.right,
             ),
@@ -624,18 +670,27 @@ class ProfileComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
         final bool isSmallScreen = screenSize.width < 360;
-        final double messageSize = isSmallScreen ? 14.0 : 16.0;
+        final bool isMediumScreen =
+            screenSize.width >= 360 && screenSize.width < 400;
+
+        final double messageSize =
+            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+        final double indicatorSize =
+            isSmallScreen ? 25.0 : (isMediumScreen ? 28.0 : 30.0);
 
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(
-                color: ProfileConstants.kDarkPurple,
+              SizedBox(
+                width: indicatorSize,
+                height: indicatorSize,
+                child: const CircularProgressIndicator(
+                  color: ProfileConstants.kDarkPurple,
+                  strokeWidth: 3.0,
+                ),
               ),
-              if (message != null)
-                SizedBox(
-                    height: screenSize.height * 0.02), // 2% من ارتفاع الشاشة
+              if (message != null) SizedBox(height: screenSize.height * 0.02),
               if (message != null)
                 Text(
                   message,
@@ -643,6 +698,7 @@ class ProfileComponents {
                     fontSize: messageSize,
                     color: Colors.grey.shade600,
                     fontFamily: 'SYMBIOAR+LT',
+                    height: 1.2,
                   ),
                 ),
             ],
