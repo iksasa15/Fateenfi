@@ -345,8 +345,8 @@ class _HomeScreenState extends State<HomeScreen>
 
                       // مساحة إضافية في الأسفل للسماح بالسحب للأسفل بشكل أفضل
                       SizedBox(
-                          height:
-                              screenSize.height * 0.08), // 8% من ارتفاع الشاشة
+                          height: screenSize.height *
+                              0.1), // 10% من ارتفاع الشاشة لإعطاء مساحة للشريط السفلي
                     ],
                   ),
                 ),
@@ -431,26 +431,18 @@ class _HomeScreenState extends State<HomeScreen>
               backgroundColor:
                   const Color(0xFFFDFDFF), // استخدام نفس خلفية التطبيق
               body: SafeArea(
+                // إضافة هامش سفلي إضافي للمحتوى ليتناسب مع شريط التنقل
+                bottom: false,
                 child: PageStorage(
                   bucket: _bucket,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
-                    child: IndexedStack(
-                      key: ValueKey<int>(controller.selectedIndex),
-                      index: controller.selectedIndex,
-                      children: _pages,
-                    ),
+                  child: IndexedStack(
+                    key: ValueKey<int>(controller.selectedIndex),
+                    index: controller.selectedIndex,
+                    children: _pages,
                   ),
                 ),
               ),
-              // إضافة شريط التنقل السفلي
+              // إضافة شريط التنقل السفلي بدون هوامش إضافية
               bottomNavigationBar: ColorfulNavBar(
                 selectedIndex: controller.selectedIndex,
                 onItemTapped: (index) => controller.changeIndex(index),
