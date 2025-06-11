@@ -1290,6 +1290,102 @@ class Task {
     }
   }
 
+  // الحصول على ملخص لإحصائيات المهام - دالة بديلة تتجنب مشاكل الفهارس
+  static Future<Map<String, int>> getTasksStatisticsOptimized(
+      {Course? course}) async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception('المستخدم غير مسجل الدخول');
+      }
+
+      // استعلام بسيط لجلب جميع المهام
+      final taskCollection = tasksCollectionForUser(currentUser.uid);
+
+      // نقوم بجلب جميع المهام مرة واحدة ثم نقوم بالتصفية محلياً
+      final QuerySnapshot snapshot = await (course != null
+          ? taskCollection.where('courseId', isEqualTo: course.id).get()
+          : taskCollection.get());
+
+      // تاريخ اليوم
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final tomorrow = DateTime(now.year, now.month, now.day + 1);
+
+      // حساب الإحصائيات
+      int totalTasks = 0;
+      int completedTasks = 0;
+      int overdueTasks = 0;
+      int todayTasks = 0;
+      int upcomingTasks = 0;
+      int highPriorityTasks = 0;
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data() as Map<String, dynamic>;
+
+        totalTasks++;
+
+        // حالة المهمة
+        String status = data['status'] as String? ?? '';
+
+        // المهام المكتملة
+        if (status == 'مكتملة') {
+          completedTasks++;
+          continue; // نتخطى باقي الفحوصات لأن المهمة مكتملة
+        }
+
+        // نتخطى المهام الملغاة
+        if (status == 'ملغاة') {
+          continue;
+        }
+
+        // الأولوية العالية
+        if (data['priority'] == 'عالية') {
+          highPriorityTasks++;
+        }
+
+        // تاريخ استحقاق المهمة
+        if (data.containsKey('dueDate')) {
+          DateTime dueDate = (data['dueDate'] as Timestamp).toDate();
+
+          // المهام المتأخرة
+          if (dueDate.isBefore(today)) {
+            overdueTasks++;
+          }
+          // مهام اليوم
+          else if (dueDate.year == today.year &&
+              dueDate.month == today.month &&
+              dueDate.day == today.day) {
+            todayTasks++;
+          }
+          // المهام القادمة
+          else if (dueDate.isAfter(today)) {
+            upcomingTasks++;
+          }
+        }
+      }
+
+      return {
+        'total': totalTasks,
+        'completed': completedTasks,
+        'overdue': overdueTasks,
+        'today': todayTasks,
+        'upcoming': upcomingTasks,
+        'highPriority': highPriorityTasks,
+      };
+    } catch (e) {
+      print('فشل في الحصول على إحصائيات المهام: $e');
+      return {
+        'total': 0,
+        'completed': 0,
+        'overdue': 0,
+        'today': 0,
+        'upcoming': 0,
+        'highPriority': 0,
+      };
+    }
+  }
+
   // إضافة دوال الإشعارات والتذكيرات
 
   // دالة لجدولة تذكير للمهمة

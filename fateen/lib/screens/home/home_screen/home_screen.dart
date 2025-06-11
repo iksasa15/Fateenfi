@@ -16,10 +16,6 @@ import 'controllers/semester_progress_controller.dart';
 import 'components/performance_indicators_widget.dart';
 import 'controllers/performance_indicators_controller.dart';
 
-// استيراد ميزة المواعيد القادمة
-import 'components/upcoming_events_widget.dart';
-import 'controllers/upcoming_events_controller.dart';
-
 // استيراد ميزة فئات المهام
 import 'components/task_categories_widget.dart';
 import 'controllers/task_categories_controller.dart';
@@ -206,7 +202,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // ألوان ثابتة لتوحيد المظهر
   static const Color kDarkPurple = Color(0xFF4338CA);
   static const Color kMediumPurple = Color(0xFF6366F1);
@@ -225,7 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late ProfileCardController _profileCardController;
   late SemesterProgressController _semesterProgressController;
   late PerformanceIndicatorsController _performanceIndicatorsController;
-  late UpcomingEventsController _upcomingEventsController;
   late TaskCategoriesController _taskCategoriesController;
 
   // إضافة وحدة تحكم شريط التنقل
@@ -243,10 +238,70 @@ class _HomeScreenState extends State<HomeScreen> {
   // مؤشر لعملية التحديث
   bool _isRefreshing = false;
 
+  // إضافة متغير لتتبع الصفحة النشطة السابقة
+  int _previousIndex = 0;
+
   @override
   void initState() {
     super.initState();
+    // إضافة مراقب التطبيق لتتبع حالة التطبيق (في الخلفية، نشط، الخ)
+    WidgetsBinding.instance.addObserver(this);
     _initializeControllers();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // تفقد ما إذا كانت وحدة تحكم التنقل متاحة
+    if (!_isInitialLoading) {
+      final navController =
+          Provider.of<BottomNavController>(context, listen: true);
+      _listenToPageChanges(navController);
+    }
+  }
+
+  // استماع للتغييرات في الصفحة النشطة
+  void _listenToPageChanges(BottomNavController navController) {
+    if (navController.selectedIndex == 0 && _previousIndex != 0) {
+      // تم الانتقال إلى الصفحة الرئيسية من صفحة أخرى
+      debugPrint('تم الانتقال إلى الصفحة الرئيسية - تحديث البيانات');
+      _updateHomePageData();
+    }
+    _previousIndex = navController.selectedIndex;
+  }
+
+  // تحديث بيانات الصفحة الرئيسية
+  Future<void> _updateHomePageData() async {
+    if (_isRefreshing) return; // منع التحديث المتزامن المتعدد
+
+    debugPrint('بدء تحديث بيانات الصفحة الرئيسية...');
+
+    try {
+      // تحديث مؤشرات الأداء والمهام والمحاضرة القادمة
+      await Future.wait([
+        _performanceIndicatorsController.refresh(),
+        _taskCategoriesController.refresh(),
+        _nextLectureController.refresh(),
+      ]);
+
+      // لا نحتاج لتحديث واجهة المستخدم هنا لأن وحدات التحكم تستخدم ChangeNotifier
+      debugPrint('تم تحديث بيانات الصفحة الرئيسية بنجاح');
+    } catch (e) {
+      debugPrint('حدث خطأ أثناء تحديث بيانات الصفحة الرئيسية: $e');
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // تحديث البيانات عند العودة إلى التطبيق
+    if (state == AppLifecycleState.resumed) {
+      final navController =
+          Provider.of<BottomNavController>(context, listen: false);
+      if (navController.selectedIndex == 0) {
+        debugPrint('العودة إلى التطبيق في الصفحة الرئيسية - تحديث البيانات');
+        _updateHomePageData();
+      }
+    }
   }
 
   // استخدام دالة منفصلة لتهيئة وحدات التحكم لتحسين الأداء
@@ -259,7 +314,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _profileCardController = ProfileCardController();
     _semesterProgressController = SemesterProgressController();
     _performanceIndicatorsController = PerformanceIndicatorsController();
-    _upcomingEventsController = UpcomingEventsController();
     _taskCategoriesController = TaskCategoriesController();
 
     // تهيئة وحدات التحكم في مجموعات متوازية لتحسين الأداء
@@ -268,7 +322,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _profileCardController.initialize(),
       _semesterProgressController.initialize(),
       _performanceIndicatorsController.initialize(),
-      _upcomingEventsController.initialize(),
       _taskCategoriesController.initialize(),
       Future(() async {
         _nextLectureController = NextLectureController();
@@ -363,7 +416,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ChangeNotifierProvider.value(value: _semesterProgressController),
             ChangeNotifierProvider.value(
                 value: _performanceIndicatorsController),
-            ChangeNotifierProvider.value(value: _upcomingEventsController),
             ChangeNotifierProvider.value(value: _taskCategoriesController),
           ],
           child: RefreshIndicator(
@@ -470,21 +522,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context, controller, _) {
                           return PerformanceIndicatorsWidget(
                             controller: controller,
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: sectionSpacing),
-
-                      // استخدام ميزة المواعيد القادمة المستخرجة
-                      Consumer<UpcomingEventsController>(
-                        builder: (context, controller, _) {
-                          return UpcomingEventsWidget(
-                            controller: controller,
-                            onViewAllPressed: () {
-                              _navController
-                                  .changeIndex(1); // الانتقال إلى صفحة المواعيد
-                            },
                           );
                         },
                       ),
@@ -621,6 +658,9 @@ class _HomeScreenState extends State<HomeScreen> {
       value: _navController,
       child: Consumer<BottomNavController>(
         builder: (context, controller, _) {
+          // تتبع التغييرات في الصفحة النشطة
+          _listenToPageChanges(controller);
+
           return WillPopScope(
             onWillPop: () async {
               // إذا كنا في صفحة غير الرئيسية، انتقل إلى الرئيسية بدلاً من الخروج
@@ -672,7 +712,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _profileCardController.refresh(),
         _semesterProgressController.refresh(),
         _performanceIndicatorsController.refresh(),
-        _upcomingEventsController.refresh(),
         _taskCategoriesController.refresh(),
       ]);
 
@@ -694,13 +733,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    // إزالة مراقب دورة حياة التطبيق
+    WidgetsBinding.instance.removeObserver(this);
+
     _nextLectureController.dispose();
     _statsController.dispose();
     _tasksController.dispose();
     _profileCardController.dispose();
     _semesterProgressController.dispose();
     _performanceIndicatorsController.dispose();
-    _upcomingEventsController.dispose();
     _taskCategoriesController.dispose();
     super.dispose();
   }

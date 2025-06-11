@@ -1,108 +1,118 @@
-import 'dart:async';
+// lib/services/tasks_firebase_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fateen/models/task.dart';
+import '../../../../../models/task.dart';
 
-/// خدمة Firebase للمهام التي تحتاج اهتمام
+/// خدمة Firebase للتعامل مع المهام بشكل مباشر
 class TasksFirebaseService {
-  // حقول Firestore
-  static const String tasksCollection = 'tasks';
-  static const String usersCollection = 'users';
-  static const String nameField = 'name';
-  static const String descriptionField = 'description';
-  static const String dueDateField = 'dueDate';
-  static const String statusField = 'status';
-  static const String priorityField = 'priority';
-  static const String createdAtField = 'createdAt';
-  static const String updatedAtField = 'updatedAt';
+  // تطبيق النمط Singleton
+  static final TasksFirebaseService _instance =
+      TasksFirebaseService._internal();
+  factory TasksFirebaseService() => _instance;
+  TasksFirebaseService._internal();
 
-  // قيم الحالة
-  static const String statusInProgress = 'قيد التنفيذ';
-  static const String statusCompleted = 'مكتملة';
-  static const String statusCancelled = 'ملغية';
+  // مراجع Firebase
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // جلب المهام ليوم اليوم
-  static Future<List<Task>> getTodayTasks() async {
+  // الحصول على معرف المستخدم الحالي
+  String? get _userId => _auth.currentUser?.uid;
+
+  // التحقق من تسجيل الدخول
+  bool get isUserLoggedIn => _auth.currentUser != null;
+
+  // الحصول على مرجع مجموعة المهام
+  CollectionReference _getTasksCollection() {
+    if (_userId == null) {
+      throw Exception('المستخدم غير مسجل الدخول');
+    }
+    return _firestore.collection('users').doc(_userId).collection('tasks');
+  }
+
+  // جلب مهمة اليوم - تاريخ استحقاقها اليوم وحالتها قيد التنفيذ
+  Future<Task?> getTodayTask() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        return [];
-      }
+      if (_userId == null) return null;
 
+      // تحديد بداية ونهاية اليوم الحالي
       final now = DateTime.now();
       final startOfDay = DateTime(now.year, now.month, now.day);
-      final endOfDay = startOfDay.add(const Duration(days: 1));
+      final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-      final query = FirebaseFirestore.instance
-          .collection(usersCollection)
-          .doc(user.uid)
-          .collection(tasksCollection)
-          .where(dueDateField, isGreaterThanOrEqualTo: startOfDay)
-          .where(dueDateField, isLessThan: endOfDay)
-          .where(statusField, isEqualTo: statusInProgress)
-          .orderBy(dueDateField)
-          .limit(1); // نحتاج فقط للمهمة الأولى
+      debugPrint(
+          'جلب مهمة اليوم... من ${startOfDay.toIso8601String()} إلى ${endOfDay.toIso8601String()}');
 
-      final snapshot = await query.get();
-      return snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
+      // جلب مهام اليوم المحددة
+      final query = await _getTasksCollection()
+          .where('dueDate',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+          .where('dueDate', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
+          .where('status', isEqualTo: 'قيد التنفيذ')
+          .orderBy('dueDate')
+          .limit(1)
+          .get();
+
+      // تحقق من وجود مهام
+      debugPrint('عدد المهام التي تم استرجاعها لليوم: ${query.docs.length}');
+      if (query.docs.isEmpty) {
+        debugPrint('لا توجد مهام لليوم');
+        return null;
+      }
+
+      // تحويل المستند إلى كائن Task
+      final taskDoc = query.docs.first;
+      debugPrint('تم العثور على مهمة اليوم: ${taskDoc.id}');
+      return Task.fromFirestore(taskDoc);
     } catch (e) {
-      debugPrint('خطأ في جلب مهام اليوم: $e');
-      return [];
+      debugPrint('خطأ في جلب مهمة اليوم: $e');
+      return null;
     }
   }
 
-  // جلب المهام المتأخرة
-  static Future<List<Task>> getOverdueTasks() async {
+  // جلب مهمة متأخرة - تاريخ استحقاقها قبل اليوم وحالتها قيد التنفيذ
+  Future<Task?> getOverdueTask() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        return [];
+      if (_userId == null) return null;
+
+      // تحديد بداية اليوم الحالي
+      final now = DateTime.now();
+      final startOfToday = DateTime(now.year, now.month, now.day);
+
+      debugPrint('جلب مهمة متأخرة... قبل ${startOfToday.toIso8601String()}');
+
+      // جلب المهام المتأخرة
+      final query = await _getTasksCollection()
+          .where('dueDate', isLessThan: Timestamp.fromDate(startOfToday))
+          .where('status', isEqualTo: 'قيد التنفيذ')
+          .orderBy('dueDate', descending: true) // أحدث المهام المتأخرة أولاً
+          .limit(1)
+          .get();
+
+      // تحقق من وجود مهام
+      debugPrint('عدد المهام التي تم استرجاعها المتأخرة: ${query.docs.length}');
+      if (query.docs.isEmpty) {
+        debugPrint('لا توجد مهام متأخرة');
+        return null;
       }
 
-      final now = DateTime.now();
-      final startOfDay = DateTime(now.year, now.month, now.day);
-
-      final query = FirebaseFirestore.instance
-          .collection(usersCollection)
-          .doc(user.uid)
-          .collection(tasksCollection)
-          .where(dueDateField, isLessThan: startOfDay)
-          .where(statusField, isEqualTo: statusInProgress)
-          .orderBy(dueDateField, descending: true)
-          .limit(1); // نحتاج فقط للمهمة الأولى
-
-      final snapshot = await query.get();
-      return snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
+      // تحويل المستند إلى كائن Task
+      final taskDoc = query.docs.first;
+      debugPrint('تم العثور على مهمة متأخرة: ${taskDoc.id}');
+      final task = Task.fromFirestore(taskDoc);
+      debugPrint(
+          'تفاصيل المهمة المتأخرة: ${task.name}, التاريخ: ${task.dueDateFormatted}');
+      return task;
     } catch (e) {
-      debugPrint('خطأ في جلب المهام المتأخرة: $e');
-      return [];
+      debugPrint('خطأ في جلب مهمة متأخرة: $e');
+      return null;
     }
-  }
-
-  // الاستماع للتغييرات في المهام
-  static Stream<List<Task>> listenToAllTasks() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return Stream.value([]);
-    }
-
-    return FirebaseFirestore.instance
-        .collection(usersCollection)
-        .doc(user.uid)
-        .collection(tasksCollection)
-        .orderBy(dueDateField)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
-    });
   }
 
   // جلب إحصائيات المهام
-  static Future<Map<String, int>> getTasksStatistics() async {
+  Future<Map<String, int>> getTasksStatistics() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      if (_userId == null) {
         return {
           'total': 0,
           'completed': 0,
@@ -113,55 +123,60 @@ class TasksFirebaseService {
         };
       }
 
-      final tasksRef = FirebaseFirestore.instance
-          .collection(usersCollection)
-          .doc(user.uid)
-          .collection(tasksCollection);
+      // جلب جميع المهام
+      final snapshot = await _getTasksCollection().get();
+      final tasks =
+          snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList();
 
-      // إجمالي المهام
-      final totalSnapshot = await tasksRef.get();
-      final totalTasks = totalSnapshot.docs.length;
-
-      // المهام المكتملة
-      final completedSnapshot =
-          await tasksRef.where(statusField, isEqualTo: statusCompleted).get();
-      final completedTasks = completedSnapshot.docs.length;
-
-      // استخدام التاريخ للمقارنة
+      // تحديد التواريخ الهامة
       final now = DateTime.now();
-      final startOfDay = DateTime(now.year, now.month, now.day);
-      final endOfDay = startOfDay.add(const Duration(days: 1));
+      final today = DateTime(now.year, now.month, now.day);
+      final tomorrow = DateTime(now.year, now.month, now.day + 1);
 
-      // المهام المتأخرة
-      final overdueSnapshot = await tasksRef
-          .where(dueDateField, isLessThan: startOfDay)
-          .where(statusField, isEqualTo: statusInProgress)
-          .get();
-      final overdueTasks = overdueSnapshot.docs.length;
+      // حساب الإحصائيات
+      int totalTasks = tasks.length;
+      int completedTasks = 0;
+      int overdueTasks = 0;
+      int todayTasks = 0;
+      int upcomingTasks = 0;
+      int highPriorityTasks = 0;
 
-      // مهام اليوم
-      final todaySnapshot = await tasksRef
-          .where(dueDateField, isGreaterThanOrEqualTo: startOfDay)
-          .where(dueDateField, isLessThan: endOfDay)
-          .where(statusField, isEqualTo: statusInProgress)
-          .get();
-      final todayTasks = todaySnapshot.docs.length;
+      debugPrint('إجمالي المهام المسترجعة للإحصائيات: $totalTasks');
 
-      // المهام القادمة
-      final upcomingSnapshot = await tasksRef
-          .where(dueDateField, isGreaterThanOrEqualTo: endOfDay)
-          .where(statusField, isEqualTo: statusInProgress)
-          .get();
-      final upcomingTasks = upcomingSnapshot.docs.length;
+      for (final task in tasks) {
+        final taskDate = DateTime(
+          task.dueDate.year,
+          task.dueDate.month,
+          task.dueDate.day,
+        );
 
-      // المهام ذات الأولوية العالية
-      final highPrioritySnapshot = await tasksRef
-          .where(priorityField, isEqualTo: 'عالية')
-          .where(statusField, isEqualTo: statusInProgress)
-          .get();
-      final highPriorityTasks = highPrioritySnapshot.docs.length;
+        if (task.status == 'مكتملة') {
+          completedTasks++;
+          continue;
+        }
 
-      return {
+        if (task.status == 'ملغاة') {
+          continue;
+        }
+
+        // الأولوية العالية
+        if (task.priority == 'عالية') {
+          highPriorityTasks++;
+        }
+
+        // تصنيف المهام حسب التاريخ
+        if (taskDate.isBefore(today)) {
+          overdueTasks++;
+        } else if (taskDate.year == today.year &&
+            taskDate.month == today.month &&
+            taskDate.day == today.day) {
+          todayTasks++;
+        } else {
+          upcomingTasks++;
+        }
+      }
+
+      final stats = {
         'total': totalTasks,
         'completed': completedTasks,
         'overdue': overdueTasks,
@@ -169,6 +184,9 @@ class TasksFirebaseService {
         'upcoming': upcomingTasks,
         'highPriority': highPriorityTasks,
       };
+
+      debugPrint('الإحصائيات المحسوبة: $stats');
+      return stats;
     } catch (e) {
       debugPrint('خطأ في جلب إحصائيات المهام: $e');
       return {
@@ -182,40 +200,53 @@ class TasksFirebaseService {
     }
   }
 
-  // إنشاء مهمة جديدة (للاختبار)
-  static Future<void> createNewTask({
-    required String name,
-    required String description,
-    required DateTime dueDate,
-    required String status,
-    String priority = 'متوسطة',
-  }) async {
+  // إكمال مهمة
+  Future<void> completeTask(String taskId) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception('لم يتم تسجيل الدخول');
+      if (_userId == null) {
+        throw Exception('المستخدم غير مسجل الدخول');
       }
 
-      final taskData = {
-        nameField: name,
-        descriptionField: description,
-        dueDateField: Timestamp.fromDate(dueDate),
-        statusField: status,
-        priorityField: priority,
-        createdAtField: FieldValue.serverTimestamp(),
-        updatedAtField: FieldValue.serverTimestamp(),
-      };
+      await _getTasksCollection().doc(taskId).update({
+        'status': 'مكتملة',
+        'completedDate': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'progress': 1.0
+      });
 
-      await FirebaseFirestore.instance
-          .collection(usersCollection)
-          .doc(user.uid)
-          .collection(tasksCollection)
-          .add(taskData);
-
-      debugPrint('تم إنشاء مهمة جديدة: $name');
+      debugPrint('تم إكمال المهمة بنجاح: $taskId');
     } catch (e) {
-      debugPrint('خطأ في إنشاء مهمة جديدة: $e');
-      throw e;
+      debugPrint('خطأ في إكمال المهمة: $e');
+      throw Exception('فشل في إكمال المهمة: $e');
+    }
+  }
+
+  // مراقبة التغييرات في المهام
+  Stream<QuerySnapshot> watchTasks() {
+    try {
+      if (_userId == null) {
+        throw Exception('المستخدم غير مسجل الدخول');
+      }
+      return _getTasksCollection().snapshots();
+    } catch (e) {
+      debugPrint('خطأ في مراقبة المهام: $e');
+      throw Exception('فشل في مراقبة المهام: $e');
+    }
+  }
+
+  // التهيئة والتحقق من الاتصال
+  Future<void> initialize() async {
+    try {
+      if (_userId != null) {
+        // محاولة جلب وثيقة واحدة للتحقق من الاتصال
+        final snapshot = await _getTasksCollection().limit(1).get();
+        debugPrint('تمت تهيئة خدمة المهام بنجاح للمستخدم: $_userId');
+        debugPrint('عدد المهام المسترجعة في التهيئة: ${snapshot.docs.length}');
+      } else {
+        debugPrint('لم يتم تسجيل الدخول، لا يمكن تهيئة خدمة المهام');
+      }
+    } catch (e) {
+      debugPrint('خطأ في تهيئة خدمة المهام: $e');
     }
   }
 }

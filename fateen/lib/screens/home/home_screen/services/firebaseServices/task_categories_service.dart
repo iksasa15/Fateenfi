@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class TaskCategoriesService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,8 +25,14 @@ class TaskCategoriesService {
             .doc('summary')
             .get();
 
+        debugPrint(
+            'جلب ملخص فئات المهام: ${categoriesDoc.exists ? "موجود" : "غير موجود"}');
+
         if (categoriesDoc.exists && categoriesDoc.data() != null) {
-          return categoriesDoc.data() as Map<String, dynamic>;
+          final Map<String, dynamic> data =
+              categoriesDoc.data() as Map<String, dynamic>;
+          debugPrint('البيانات المسترجعة: $data');
+          return data;
         }
 
         // إذا لم يكن هناك ملخص جاهز، قم بحساب الإحصائيات من المهام الفعلية
@@ -34,6 +41,8 @@ class TaskCategoriesService {
             .doc(currentUser.uid)
             .collection(_tasksCollection)
             .get();
+
+        debugPrint('عدد المهام المسترجعة: ${tasksSnapshot.docs.length}');
 
         if (tasksSnapshot.docs.isNotEmpty) {
           int urgentCount = 0;
@@ -45,35 +54,56 @@ class TaskCategoriesService {
                 doc.data() as Map<String, dynamic>;
 
             // حساب المهام حسب الفئة
-            if (task['isCompleted'] == true) {
+            if (task['status'] == 'مكتملة') {
               completedCount++;
-            } else {
+            } else if (task['status'] != 'ملغاة') {
               // التحقق مما إذا كانت المهمة عاجلة
-              if (task['isUrgent'] == true || task['priority'] == 'high') {
+              if (task['priority'] == 'عالية') {
                 urgentCount++;
               }
 
-              // التحقق مما إذا كانت المهمة قادمة
+              // تحقق من تاريخ المهمة
               if (task['dueDate'] != null) {
-                upcomingCount++;
+                final Timestamp dueDate = task['dueDate'] as Timestamp;
+                final DateTime dueDateDT = dueDate.toDate();
+                final DateTime now = DateTime.now();
+                final DateTime today = DateTime(now.year, now.month, now.day);
+                final DateTime tomorrow =
+                    DateTime(today.year, today.month, today.day + 1);
+
+                if (dueDateDT.isBefore(today)) {
+                  // متأخرة
+                  urgentCount++;
+                } else if (dueDateDT.isBefore(tomorrow)) {
+                  // اليوم
+                  urgentCount++;
+                } else {
+                  // قادمة
+                  upcomingCount++;
+                }
               }
             }
           }
 
           // إرجاع الإحصائيات المحسوبة
-          return {
+          final Map<String, dynamic> stats = {
             'urgent': urgentCount,
             'upcoming': upcomingCount,
             'completed': completedCount,
             'all': tasksSnapshot.docs.length,
           };
+
+          debugPrint('إحصائيات المهام المحسوبة: $stats');
+          return stats;
         }
       }
 
       // في حالة عدم وجود مستخدم أو بيانات، استخدم بيانات افتراضية
-      return _getDefaultCategoriesData();
+      final defaultData = _getDefaultCategoriesData();
+      debugPrint('استخدام بيانات افتراضية: $defaultData');
+      return defaultData;
     } catch (e) {
-      print('خطأ في الحصول على بيانات فئات المهام: $e');
+      debugPrint('خطأ في الحصول على بيانات فئات المهام: $e');
 
       // إرجاع بيانات افتراضية في حالة الخطأ
       return _getDefaultCategoriesData();

@@ -35,20 +35,26 @@ class TaskCategoriesController extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
+      debugPrint('بدء تهيئة وحدة تحكم فئات المهام...');
+
       // جلب بيانات فئات المهام من Firebase
       final data = await _service.getTaskCategories();
+
+      debugPrint('تم استلام بيانات فئات المهام: $data');
 
       // معالجة البيانات
       _processData(data);
 
       _errorMessage = null;
     } catch (e) {
+      debugPrint('خطأ في تهيئة وحدة تحكم فئات المهام: $e');
       _errorMessage = 'حدث خطأ أثناء تحميل البيانات: $e';
       _categories =
           _getDefaultCategories(); // استخدام بيانات افتراضية في حالة الخطأ
     } finally {
       _isLoading = false;
       notifyListeners();
+      debugPrint('اكتملت تهيئة وحدة تحكم فئات المهام');
     }
   }
 
@@ -56,6 +62,7 @@ class TaskCategoriesController extends ChangeNotifier {
   void _processData(Map<String, dynamic> data) {
     // إذا كانت البيانات فارغة، استخدم البيانات الافتراضية
     if (data.isEmpty) {
+      debugPrint('بيانات فئات المهام فارغة، استخدام البيانات الافتراضية');
       _categories = _getDefaultCategories();
       return;
     }
@@ -116,7 +123,10 @@ class TaskCategoriesController extends ChangeNotifier {
 
     // إذا لم تكن هناك فئات، استخدم البيانات الافتراضية
     if (_categories.isEmpty) {
+      debugPrint('لا توجد فئات مهام بعد المعالجة، استخدام البيانات الافتراضية');
       _categories = _getDefaultCategories();
+    } else {
+      debugPrint('تم تجهيز ${_categories.length} فئات مهام');
     }
   }
 
@@ -157,16 +167,19 @@ class TaskCategoriesController extends ChangeNotifier {
   // معالجة النقر على فئة المهام
   void handleCategoryTap(String categoryId) {
     // يمكن إضافة منطق إضافي هنا إذا لزم الأمر
-    print('تم النقر على فئة المهام: $categoryId');
+    debugPrint('تم النقر على فئة المهام: $categoryId');
   }
 
   // تحديث البيانات
   Future<void> refresh() async {
+    debugPrint('بدء تحديث بيانات فئات المهام...');
     await initialize();
+    debugPrint('تم تحديث بيانات فئات المهام');
   }
 
   @override
   void dispose() {
+    debugPrint('تحرير موارد وحدة تحكم فئات المهام');
     // تنظيف الموارد إذا لزم الأمر
     super.dispose();
   }

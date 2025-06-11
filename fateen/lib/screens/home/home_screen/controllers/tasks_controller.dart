@@ -1,243 +1,193 @@
+// lib/controllers/tasks_controller.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fateen/models/task.dart';
+import '../../../../models/task.dart';
+import '../services/firebaseServices/tasks_firebase_service.dart';
 
 /// وحدة تحكم المهام تدير حالة المهام التي تحتاج اهتمام
 class TasksController extends ChangeNotifier {
-  // حالة المستخدم والبيانات
-  User? currentUser;
+  // الخدمة المسؤولة عن التعامل مع Firebase
+  final TasksFirebaseService _service = TasksFirebaseService();
+
+  // حالة البيانات
   bool isLoading = true;
   bool hasError = false;
   String errorMessage = '';
 
-  // مهام تحتاج اهتمام
-  Task? todayTask; // مهمة اليوم للعرض
-  Task? overdueTask; // مهمة متأخرة للعرض
+  // المهام التي تحتاج اهتمام
+  Task? todayTask;
+  Task? overdueTask;
 
-  // مستمع للتغييرات على المهام
+  // مستمع للتغييرات
   StreamSubscription? _tasksSubscription;
 
   // إحصائيات المهام
   Map<String, int> tasksStats = {
-    'total': 0, // إجمالي المهام
-    'completed': 0, // المهام المكتملة
-    'overdue': 0, // المهام المتأخرة
-    'today': 0, // مهام اليوم
-    'upcoming': 0, // المهام القادمة
-    'highPriority': 0, // المهام ذات الأولوية العالية
+    'total': 0,
+    'completed': 0,
+    'overdue': 0,
+    'today': 0,
+    'upcoming': 0,
+    'highPriority': 0,
   };
 
-  /// إنشاء وحدة التحكم
-  TasksController() {
-    currentUser = FirebaseAuth.instance.currentUser;
-  }
-
-  /// تهيئة البيانات
+  /// تهيئة وحدة التحكم وبدء تحميل البيانات
   Future<void> initialize() async {
     try {
+      debugPrint('بدء تهيئة وحدة تحكم المهام...');
+
       isLoading = true;
       hasError = false;
       errorMessage = '';
       notifyListeners();
 
+      // تهيئة الخدمة
+      await _service.initialize();
+
       // تحميل البيانات
-      await _loadTasksData();
+      await _loadData();
+
+      // بدء الاستماع للتغييرات
+      _setupTasksListener();
 
       isLoading = false;
       notifyListeners();
+
+      debugPrint('تمت تهيئة وحدة تحكم المهام بنجاح');
+      if (todayTask != null) {
+        debugPrint('تم تحميل مهمة اليوم: ${todayTask!.name}');
+      } else {
+        debugPrint('لا توجد مهمة لليوم');
+      }
+
+      if (overdueTask != null) {
+        debugPrint('تم تحميل مهمة متأخرة: ${overdueTask!.name}');
+      } else {
+        debugPrint('لا توجد مهمة متأخرة');
+      }
     } catch (e) {
+      debugPrint('خطأ في تهيئة وحدة تحكم المهام: $e');
       isLoading = false;
       hasError = true;
-      errorMessage = 'حدث خطأ أثناء تحميل بيانات المهام: $e';
+      errorMessage = 'حدث خطأ أثناء تحميل البيانات: $e';
       notifyListeners();
-      debugPrint(errorMessage);
     }
   }
 
-  /// تحديث البيانات
-  Future<void> refresh() async {
-    try {
-      isLoading = true;
-      hasError = false;
-      errorMessage = '';
-      notifyListeners();
-
-      // تحميل البيانات
-      await _loadTasksData();
-
-      isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      isLoading = false;
-      hasError = true;
-      errorMessage = 'حدث خطأ أثناء تحديث بيانات المهام: $e';
-      notifyListeners();
-      debugPrint(errorMessage);
-    }
-  }
-
-  /// تحميل بيانات المهام
-  Future<void> _loadTasksData() async {
+  /// تحميل البيانات بشكل متزامن
+  Future<void> _loadData() async {
     try {
       debugPrint('بدء تحميل بيانات المهام...');
 
-      // تحديث المستخدم الحالي
-      currentUser = FirebaseAuth.instance.currentUser;
+      // جلب البيانات بالتوازي لتحسين الأداء
+      final results = await Future.wait([
+        _service.getTodayTask(),
+        _service.getOverdueTask(),
+        _service.getTasksStatistics(),
+      ]);
 
-      // تحميل إحصائيات المهام
-      await _loadTasksStatistics();
+      // تعيين البيانات
+      todayTask = results[0] as Task?;
+      overdueTask = results[1] as Task?;
+      tasksStats = results[2] as Map<String, int>;
 
-      // جلب مهام اليوم والمهام المتأخرة
-      await _fetchTodayAndOverdueTasks();
-
-      // الاستماع للتغييرات في المهام
-      _listenToTasksChanges();
-
-      debugPrint('اكتمل تحميل بيانات المهام بنجاح');
+      debugPrint('تم تحميل بيانات المهام:');
+      debugPrint('- مهمة اليوم: ${todayTask?.name ?? "غير موجودة"}');
+      debugPrint('- مهمة متأخرة: ${overdueTask?.name ?? "غير موجودة"}');
+      debugPrint('- إحصائيات المهام: $tasksStats');
     } catch (e) {
       debugPrint('خطأ في تحميل بيانات المهام: $e');
       throw e;
     }
   }
 
-  /// جلب مهام اليوم والمهام المتأخرة للعرض
-  Future<void> _fetchTodayAndOverdueTasks() async {
+  /// إعداد مستمع للتغييرات في المهام
+  void _setupTasksListener() {
     try {
-      debugPrint('بدء جلب مهام اليوم والمهام المتأخرة...');
+      debugPrint('بدء الاستماع للتغييرات في المهام...');
 
-      // جلب مهام اليوم
-      final todayTasks = await Task.getTodayTasks();
-      debugPrint('عدد مهام اليوم المسترجعة: ${todayTasks.length}');
-
-      for (var task in todayTasks) {
-        debugPrint(
-            'مهمة اليوم: ${task.name}, الموعد: ${task.dueDateFormatted}, الحالة: ${task.status}');
-      }
-
-      if (todayTasks.isNotEmpty) {
-        todayTask = todayTasks.first;
-        debugPrint('تم تعيين مهمة اليوم: ${todayTask?.name}');
-      } else {
-        todayTask = null;
-        debugPrint('لا توجد مهام لليوم');
-      }
-
-      // جلب المهام المتأخرة
-      final overdueTasks = await Task.getOverdueTasks();
-      debugPrint('عدد المهام المتأخرة المسترجعة: ${overdueTasks.length}');
-
-      for (var task in overdueTasks) {
-        debugPrint(
-            'مهمة متأخرة: ${task.name}, الموعد: ${task.dueDateFormatted}, الحالة: ${task.status}');
-      }
-
-      if (overdueTasks.isNotEmpty) {
-        overdueTask = overdueTasks.first;
-        debugPrint('تم تعيين مهمة متأخرة: ${overdueTask?.name}');
-      } else {
-        overdueTask = null;
-        debugPrint('لا توجد مهام متأخرة');
-      }
-
-      // طباعة حالة المهام النهائية
-      debugPrint(
-          'الحالة النهائية - مهمة اليوم: ${todayTask != null ? "موجودة" : "غير موجودة"}, ' +
-              'مهمة متأخرة: ${overdueTask != null ? "موجودة" : "غير موجودة"}');
-    } catch (e) {
-      debugPrint('خطأ في جلب مهام اليوم والمهام المتأخرة: $e');
-      todayTask = null;
-      overdueTask = null;
-    }
-  }
-
-  /// تحميل إحصائيات المهام
-  Future<void> _loadTasksStatistics() async {
-    if (currentUser == null) return;
-
-    try {
-      debugPrint('جاري جلب إحصائيات المهام...');
-
-      // استخدام دالة getTasksStatistics من كلاس Task
-      final stats = await Task.getTasksStatistics();
-      tasksStats = stats;
-
-      debugPrint('تم جلب إحصائيات المهام بنجاح: $tasksStats');
-    } catch (e) {
-      debugPrint('حدث خطأ أثناء جلب إحصائيات المهام: $e');
-      throw e;
-    }
-  }
-
-  /// الاستماع للتغييرات في المهام
-  void _listenToTasksChanges() {
-    if (currentUser == null) return;
-
-    try {
-      // إلغاء أي اشتراك سابق
+      // إلغاء أي مستمع سابق
       _tasksSubscription?.cancel();
 
-      debugPrint('بدء الاستماع لتغييرات المهام...');
+      // إنشاء مستمع جديد
+      _tasksSubscription = _service.watchTasks().listen((snapshot) async {
+        debugPrint('تم استلام تحديث للمهام: ${snapshot.docs.length} مهمة');
 
-      // الاستماع لتغييرات المهام في الوقت الفعلي
-      _tasksSubscription = Task.listenToAllTasks().listen((tasks) {
-        debugPrint('تم استلام تحديث للمهام، عدد المهام: ${tasks.length}');
+        // إعادة تحميل البيانات فوراً
+        await _loadData();
 
-        // عند تغيير المهام، قم بتحديث الإحصائيات
-        _loadTasksStatistics().then((_) {
-          // تحديث مهام اليوم والمهام المتأخرة
-          _fetchTodayAndOverdueTasks().then((_) {
-            debugPrint('تم تحديث بيانات المهام بعد التغيير');
-            notifyListeners();
-          });
-        });
+        // إخطار المستمعين بالتغييرات
+        notifyListeners();
       }, onError: (error) {
         debugPrint('خطأ في مستمع المهام: $error');
       });
+
+      debugPrint('تم إعداد مستمع المهام بنجاح');
     } catch (e) {
       debugPrint('خطأ في إعداد مستمع المهام: $e');
     }
   }
 
-  /// إضافة مهمة اختبارية (للتجريب فقط)
-  Future<void> addTestTask() async {
+  /// تحديث البيانات يدوياً
+  Future<void> refresh() async {
     try {
-      if (currentUser == null) {
-        debugPrint('لا يوجد مستخدم حالي، لا يمكن إضافة مهام اختبارية');
-        return;
+      debugPrint('بدء تحديث البيانات يدوياً...');
+
+      isLoading = true;
+      notifyListeners();
+
+      // إعادة تحميل البيانات
+      await _loadData();
+
+      isLoading = false;
+      notifyListeners();
+
+      debugPrint('تم تحديث البيانات بنجاح');
+      debugPrint(
+          'بعد التحديث - مهمة اليوم: ${todayTask?.name ?? "غير موجودة"}');
+      debugPrint(
+          'بعد التحديث - مهمة متأخرة: ${overdueTask?.name ?? "غير موجودة"}');
+    } catch (e) {
+      debugPrint('خطأ في تحديث البيانات: $e');
+      isLoading = false;
+      hasError = true;
+      errorMessage = 'حدث خطأ أثناء تحديث البيانات: $e';
+      notifyListeners();
+    }
+  }
+
+  /// إكمال مهمة
+  Future<void> completeTask(String taskId) async {
+    try {
+      debugPrint('بدء إكمال المهمة: $taskId');
+
+      // إكمال المهمة في قاعدة البيانات
+      await _service.completeTask(taskId);
+
+      // تحديث الحالة المحلية
+      if (todayTask?.id == taskId) {
+        todayTask = null;
+      }
+      if (overdueTask?.id == taskId) {
+        overdueTask = null;
       }
 
-      debugPrint('إضافة مهمات اختبارية...');
+      // إعادة تحميل البيانات لتحديث الإحصائيات
+      await _loadData();
 
-      // إنشاء مهمة ليوم اليوم
-      final now = DateTime.now();
-      await Task.createNewTask(
-          name: "مهمة اختبارية لليوم",
-          description: "هذه مهمة اختبارية للتأكد من عرض مهام اليوم",
-          dueDate: now,
-          status: "قيد التنفيذ");
-
-      // إنشاء مهمة متأخرة (أمس)
-      final yesterday = now.subtract(const Duration(days: 1));
-      await Task.createNewTask(
-          name: "مهمة اختبارية متأخرة",
-          description: "هذه مهمة اختبارية للتأكد من عرض المهام المتأخرة",
-          dueDate: yesterday,
-          status: "قيد التنفيذ");
-
-      debugPrint('تم إنشاء مهام اختبارية بنجاح');
-
-      // تحديث المهام
-      await _fetchTodayAndOverdueTasks();
+      // إخطار المستمعين بالتغييرات
       notifyListeners();
+
+      debugPrint('تم إكمال المهمة بنجاح');
     } catch (e) {
-      debugPrint('فشل في إنشاء المهام الاختبارية: $e');
+      debugPrint('خطأ في إكمال المهمة: $e');
+      throw e;
     }
   }
 
   @override
   void dispose() {
+    debugPrint('تحرير موارد وحدة تحكم المهام...');
     _tasksSubscription?.cancel();
     super.dispose();
   }

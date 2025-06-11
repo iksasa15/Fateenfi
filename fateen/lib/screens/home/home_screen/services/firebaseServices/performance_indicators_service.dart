@@ -82,7 +82,7 @@ class PerformanceIndicatorsService {
     }
   }
 
-  // حساب متوسط الدرجات
+  // حساب معدل الدرجات - تم تعديل هذه الدالة لحساب المعدل الفعلي
   Future<int> _calculateGradesAverage(String userId) async {
     try {
       // جلب المقررات
@@ -96,40 +96,64 @@ class PerformanceIndicatorsService {
         return 78; // قيمة افتراضية إذا لم تكن هناك مقررات
       }
 
-      double totalWeightedGrades = 0;
-      int totalCreditHours = 0;
+      double totalGradePoints = 0;
+      double totalPossiblePoints = 0;
 
-      // حساب المتوسط المرجح للدرجات
+      // حساب مجموع الدرجات ومجموع الدرجات الممكنة
       for (var doc in coursesSnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        Course course = Course.fromMap(data, doc.id);
 
-        // الحصول على مجموع الدرجات في المقرر
-        double courseTotal = course.totalGrades;
+        // استخراج بيانات الدرجات والدرجات القصوى
+        Map<String, dynamic> gradesData = data['grades'] ?? {};
+        Map<String, dynamic> maxGradesData = data['maxGrades'] ?? {};
 
-        // التحقق من وجود درجات في المقرر
-        if (course.grades.isNotEmpty) {
-          // إضافة الدرجة المرجحة للمجموع
-          totalWeightedGrades += courseTotal * course.creditHours;
-          totalCreditHours += course.creditHours;
+        if (gradesData.isEmpty) {
+          continue; // تخطي المقررات التي ليس لها درجات
         }
+
+        // حساب مجموع نقاط الدرجات لهذا المقرر
+        gradesData.forEach((key, value) {
+          double gradeValue = 0;
+          if (value is int) {
+            gradeValue = value.toDouble();
+          } else if (value is double) {
+            gradeValue = value;
+          } else if (value is String) {
+            gradeValue = double.tryParse(value) ?? 0.0;
+          }
+
+          // الحصول على الدرجة القصوى لهذا التقييم
+          double maxGrade = 100.0;
+          if (maxGradesData.containsKey(key)) {
+            var maxValue = maxGradesData[key];
+            if (maxValue is int) {
+              maxGrade = maxValue.toDouble();
+            } else if (maxValue is double) {
+              maxGrade = maxValue;
+            } else if (maxValue is String) {
+              maxGrade = double.tryParse(maxValue) ?? 100.0;
+            }
+          }
+
+          // إضافة النقاط إلى المجموع
+          totalGradePoints += gradeValue;
+          totalPossiblePoints += maxGrade;
+        });
       }
 
-      // التحقق من وجود ساعات معتمدة
-      if (totalCreditHours == 0) {
-        return 78; // قيمة افتراضية إذا لم تكن هناك ساعات معتمدة
+      // التحقق من وجود نقاط ممكنة
+      if (totalPossiblePoints == 0) {
+        return 78; // قيمة افتراضية إذا لم تكن هناك نقاط ممكنة
       }
 
-      // حساب المتوسط المرجح
-      double averageGrade = totalWeightedGrades / totalCreditHours;
-
-      // تحويل المتوسط إلى نسبة مئوية (افتراض أن الدرجة القصوى هي 100)
-      double averagePercentage = averageGrade;
+      // حساب النسبة المئوية للمعدل
+      double averagePercentage = (totalGradePoints / totalPossiblePoints) * 100;
 
       // تحويل النسبة إلى عدد صحيح
       return averagePercentage.round();
     } catch (e) {
-      print('خطأ في حساب متوسط الدرجات: $e');
+      print('خطأ في حساب معدل الدرجات: $e');
+      print(e.toString());
       return 78; // قيمة افتراضية في حالة الخطأ
     }
   }
