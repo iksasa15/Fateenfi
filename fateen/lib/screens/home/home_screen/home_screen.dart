@@ -4,6 +4,18 @@ import 'package:fateen/screens/home/home_screen/controllers/header_controller.da
 import 'package:fateen/screens/tasks/task_screen/task_screen.dart';
 import '../home_screen/components/header.dart';
 
+// استيراد ميزة بطاقة الملف الشخصي
+import 'components/profile_card_widget.dart';
+import 'controllers/profile_card_controller.dart';
+
+// استيراد ميزة تقدم التقويم الدراسي
+import 'components/semester_progress_widget.dart';
+import 'controllers/semester_progress_controller.dart';
+
+// استيراد ميزة مؤشرات الأداء
+import 'components/performance_indicators_widget.dart';
+import 'controllers/performance_indicators_controller.dart';
+
 // استيراد ملفات ميزة المحاضرة القادمة
 import '../home_screen/controllers/next_lecture_controller.dart';
 import '../home_screen/components/next_lecture_card.dart';
@@ -348,6 +360,11 @@ class _HomeScreenState extends State<HomeScreen> {
   late StatsController _statsController;
   late TasksController _tasksController;
 
+  // إضافة متحكمات الميزات المستخرجة
+  late ProfileCardController _profileCardController;
+  late SemesterProgressController _semesterProgressController;
+  late PerformanceIndicatorsController _performanceIndicatorsController;
+
   // إضافة وحدة تحكم شريط التنقل
   late BottomNavController _navController;
 
@@ -400,9 +417,17 @@ class _HomeScreenState extends State<HomeScreen> {
       _isInitialLoading = true;
     });
 
+    // تهيئة متحكمات الميزات المستخرجة
+    _profileCardController = ProfileCardController();
+    _semesterProgressController = SemesterProgressController();
+    _performanceIndicatorsController = PerformanceIndicatorsController();
+
     // تهيئة وحدات التحكم في مجموعات متوازية لتحسين الأداء
     await Future.wait([
       _headerController.initialize(),
+      _profileCardController.initialize(),
+      _semesterProgressController.initialize(),
+      _performanceIndicatorsController.initialize(),
       Future(() async {
         _nextLectureController = NextLectureController();
         await _nextLectureController.initialize();
@@ -459,412 +484,6 @@ class _HomeScreenState extends State<HomeScreen> {
         // يمكن إضافة تنقل لصفحة الاختبارات إذا كانت موجودة
         break;
     }
-  }
-
-  // إضافة بطاقة الملف الشخصي
-  Widget _buildProfileCard(
-      double horizontalPadding, double smallSpacing, double fontSize) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      padding: EdgeInsets.all(horizontalPadding * 0.8),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: kAccentColor.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                ),
-                child: ClipOval(
-                  child: Center(
-                    child: Text(
-                      widget.userName.isNotEmpty
-                          ? widget.userName[0].toUpperCase()
-                          : "؟",
-                      style: TextStyle(
-                        fontFamily: 'SYMBIOAR+LT',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: kAccentColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: horizontalPadding * 0.8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.userName,
-                      style: TextStyle(
-                        fontFamily: 'SYMBIOAR+LT',
-                        fontSize: fontSize + 2,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "طالب في ${widget.userMajor}",
-                      style: TextStyle(
-                        fontFamily: 'SYMBIOAR+LT',
-                        fontSize: fontSize - 2,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.settings,
-                  color: Colors.white.withOpacity(0.9),
-                ),
-                onPressed: () {
-                  _navController.changeIndex(5); // الانتقال إلى صفحة الإعدادات
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: smallSpacing * 1.5),
-          // معلومات الطالب
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildProfileStat("المستوى", "6", fontSize),
-              _buildProfileStat("الساعات", "84", fontSize),
-              _buildProfileStat("المعدل", "4.52", fontSize),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // بناء إحصائية الملف الشخصي
-  Widget _buildProfileStat(String title, String value, double fontSize) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontFamily: 'SYMBIOAR+LT',
-            fontSize: fontSize + 3,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        SizedBox(height: 2),
-        Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'SYMBIOAR+LT',
-            fontSize: fontSize - 3,
-            color: Colors.white.withOpacity(0.8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // بناء بطاقات مؤشرات الأداء
-  Widget _buildPerformanceIndicators(
-      double horizontalPadding, double smallSpacing, double fontSize) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'مؤشرات الأداء',
-            style: TextStyle(
-              fontFamily: 'SYMBIOAR+LT',
-              fontSize: fontSize + 1,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: smallSpacing),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPerformanceCard(
-                  title: "الحضور",
-                  value: "92%",
-                  icon: Icons.people,
-                  color: kGreenColor,
-                  description: "ممتاز",
-                  fontSize: fontSize,
-                ),
-              ),
-              SizedBox(width: horizontalPadding * 0.5),
-              Expanded(
-                child: _buildPerformanceCard(
-                  title: "إنجاز المهام",
-                  value: "85%",
-                  icon: Icons.assignment_turned_in,
-                  color: kMediumPurple,
-                  description: "جيد جدًا",
-                  fontSize: fontSize,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: smallSpacing),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPerformanceCard(
-                  title: "معدل الدرجات",
-                  value: "78%",
-                  icon: Icons.grade,
-                  color: kOrangeColor,
-                  description: "بحاجة لتحسين",
-                  fontSize: fontSize,
-                ),
-              ),
-              SizedBox(width: horizontalPadding * 0.5),
-              Expanded(
-                child: _buildPerformanceCard(
-                  title: "الأنشطة",
-                  value: "60%",
-                  icon: Icons.stars,
-                  color: Colors.red.shade400,
-                  description: "ضعيف",
-                  fontSize: fontSize,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // بناء بطاقة مؤشر أداء
-  Widget _buildPerformanceCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-    required String description,
-    required double fontSize,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize - 2,
-                  color: Colors.grey[600],
-                ),
-              ),
-              Icon(
-                icon,
-                color: color,
-                size: 18,
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'SYMBIOAR+LT',
-              fontSize: fontSize + 4,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              description,
-              style: TextStyle(
-                fontFamily: 'SYMBIOAR+LT',
-                fontSize: fontSize - 4,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // بناء شريط تقدم الفصل الدراسي
-  Widget _buildSemesterProgressBar(
-      double horizontalPadding, double smallSpacing, double fontSize) {
-    // بيانات افتراضية لتقدم الفصل الدراسي
-    final int totalDays = 105; // إجمالي أيام الفصل الدراسي
-    final int passedDays = 65; // الأيام التي مرت
-    final double progressPercentage = passedDays / totalDays; // نسبة التقدم
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      padding: EdgeInsets.all(horizontalPadding * 0.8),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF4338CA)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: kDarkPurple.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'تقدم الفصل الدراسي',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${(progressPercentage * 100).toInt()}%',
-                  style: TextStyle(
-                    fontFamily: 'SYMBIOAR+LT',
-                    fontSize: fontSize - 3,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: smallSpacing),
-          LinearProgressIndicator(
-            value: progressPercentage,
-            backgroundColor: Colors.white.withOpacity(0.3),
-            color: Colors.white,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          SizedBox(height: smallSpacing),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'بداية الفصل',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize - 3,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-              Text(
-                'نهاية الفصل',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize - 3,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: smallSpacing * 0.5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '١٥ مارس',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize - 3,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                '٢٨ يونيو',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize - 3,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   // إضافة قسم المواعيد القادمة
@@ -1026,6 +645,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ChangeNotifierProvider.value(value: _nextLectureController),
             ChangeNotifierProvider.value(value: _statsController),
             ChangeNotifierProvider.value(value: _tasksController),
+            ChangeNotifierProvider.value(value: _profileCardController),
+            ChangeNotifierProvider.value(value: _semesterProgressController),
+            ChangeNotifierProvider.value(
+                value: _performanceIndicatorsController),
           ],
           child: RefreshIndicator(
             onRefresh: _refreshData,
@@ -1041,9 +664,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       SizedBox(height: verticalPadding),
 
-                      // بطاقة الملف الشخصي
-                      _buildProfileCard(
-                          horizontalPadding, smallSpacing, normalFontSize),
+                      // استخدام بطاقة الملف الشخصي المستخرجة
+                      Consumer<ProfileCardController>(
+                        builder: (context, controller, _) {
+                          // تعيين بيانات المستخدم من خلال المتحكم (للاختبار)
+                          if (widget.userName != controller.userName ||
+                              widget.userMajor != controller.userMajor) {
+                            controller.setUserData(
+                                widget.userName, widget.userMajor);
+                          }
+
+                          return ProfileCardWidget(
+                            controller: controller,
+                            onSettingsPressed: () {
+                              _navController.changeIndex(
+                                  5); // الانتقال إلى صفحة الإعدادات
+                            },
+                          );
+                        },
+                      ),
 
                       SizedBox(height: sectionSpacing),
 
@@ -1085,15 +724,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
-                      // شريط تقدم الفصل الدراسي
-                      _buildSemesterProgressBar(
-                          horizontalPadding, smallSpacing, normalFontSize),
+                      // استخدام ميزة تقدم التقويم الدراسي المستخرجة
+                      Consumer<SemesterProgressController>(
+                        builder: (context, controller, _) {
+                          return SemesterProgressWidget(
+                            controller: controller,
+                          );
+                        },
+                      ),
 
                       SizedBox(height: sectionSpacing),
 
-                      // قسم مؤشرات الأداء
-                      _buildPerformanceIndicators(
-                          horizontalPadding, smallSpacing, normalFontSize),
+                      // استخدام ميزة مؤشرات الأداء المستخرجة
+                      Consumer<PerformanceIndicatorsController>(
+                        builder: (context, controller, _) {
+                          return PerformanceIndicatorsWidget(
+                            controller: controller,
+                          );
+                        },
+                      ),
 
                       SizedBox(height: sectionSpacing),
 
@@ -1276,6 +925,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _statsController.refresh(),
         _tasksController.refresh(),
         _headerController.initialize(),
+        _profileCardController.refresh(),
+        _semesterProgressController.refresh(),
+        _performanceIndicatorsController.refresh(),
       ]);
 
       // إعلام واجهة المستخدم بالتحديث
@@ -1299,6 +951,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _nextLectureController.dispose();
     _statsController.dispose();
     _tasksController.dispose();
+    _profileCardController.dispose();
+    _semesterProgressController.dispose();
+    _performanceIndicatorsController.dispose();
     super.dispose();
   }
 }
