@@ -8,6 +8,10 @@ class ProfileCardConstants {
   static const Color accentColor = Color(0xFF7E22CE);
   static const Color textColor = Colors.white;
   static const Color iconBackgroundColor = Colors.white;
+  static const Color badgeBackgroundColor =
+      Color(0x33FFFFFF); // White with opacity 0.2
+  static const Color cardShadowColor =
+      Color(0x33000000); // Black with opacity 0.2
 
   // النصوص
   static const String morningGreeting = 'صباح الخير';
@@ -16,8 +20,10 @@ class ProfileCardConstants {
   static const String defaultUserMajor = 'غير محدد';
   static const String unknownCharacter = '؟';
 
-  // الخط المستخدم
+  // خصائص التصميم
   static const String fontFamily = 'SYMBIOAR+LT';
+  static const double cardBorderRadius = 20.0;
+  static const double avatarSize = 55.0;
 
   // قائمة أيام الأسبوع بالعربية
   static const List<String> arabicDays = [

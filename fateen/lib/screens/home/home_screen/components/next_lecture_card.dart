@@ -218,46 +218,30 @@ class NextLectureComponents {
     return LayoutBuilder(
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
 
-        // زيادة حجم العنوان
-        final double titleSize =
-            isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
+        // تحديد ثوابت الألوان المتسقة مع باقي التطبيق
+        const Color titleColor =
+            Color(0xFF111827); // لون أسود داكن متسق مع العناوين الأخرى
+
+        // توحيد حجم الخط - بدون التفريق بين أحجام الشاشات
+        const double titleFontSize = 18.0; // حجم موحد مع العناوين الأخرى
 
         return Padding(
           padding: EdgeInsets.only(
             bottom: screenSize.height * 0.01,
-            top: screenSize.height * 0.02,
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    NextLectureConstants.nextLectureTitle,
-                    style: TextStyle(
-                      fontSize: titleSize,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF4338CA),
-                      letterSpacing: 0.3,
-                      fontFamily: 'SYMBIOAR+LT',
-                      height: 1.2, // تحسين المسافة بين السطور
-                    ),
-                  ),
-                  SizedBox(height: screenSize.height * 0.004),
-                  Container(
-                    width: screenSize.width * 0.07,
-                    height: 2.5, // زيادة سمك الخط
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1),
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                  ),
-                ],
+              // نص العنوان فقط بدون خط تحته
+              const Text(
+                NextLectureConstants.nextLectureTitle,
+                style: TextStyle(
+                  fontSize: titleFontSize, // حجم خط موحد
+                  fontWeight: FontWeight.bold,
+                  color: titleColor, // لون موحد
+                  fontFamily: 'SYMBIOAR+LT',
+                  height: 1.2,
+                ),
               ),
             ],
           ),

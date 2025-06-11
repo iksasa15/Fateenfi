@@ -42,7 +42,6 @@ class ProfileCardWidget extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -52,129 +51,133 @@ class ProfileCardWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
         boxShadow: [
           BoxShadow(
-            color: ProfileCardConstants.accentColor.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: ProfileCardConstants.cardShadowColor,
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+            spreadRadius: 1,
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // أيقونة المستخدم / الحرف الأول من اسمه
-              _buildUserAvatar(controller.userName),
-
-              SizedBox(width: horizontalPadding * 0.8),
-
-              // معلومات المستخدم (الاسم والتخصص)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$greeting ${controller.userName}',
-                      style: TextStyle(
-                        fontFamily: ProfileCardConstants.fontFamily,
-                        fontSize: fontSize + 2,
-                        fontWeight: FontWeight.bold,
-                        color: ProfileCardConstants.textColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      controller.userMajor,
-                      style: TextStyle(
-                        fontFamily: ProfileCardConstants.fontFamily,
-                        fontSize: fontSize - 2,
-                        color: ProfileCardConstants.textColor.withOpacity(0.9),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+      child: ClipRRect(
+        borderRadius:
+            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
+        child: Stack(
+          children: [
+            // النمط الزخرفي في الخلفية
+            Positioned(
+              right: -40,
+              top: -40,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
               ),
-
-              // زر الإعدادات
-              IconButton(
-                icon: Icon(
-                  Icons.settings,
-                  color: ProfileCardConstants.textColor.withOpacity(0.9),
-                ),
-                onPressed: onSettingsPressed,
-              ),
-            ],
-          ),
-          SizedBox(height: smallSpacing),
-
-          // عرض التاريخ
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: ProfileCardConstants.textColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: ProfileCardConstants.textColor,
-                  size: 14,
+            Positioned(
+              left: -20,
+              bottom: -20,
+              child: Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  formattedDate,
-                  style: TextStyle(
-                    fontFamily: ProfileCardConstants.fontFamily,
-                    fontSize: fontSize - 2,
-                    color: ProfileCardConstants.textColor,
-                    fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            // المحتوى الرئيسي
+            Padding(
+              padding: EdgeInsets.all(horizontalPadding * 0.8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // الجانب الأيمن: معلومات المستخدم (بدون صورة)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          // أيقونة صغيرة بجانب الاسم بدلاً من الدائرة الكبيرة
+                          Icon(
+                            Icons.person,
+                            color: ProfileCardConstants.textColor,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            '$greeting ${controller.userName}',
+                            style: TextStyle(
+                              fontFamily: ProfileCardConstants.fontFamily,
+                              fontSize: fontSize + 1,
+                              fontWeight: FontWeight.bold,
+                              color: ProfileCardConstants.textColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 26),
+                        child: Text(
+                          controller.userMajor,
+                          style: TextStyle(
+                            fontFamily: ProfileCardConstants.fontFamily,
+                            fontSize: fontSize - 2,
+                            color:
+                                ProfileCardConstants.textColor.withOpacity(0.9),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // صورة المستخدم (الحرف الأول من اسمه)
-  Widget _buildUserAvatar(String userName) {
-    return Container(
-      width: 55,
-      height: 55,
-      decoration: BoxDecoration(
-        color: ProfileCardConstants.iconBackgroundColor,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: ProfileCardConstants.iconBackgroundColor,
-          width: 2,
-        ),
-      ),
-      child: ClipOval(
-        child: Center(
-          child: Text(
-            userName.isNotEmpty
-                ? userName[0].toUpperCase()
-                : ProfileCardConstants.unknownCharacter,
-            style: TextStyle(
-              fontFamily: ProfileCardConstants.fontFamily,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: ProfileCardConstants.accentColor,
+                  // الجانب الأيسر: التاريخ
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: ProfileCardConstants.badgeBackgroundColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          color: ProfileCardConstants.textColor,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          formattedDate,
+                          style: TextStyle(
+                            fontFamily: ProfileCardConstants.fontFamily,
+                            fontSize: fontSize - 3,
+                            color: ProfileCardConstants.textColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -186,12 +189,23 @@ class ProfileCardWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
-        color: ProfileCardConstants.gradientStartColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            ProfileCardConstants.gradientStartColor.withOpacity(0.7),
+            ProfileCardConstants.gradientEndColor.withOpacity(0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius:
+            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
       ),
       child: const Center(
-        child: CircularProgressIndicator(
-          color: ProfileCardConstants.gradientStartColor,
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(
+            color: ProfileCardConstants.textColor,
+          ),
         ),
       ),
     );
@@ -204,22 +218,36 @@ class ProfileCardWidget extends StatelessWidget {
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
         border: Border.all(color: Colors.red.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.error_outline, color: Colors.red),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'حدث خطأ',
+              const Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text(
+                    'حدث خطأ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      fontFamily: ProfileCardConstants.fontFamily,
+                    ),
+                  ),
+                ],
+              ),
+              // زر لمحاولة إعادة التحميل
+              TextButton(
+                onPressed: () => controller.refresh(),
+                child: const Text(
+                  'إعادة المحاولة',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
                     fontFamily: ProfileCardConstants.fontFamily,
                   ),
                 ),

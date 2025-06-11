@@ -61,19 +61,6 @@ class PerformanceIndicatorsController extends ChangeNotifier {
 
     final List<PerformanceIndicator> indicators = [];
 
-    // الحضور
-    if (data.containsKey('attendance')) {
-      indicators.add(
-        PerformanceIndicator(
-          title: PerformanceIndicatorsConstants.attendanceTitle,
-          value: '${data['attendance']}%',
-          icon: Icons.people,
-          color: _getColorForValue(data['attendance']),
-          description: _getDescriptionForValue(data['attendance']),
-        ),
-      );
-    }
-
     // إنجاز المهام
     if (data.containsKey('tasksCompletion')) {
       indicators.add(
@@ -96,19 +83,6 @@ class PerformanceIndicatorsController extends ChangeNotifier {
           icon: Icons.grade,
           color: _getColorForValue(data['gradesAverage']),
           description: _getDescriptionForValue(data['gradesAverage']),
-        ),
-      );
-    }
-
-    // الأنشطة
-    if (data.containsKey('activities')) {
-      indicators.add(
-        PerformanceIndicator(
-          title: PerformanceIndicatorsConstants.activitiesTitle,
-          value: '${data['activities']}%',
-          icon: Icons.stars,
-          color: _getColorForValue(data['activities']),
-          description: _getDescriptionForValue(data['activities']),
         ),
       );
     }
@@ -151,13 +125,6 @@ class PerformanceIndicatorsController extends ChangeNotifier {
   List<PerformanceIndicator> _getDefaultIndicators() {
     return [
       PerformanceIndicator(
-        title: PerformanceIndicatorsConstants.attendanceTitle,
-        value: '92%',
-        icon: Icons.people,
-        color: PerformanceIndicatorsConstants.greenColor,
-        description: PerformanceIndicatorsConstants.excellentDescription,
-      ),
-      PerformanceIndicator(
         title: PerformanceIndicatorsConstants.tasksCompletionTitle,
         value: '85%',
         icon: Icons.assignment_turned_in,
@@ -170,13 +137,6 @@ class PerformanceIndicatorsController extends ChangeNotifier {
         icon: Icons.grade,
         color: PerformanceIndicatorsConstants.orangeColor,
         description: PerformanceIndicatorsConstants.needsImprovementDescription,
-      ),
-      PerformanceIndicator(
-        title: PerformanceIndicatorsConstants.activitiesTitle,
-        value: '60%',
-        icon: Icons.stars,
-        color: PerformanceIndicatorsConstants.redColor,
-        description: PerformanceIndicatorsConstants.poorDescription,
       ),
     ];
   }

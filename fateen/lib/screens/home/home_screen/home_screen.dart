@@ -402,44 +402,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       SizedBox(height: sectionSpacing),
 
-                      // المحاضرة القادمة
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
-                        child: Consumer<NextLectureController>(
-                          builder: (context, controller, child) {
-                            // عرض المحاضرة القادمة فقط إذا لم تكن حالة التحميل وكانت المحاضرة متوفرة
-                            if (!controller.isLoading &&
-                                controller.nextLectureMap != null) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // عنوان قسم المحاضرة القادمة
-                                  NextLectureComponents.buildSectionTitle(),
-
-                                  SizedBox(height: smallSpacing),
-
-                                  // استخدام المكون البديل بدون أنيميشن
-                                  StaticNextLectureCard(
-                                    courseName: controller.nextLectureMap![
-                                        NextLectureConstants.courseNameField],
-                                    classroom: controller.nextLectureMap![
-                                        NextLectureConstants.classroomField],
-                                    diffSeconds: controller
-                                        .nextLectureMap!['diffSeconds'],
-                                  ),
-
-                                  SizedBox(height: sectionSpacing),
-                                ],
-                              );
-                            }
-
-                            // في حالة التحميل أو عدم وجود محاضرة، لن نعرض أي شيء
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ),
-
                       // استخدام ميزة تقدم التقويم الدراسي المستخرجة
                       Consumer<SemesterProgressController>(
                         builder: (context, controller, _) {
@@ -447,6 +409,58 @@ class _HomeScreenState extends State<HomeScreen> {
                             controller: controller,
                           );
                         },
+                      ),
+
+                      SizedBox(height: sectionSpacing),
+
+                      // المحاضرة القادمة - تحت التقويم الدراسي مباشرة
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: Consumer<NextLectureController>(
+                          builder: (context, controller, child) {
+                            // عرض عنوان قسم المحاضرة القادمة دائماً
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // عنوان قسم المحاضرة القادمة
+                                NextLectureComponents.buildSectionTitle(),
+
+                                SizedBox(height: smallSpacing),
+
+                                // حالة التحميل
+                                if (controller.isLoading)
+                                  Container(
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: kMediumPurple,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  )
+                                // حالة وجود محاضرة قادمة
+                                else if (controller.nextLectureMap != null)
+                                  StaticNextLectureCard(
+                                    courseName: controller.nextLectureMap![
+                                        NextLectureConstants.courseNameField],
+                                    classroom: controller.nextLectureMap![
+                                        NextLectureConstants.classroomField],
+                                    diffSeconds: controller
+                                        .nextLectureMap!['diffSeconds'],
+                                  )
+                                // حالة عدم وجود محاضرة قادمة
+                                else
+                                  NextLectureComponents
+                                      .buildEmptyLectureState(),
+                              ],
+                            );
+                          },
+                        ),
                       ),
 
                       SizedBox(height: sectionSpacing),
