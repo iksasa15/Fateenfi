@@ -7,51 +7,31 @@ class DaysTabsComponent {
   /// بناء تابات الأيام
   static Widget buildDaysTabs(BuildContext context,
       DaysTabsController controller, TabController tabController) {
-    // استخدام MediaQuery للتجاوب
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    final double tabHeight =
-        isSmallScreen ? 36.0 : (isMediumScreen ? 40.0 : 44.0);
-    final double fontSize =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-    final double horizontalPadding = screenSize.width * 0.04;
+    // ضبط الحجم ليكون متجاوبًا
+    final tabHeight =
+        DaysTabsConstants.getResponsiveSize(context, 35.0, 40.0, 45.0);
+    final fontSize =
+        DaysTabsConstants.getResponsiveSize(context, 12.0, 14.0, 16.0);
 
     // حساب عرض كل تاب بناءً على عرض الشاشة
-    final availableWidth = screenSize.width - (horizontalPadding * 2);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding =
+        DaysTabsConstants.getResponsiveSize(context, 12.0, 16.0, 20.0);
+    final availableWidth = screenWidth - (horizontalPadding * 2);
     final tabWidth = availableWidth / controller.allDays.length;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       height: tabHeight,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            spreadRadius: 0,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: TabBar(
         controller: tabController,
         labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF4338CA),
+        unselectedLabelColor:
+            const Color(0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
         indicator: BoxDecoration(
-          color: const Color(0xFF4338CA),
+          color: const Color(
+              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF4338CA).withOpacity(0.3),
-              spreadRadius: 0,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         tabs: controller.allDays.asMap().entries.map((entry) {
           final index = entry.key;
@@ -62,14 +42,15 @@ class DaysTabsComponent {
               DateFormat('EEEE').format(DateTime.now());
 
           return Tab(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: tabWidth - 1,
+            child: Container(
+              width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
               decoration: isToday && index != controller.selectedDayIndex
                   ? BoxDecoration(
-                      border: Border.all(color: const Color(0xFF4338CA)),
+                      border: Border.all(
+                          color: const Color(
+                              0xFF4338CA)), // استخدام لون kDarkPurple من صفحات التسجيل
                       borderRadius: BorderRadius.circular(12),
                     )
                   : null,
@@ -77,18 +58,16 @@ class DaysTabsComponent {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   day,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'SYMBIOAR+LT',
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
           );
         }).toList(),
-        isScrollable: false,
-        labelPadding: EdgeInsets.zero,
+        isScrollable: false, // جعل التابات ثابتة
+        labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
         indicatorSize: TabBarIndicatorSize.tab,
       ),
     );
@@ -97,32 +76,32 @@ class DaysTabsComponent {
   /// بناء ملخص الجدول اليومي - يعرض فوق قائمة المحاضرات
   static Widget buildDaySummary(
       BuildContext context, DaysTabsController controller) {
-    // استخدام MediaQuery للتجاوب
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
+    // استخدام دالة قياس حجم الشاشة
+    final titleSize = DaysTabsConstants.getResponsiveSize(
+      context,
+      14.0, // للشاشات الصغيرة
+      16.0, // للشاشات المتوسطة
+      18.0, // للشاشات الكبيرة
+    );
 
-    final double titleSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 16.0 : 18.0);
-    final double countSize =
-        isSmallScreen ? 10.0 : (isMediumScreen ? 12.0 : 14.0);
-    final double padding =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 15.0 : 20.0);
+    final countSize = DaysTabsConstants.getResponsiveSize(
+      context,
+      10.0, // للشاشات الصغيرة
+      12.0, // للشاشات المتوسطة
+      14.0, // للشاشات الكبيرة
+    );
+
+    final padding = DaysTabsConstants.getResponsiveSize(
+      context,
+      12.0, // للشاشات الصغيرة
+      15.0, // للشاشات المتوسطة
+      20.0, // للشاشات الكبيرة
+    );
 
     return Container(
       padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            spreadRadius: 0,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color:
+          Colors.white, // خلفية بيضاء لضمان التمييز عن المحتوى الذي يأتي بعده
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -133,7 +112,8 @@ class DaysTabsComponent {
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF4338CA),
+                color: const Color(
+                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
                 fontFamily: 'SYMBIOAR+LT',
               ),
               overflow: TextOverflow.ellipsis,
@@ -142,27 +122,23 @@ class DaysTabsComponent {
           // عدد المحاضرات في هذا اليوم
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: isSmallScreen ? 8.0 : (isMediumScreen ? 10.0 : 12.0),
-              vertical: isSmallScreen ? 4.0 : (isMediumScreen ? 5.0 : 6.0),
+              horizontal:
+                  DaysTabsConstants.getResponsiveSize(context, 8.0, 10.0, 12.0),
+              vertical:
+                  DaysTabsConstants.getResponsiveSize(context, 4.0, 5.0, 6.0),
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F3FF),
+              color: const Color(
+                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
               borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  spreadRadius: 0,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Text(
               '${controller.getCoursesCountForDay(controller.allDays[controller.selectedDayIndex])} ${DaysTabsConstants.lectureCountSuffix}',
               style: TextStyle(
                 fontSize: countSize,
-                color: const Color(0xFF4338CA),
-                fontWeight: FontWeight.w600,
+                color: const Color(
+                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                fontWeight: FontWeight.w500,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),

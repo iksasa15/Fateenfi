@@ -200,16 +200,13 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
 
               return Expanded(
                 child: ScheduleCalendarComponents.buildDayCell(
-                  course as BuildContext,
-                  (isToday && isCurrentTime) as Course?,
-                  (course != null ? _controller.courseColors[course.id] : null)
-                      as bool,
+                  course,
+                  isToday && isCurrentTime,
+                  course != null ? _controller.courseColors[course.id] : null,
                   course != null
                       ? _controller.courseBorderColors[course.id]
                       : null,
-                  (course != null ? () => _courseTapped(course, context) : null)
-                      as Color?,
-                  context as VoidCallback?,
+                  course != null ? () => _courseTapped(course, context) : null,
                 ),
               );
             }),

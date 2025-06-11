@@ -190,10 +190,11 @@ class _DailyScheduleScreenState extends State<DailyScheduleScreen>
                       context, 10.0, 15.0, 20.0),
                 ),
                 child: DailyScheduleComponents.buildCourseCard(
-                  context,
                   course,
-                  _controller.courseColors[course.id] ?? DailyScheduleConstants.kLightPurple,
-                  _controller.courseBorderColors[course.id] ?? DailyScheduleConstants.kMediumPurple,
+                  _controller.courseColors[course.id] ??
+                      DailyScheduleConstants.kLightPurple,
+                  _controller.courseBorderColors[course.id] ??
+                      DailyScheduleConstants.kMediumPurple,
                   () => _showCourseDetails(course),
                 ),
               );
