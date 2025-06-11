@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import '../constants/task_categories_constants.dart';
+import '../services/firebaseServices/task_categories_service.dart';
+
+class TaskCategory {
+  final String id;
+  final String title;
+  final IconData icon;
+  final Color color;
+  final int count;
+
+  TaskCategory({
+    required this.id,
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.count,
+  });
+}
+
+class TaskCategoriesController extends ChangeNotifier {
+  final TaskCategoriesService _service = TaskCategoriesService();
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<TaskCategory> _categories = [];
+
+  // الحصول على القيم
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  List<TaskCategory> get categories => _categories;
+
+  // تهيئة البيانات
+  Future<void> initialize() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      // جلب بيانات فئات المهام من Firebase
+      final data = await _service.getTaskCategories();
+
+      // معالجة البيانات
+      _processData(data);
+
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = 'حدث خطأ أثناء تحميل البيانات: $e';
+      _categories =
+          _getDefaultCategories(); // استخدام بيانات افتراضية في حالة الخطأ
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // معالجة البيانات القادمة من Firebase
+  void _processData(Map<String, dynamic> data) {
+    // إذا كانت البيانات فارغة، استخدم البيانات الافتراضية
+    if (data.isEmpty) {
+      _categories = _getDefaultCategories();
+      return;
+    }
+
+    _categories = [];
+
+    // المهام العاجلة
+    if (data.containsKey('urgent')) {
+      _categories.add(
+        TaskCategory(
+          id: 'urgent',
+          title: TaskCategoriesConstants.urgentTasksTitle,
+          icon: TaskCategoriesConstants.urgentTasksIcon,
+          color: TaskCategoriesConstants.urgentTasksColor,
+          count: data['urgent'] ?? 0,
+        ),
+      );
+    }
+
+    // المهام القادمة
+    if (data.containsKey('upcoming')) {
+      _categories.add(
+        TaskCategory(
+          id: 'upcoming',
+          title: TaskCategoriesConstants.upcomingTasksTitle,
+          icon: TaskCategoriesConstants.upcomingTasksIcon,
+          color: TaskCategoriesConstants.upcomingTasksColor,
+          count: data['upcoming'] ?? 0,
+        ),
+      );
+    }
+
+    // المهام المكتملة
+    if (data.containsKey('completed')) {
+      _categories.add(
+        TaskCategory(
+          id: 'completed',
+          title: TaskCategoriesConstants.completedTasksTitle,
+          icon: TaskCategoriesConstants.completedTasksIcon,
+          color: TaskCategoriesConstants.completedTasksColor,
+          count: data['completed'] ?? 0,
+        ),
+      );
+    }
+
+    // كل المهام
+    if (data.containsKey('all')) {
+      _categories.add(
+        TaskCategory(
+          id: 'all',
+          title: TaskCategoriesConstants.allTasksTitle,
+          icon: TaskCategoriesConstants.allTasksIcon,
+          color: TaskCategoriesConstants.allTasksColor,
+          count: data['all'] ?? 0,
+        ),
+      );
+    }
+
+    // إذا لم تكن هناك فئات، استخدم البيانات الافتراضية
+    if (_categories.isEmpty) {
+      _categories = _getDefaultCategories();
+    }
+  }
+
+  // بيانات افتراضية للفئات
+  List<TaskCategory> _getDefaultCategories() {
+    return [
+      TaskCategory(
+        id: 'urgent',
+        title: TaskCategoriesConstants.urgentTasksTitle,
+        icon: TaskCategoriesConstants.urgentTasksIcon,
+        color: TaskCategoriesConstants.urgentTasksColor,
+        count: 3,
+      ),
+      TaskCategory(
+        id: 'upcoming',
+        title: TaskCategoriesConstants.upcomingTasksTitle,
+        icon: TaskCategoriesConstants.upcomingTasksIcon,
+        color: TaskCategoriesConstants.upcomingTasksColor,
+        count: 5,
+      ),
+      TaskCategory(
+        id: 'completed',
+        title: TaskCategoriesConstants.completedTasksTitle,
+        icon: TaskCategoriesConstants.completedTasksIcon,
+        color: TaskCategoriesConstants.completedTasksColor,
+        count: 12,
+      ),
+      TaskCategory(
+        id: 'all',
+        title: TaskCategoriesConstants.allTasksTitle,
+        icon: TaskCategoriesConstants.allTasksIcon,
+        color: TaskCategoriesConstants.allTasksColor,
+        count: 20,
+      ),
+    ];
+  }
+
+  // معالجة النقر على فئة المهام
+  void handleCategoryTap(String categoryId) {
+    // يمكن إضافة منطق إضافي هنا إذا لزم الأمر
+    print('تم النقر على فئة المهام: $categoryId');
+  }
+
+  // تحديث البيانات
+  Future<void> refresh() async {
+    await initialize();
+  }
+
+  @override
+  void dispose() {
+    // تنظيف الموارد إذا لزم الأمر
+    super.dispose();
+  }
+}

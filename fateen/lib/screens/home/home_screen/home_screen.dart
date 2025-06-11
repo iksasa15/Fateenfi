@@ -16,6 +16,14 @@ import 'controllers/semester_progress_controller.dart';
 import 'components/performance_indicators_widget.dart';
 import 'controllers/performance_indicators_controller.dart';
 
+// استيراد ميزة المواعيد القادمة
+import 'components/upcoming_events_widget.dart';
+import 'controllers/upcoming_events_controller.dart';
+
+// استيراد ميزة فئات المهام
+import 'components/task_categories_widget.dart';
+import 'controllers/task_categories_controller.dart';
+
 // استيراد ملفات ميزة المحاضرة القادمة
 import '../home_screen/controllers/next_lecture_controller.dart';
 import '../home_screen/components/next_lecture_card.dart';
@@ -29,9 +37,6 @@ import '../home_screen/controllers/stats_controller.dart';
 
 // استيراد ملفات ميزة المهام التي تحتاج اهتمام
 import '../home_screen/controllers/tasks_controller.dart';
-
-// استيراد قسم فئات المهام الجديد
-import '../home_screen/components/task_categories_section.dart';
 
 // استيراد ملفات الصفحات الرئيسية
 import 'package:fateen/screens/courses/course_screen/course_screen.dart';
@@ -190,150 +195,6 @@ class StaticNextLectureCard extends StatelessWidget {
   }
 }
 
-// إنشاء مكون TaskCategoriesSection معدل لإزالة الأنيميشن
-class StaticTaskCategoriesSection extends StatelessWidget {
-  final VoidCallback onTaskTap;
-
-  const StaticTaskCategoriesSection({
-    Key? key,
-    required this.onTaskTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // عنوان القسم
-        Text(
-          'فئات المهام',
-          style: TextStyle(
-            fontFamily: 'SYMBIOAR+LT',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        SizedBox(height: 12),
-        // بطاقات فئات المهام
-        GridView.count(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.5,
-          children: [
-            _buildCategoryCard(
-              context,
-              title: 'المهام العاجلة',
-              icon: Icons.timer,
-              color: Colors.red,
-              count: 3,
-            ),
-            _buildCategoryCard(
-              context,
-              title: 'المهام القادمة',
-              icon: Icons.calendar_today,
-              color: Colors.blue,
-              count: 5,
-            ),
-            _buildCategoryCard(
-              context,
-              title: 'المهام المكتملة',
-              icon: Icons.check_circle,
-              color: Colors.green,
-              count: 12,
-            ),
-            _buildCategoryCard(
-              context,
-              title: 'كل المهام',
-              icon: Icons.list_alt,
-              color: Colors.purple,
-              count: 20,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCategoryCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required Color color,
-    required int count,
-  }) {
-    return InkWell(
-      onTap: onTaskTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: Offset(0, 2),
-            ),
-          ],
-          border: Border.all(
-            color: color.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '$count',
-                    style: TextStyle(
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontFamily: 'SYMBIOAR+LT',
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class HomeScreen extends StatefulWidget {
   final String userName;
   final String userMajor;
@@ -364,6 +225,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late ProfileCardController _profileCardController;
   late SemesterProgressController _semesterProgressController;
   late PerformanceIndicatorsController _performanceIndicatorsController;
+  late UpcomingEventsController _upcomingEventsController;
+  late TaskCategoriesController _taskCategoriesController;
 
   // إضافة وحدة تحكم شريط التنقل
   late BottomNavController _navController;
@@ -379,31 +242,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // مؤشر لعملية التحديث
   bool _isRefreshing = false;
-
-  // قائمة بالمواعيد القادمة للعرض
-  final List<Map<String, dynamic>> _upcomingEvents = [
-    {
-      'title': 'اختبار نصفي - مقدمة في البرمجة',
-      'date': 'الثلاثاء، ١٠ يونيو',
-      'icon': Icons.assignment,
-      'color': Color(0xFFEF4444),
-      'isUrgent': true,
-    },
-    {
-      'title': 'تسليم واجب - هندسة البرمجيات',
-      'date': 'الخميس، ١٢ يونيو',
-      'icon': Icons.book,
-      'color': Color(0xFFF59E0B),
-      'isUrgent': false,
-    },
-    {
-      'title': 'محاضرة استثنائية - تصميم قواعد البيانات',
-      'date': 'الأحد، ١٥ يونيو',
-      'icon': Icons.event_note,
-      'color': Color(0xFF3B82F6),
-      'isUrgent': false,
-    },
-  ];
 
   @override
   void initState() {
@@ -421,6 +259,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _profileCardController = ProfileCardController();
     _semesterProgressController = SemesterProgressController();
     _performanceIndicatorsController = PerformanceIndicatorsController();
+    _upcomingEventsController = UpcomingEventsController();
+    _taskCategoriesController = TaskCategoriesController();
 
     // تهيئة وحدات التحكم في مجموعات متوازية لتحسين الأداء
     await Future.wait([
@@ -428,6 +268,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _profileCardController.initialize(),
       _semesterProgressController.initialize(),
       _performanceIndicatorsController.initialize(),
+      _upcomingEventsController.initialize(),
+      _taskCategoriesController.initialize(),
       Future(() async {
         _nextLectureController = NextLectureController();
         await _nextLectureController.initialize();
@@ -486,134 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // إضافة قسم المواعيد القادمة
-  Widget _buildUpcomingEventsSection(
-      double horizontalPadding, double smallSpacing, double fontSize) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // عنوان القسم
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'المواعيد القادمة',
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize + 1,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // الانتقال إلى صفحة المواعيد
-                  _navController.changeIndex(1);
-                },
-                style: TextButton.styleFrom(
-                  minimumSize: Size.zero,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'عرض الكل',
-                  style: TextStyle(
-                    fontFamily: 'SYMBIOAR+LT',
-                    fontSize: fontSize - 2,
-                    color: kDarkPurple,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: smallSpacing),
-
-          // قائمة المواعيد
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _upcomingEvents.length > 3 ? 3 : _upcomingEvents.length,
-            itemBuilder: (context, index) {
-              final event = _upcomingEvents[index];
-              return Container(
-                margin: EdgeInsets.only(bottom: smallSpacing),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: Colors.grey.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: (event['color'] as Color).withOpacity(0.2),
-                    child: Icon(
-                      event['icon'] as IconData,
-                      color: event['color'] as Color,
-                      size: 20,
-                    ),
-                  ),
-                  title: Text(
-                    event['title'] as String,
-                    style: TextStyle(
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontSize: fontSize - 1,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    event['date'] as String,
-                    style: TextStyle(
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontSize: fontSize - 3,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  trailing: event['isUrgent'] == true
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            'عاجل',
-                            style: TextStyle(
-                              fontFamily: 'SYMBIOAR+LT',
-                              fontSize: fontSize - 4,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
-                        )
-                      : null,
-                  onTap: () {
-                    // الانتقال إلى صفحة التفاصيل عند النقر
-                  },
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   // بناء محتوى الصفحة الرئيسية
   Widget _buildHomeContent() {
     return LayoutBuilder(
@@ -649,6 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ChangeNotifierProvider.value(value: _semesterProgressController),
             ChangeNotifierProvider.value(
                 value: _performanceIndicatorsController),
+            ChangeNotifierProvider.value(value: _upcomingEventsController),
+            ChangeNotifierProvider.value(value: _taskCategoriesController),
           ],
           child: RefreshIndicator(
             onRefresh: _refreshData,
@@ -746,19 +462,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       SizedBox(height: sectionSpacing),
 
-                      // قسم المواعيد القادمة
-                      _buildUpcomingEventsSection(
-                          horizontalPadding, smallSpacing, normalFontSize),
+                      // استخدام ميزة المواعيد القادمة المستخرجة
+                      Consumer<UpcomingEventsController>(
+                        builder: (context, controller, _) {
+                          return UpcomingEventsWidget(
+                            controller: controller,
+                            onViewAllPressed: () {
+                              _navController
+                                  .changeIndex(1); // الانتقال إلى صفحة المواعيد
+                            },
+                          );
+                        },
+                      ),
 
                       SizedBox(height: sectionSpacing),
 
-                      // قسم "فئات المهام" - استخدام المكون البديل بدون أنيميشن
+                      // استخدام ميزة فئات المهام المستخرجة
                       Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
-                        child: StaticTaskCategoriesSection(
-                          onTaskTap: () => _navController
-                              .changeIndex(3), // الانتقال إلى صفحة المهام
+                        child: Consumer<TaskCategoriesController>(
+                          builder: (context, controller, _) {
+                            return TaskCategoriesWidget(
+                              controller: controller,
+                              onTaskTap: () => _navController
+                                  .changeIndex(3), // الانتقال إلى صفحة المهام
+                            );
+                          },
                         ),
                       ),
 
@@ -928,6 +658,8 @@ class _HomeScreenState extends State<HomeScreen> {
         _profileCardController.refresh(),
         _semesterProgressController.refresh(),
         _performanceIndicatorsController.refresh(),
+        _upcomingEventsController.refresh(),
+        _taskCategoriesController.refresh(),
       ]);
 
       // إعلام واجهة المستخدم بالتحديث
@@ -954,6 +686,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _profileCardController.dispose();
     _semesterProgressController.dispose();
     _performanceIndicatorsController.dispose();
+    _upcomingEventsController.dispose();
+    _taskCategoriesController.dispose();
     super.dispose();
   }
 }
