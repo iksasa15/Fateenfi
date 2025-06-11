@@ -12,8 +12,8 @@ import 'package:fateen/screens/courses/Schedule_screen/controllers/daily_schedul
 import 'package:fateen/screens/courses/Schedule_screen/controllers/days_tabs_controller.dart';
 
 // استيراد مكونات العرض
-import 'package:fateen/screens/courses/Schedule_screen/components/schedule_calendar_components.dart';
-import 'package:fateen/screens/courses/Schedule_screen/components/daily_schedule_components.dart';
+import 'package:fateen/screens/courses/Schedule_screen/views/daily_view.dart';
+import 'package:fateen/screens/courses/Schedule_screen/views/calendar_view.dart';
 
 // استيراد نموذج المادة
 import 'package:fateen/models/course.dart';
@@ -141,15 +141,6 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
     }
   }
 
-  /// تحديث بيانات الجدول
-  void _refreshScheduleData() {
-    if (_viewController.showCalendarView) {
-      _loadCalendarData();
-    } else {
-      _loadDailyData();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,263 +149,89 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
         child: Column(
           children: [
             // هيدر الجدول الدراسي
-            _buildHeader(),
+            ScheduleHeaderWidget(
+              controller: _viewController,
+              onViewModeChanged: (isCalendarView) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (isCalendarView && !_isCalendarDataLoaded) {
+                    _loadCalendarData();
+                  } else if (!isCalendarView && !_isDailyDataLoaded) {
+                    _loadDailyData();
+                  }
+                });
+              },
+            ),
 
             // شريط التبويبات لأيام الأسبوع (يظهر فقط في العرض اليومي)
             _buildDaysTabs(),
 
             // محتوى الجدول (أسبوعي/يومي)
-            _buildScheduleContent(),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                child: _viewController.showCalendarView
+                    ? CalendarView(
+                        key: const ValueKey('calendar_view'),
+                        controller: _calendarController,
+                        onCourseSelected: _showCourseDetails,
+                        isLoading: !_isCalendarDataLoaded,
+                      )
+                    : DailyView(
+                        key: const ValueKey('daily_view'),
+                        controller: _dailyController,
+                        tabController: _tabController,
+                        onCourseSelected: _showDailyCourseDetails,
+                        isLoading: !_isDailyDataLoaded,
+                      ),
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  /// بناء هيدر الجدول
-  Widget _buildHeader() {
-    return ScheduleHeaderWidget(
-      controller: _viewController,
-      onViewModeChanged: (isCalendarView) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (isCalendarView && !_isCalendarDataLoaded) {
-            _loadCalendarData();
-          } else if (!isCalendarView && !_isDailyDataLoaded) {
-            _loadDailyData();
-          }
-        });
-      },
     );
   }
 
   /// بناء شريط تبويبات الأيام
   Widget _buildDaysTabs() {
-    return ListenableBuilder(
-      listenable: _viewController,
-      builder: (context, _) {
-        // نعرض شريط الأيام فقط في عرض القائمة اليومية
-        if (!_viewController.showCalendarView) {
-          return Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                // شريط الأيام
-                DaysTabsComponent.buildDaysTabs(
-                    context, _daysTabsController, _tabController),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _viewController.showCalendarView
+          ? const SizedBox.shrink()
+          : Container(
+              key: const ValueKey('days_tabs'),
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                  // شريط الأيام
+                  DaysTabsComponent.buildDaysTabs(
+                      context, _daysTabsController, _tabController),
 
-                // ملخص اليوم
-                if (_isDailyDataLoaded)
-                  DaysTabsComponent.buildDaySummary(
-                      context, _daysTabsController),
-              ],
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
-    );
-  }
-
-  /// بناء محتوى الجدول (يتغير حسب وضع العرض المختار)
-  Widget _buildScheduleContent() {
-    return Expanded(
-      child: ListenableBuilder(
-        listenable: _viewController,
-        builder: (context, _) {
-          return _viewController.showCalendarView
-              ? _buildCalendarView(context)
-              : _buildDailyView(context);
-        },
-      ),
-    );
-  }
-
-  /// بناء عرض الجدول الأسبوعي
-  Widget _buildCalendarView(BuildContext context) {
-    if (!_isCalendarDataLoaded) {
-      return ScheduleCalendarComponents.buildShimmerLoading();
-    }
-
-    // إذا تم تحميل البيانات، عرض المحتوى بناءً على حالة البيانات
-    if (_calendarController.allCourses.isEmpty) {
-      return ScheduleCalendarComponents.buildEmptyCoursesView();
-    }
-
-    if (_calendarController.timeSlots.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            'لا توجد مواعيد محاضرات محددة',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-              fontFamily: 'SYMBIOAR+LT',
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-
-    // تحسين تجاوب الجدول مع أحجام الشاشة المختلفة
-    final fontSize = 18.0;
-    final paddingHorizontal = 10.0;
-    final paddingVertical = 10.0;
-
-    return ListView(
-      padding: EdgeInsets.symmetric(
-          vertical: paddingVertical, horizontal: paddingHorizontal),
-      children: [
-        // عنوان الجدول
-        Padding(
-          padding: const EdgeInsets.only(bottom: 15),
-          child: Text(
-            'جدول المحاضرات الأسبوعي',
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF4338CA),
-              fontFamily: 'SYMBIOAR+LT',
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-
-        // الجدول نفسه
-        _buildResponsiveCalendarTable(context),
-      ],
-    );
-  }
-
-  /// بناء جدول متجاوب مع حجم الشاشة
-  Widget _buildResponsiveCalendarTable(BuildContext context) {
-    // تحديد ما إذا كنا بحاجة لتصغير الجدول أو تمريره أفقيًا
-    final screenWidth = MediaQuery.of(context).size.width;
-    final minRequiredWidth = 500.0; // العرض المقدر المطلوب للجدول
-
-    // للشاشات الصغيرة نستخدم تمرير أفقي
-    if (screenWidth < minRequiredWidth) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Container(
-          // تحديد عرض ثابت للجدول على الشاشات الصغيرة
-          width: minRequiredWidth,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade200,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+                  // ملخص اليوم
+                  if (_isDailyDataLoaded)
+                    DaysTabsComponent.buildDaySummary(
+                        context, _daysTabsController),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // صف عناوين الأيام
-              ScheduleCalendarComponents.buildHeaderRow(
-                  _calendarController.allDays, _calendarController.englishDays),
-
-              // صفوف الأوقات
-              ..._buildTimeRows(context),
-            ],
-          ),
-        ),
-      );
-    } else {
-      // للشاشات الكبيرة نعرض الجدول عاديًا
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // صف عناوين الأيام
-            ScheduleCalendarComponents.buildHeaderRow(
-                _calendarController.allDays, _calendarController.englishDays),
-
-            // صفوف الأوقات
-            ..._buildTimeRows(context),
-          ],
-        ),
-      );
-    }
-  }
-
-  /// بناء صفوف الجدول الزمني
-  List<Widget> _buildTimeRows(BuildContext context) {
-    // قياس ارتفاع الخلية حسب حجم الشاشة
-    final cellHeight = 80.0;
-
-    return _calendarController.timeSlots.map((timeSlot) {
-      final isCurrentTime = _calendarController.isCurrentTime(timeSlot);
-
-      return Container(
-        height: cellHeight,
-        decoration: BoxDecoration(
-          color:
-              isCurrentTime ? const Color(0xFFF5F3FF).withOpacity(0.3) : null,
-          border: const Border(
-            top: BorderSide(color: Color(0xFFEFEFEF)),
-          ),
-        ),
-        child: Row(
-          children: [
-            // خلية الوقت
-            ScheduleCalendarComponents.buildTimeCell(timeSlot, isCurrentTime),
-
-            // خلايا الأيام
-            ..._calendarController.allDays.map((day) {
-              final isToday = _calendarController.isCurrentDay(day);
-              final course =
-                  _calendarController.getCourseAtTimeSlot(day, timeSlot);
-
-              return Expanded(
-                child: ScheduleCalendarComponents.buildDayCell(
-                  course,
-                  isToday && isCurrentTime,
-                  course != null
-                      ? _calendarController.courseColors[course.id]
-                      : null,
-                  course != null
-                      ? _calendarController.courseBorderColors[course.id]
-                      : null,
-                  course != null
-                      ? () => _showCourseDetails(course, context)
-                      : null,
-                ),
-              );
-            }),
-          ],
-        ),
-      );
-    }).toList();
+    );
   }
 
   /// عرض تفاصيل المادة في العرض الأسبوعي
   void _showCourseDetails(Course course, BuildContext context) {
-    // تحديد الحد الأقصى للارتفاع
     final screenHeight = MediaQuery.of(context).size.height;
-    final maxHeight = screenHeight * 0.7; // بحد أقصى 70% من ارتفاع الشاشة
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxHeight: maxHeight,
+        maxHeight: screenHeight * 0.7,
       ),
       builder: (context) => SingleChildScrollView(
         child: Container(
@@ -422,6 +239,14 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                spreadRadius: 0,
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -475,18 +300,18 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    ScheduleCalendarComponents.buildDetailItem(
+                    _buildDetailItem(
                       icon: Icons.location_on_outlined,
                       title: 'القاعة',
                       value: course.classroom ?? 'غير محدد',
                     ),
-                    ScheduleCalendarComponents.buildDetailItem(
+                    _buildDetailItem(
                       icon: Icons.calendar_today_outlined,
                       title: 'أيام المحاضرة',
                       value: course.days.join(' - '),
                     ),
                     if (course.creditHours != null)
-                      ScheduleCalendarComponents.buildDetailItem(
+                      _buildDetailItem(
                         icon: Icons.book_outlined,
                         title: 'الساعات المعتمدة',
                         value: '${course.creditHours} ساعات',
@@ -502,63 +327,58 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
     );
   }
 
-  /// بناء عرض القائمة اليومية
-  Widget _buildDailyView(BuildContext context) {
-    if (!_isDailyDataLoaded) {
-      return DailyScheduleComponents.buildShimmerLoading();
-    }
-
-    // عرض القائمة اليومية باستخدام مكونات DailyScheduleComponents
-    return TabBarView(
-      controller: _tabController,
-      physics: const BouncingScrollPhysics(), // للتمرير السلس
-      children: _dailyController.allDays.map((day) {
-        final courses = _dailyController.getCoursesForDaySorted(day);
-
-        if (courses.isEmpty) {
-          return DailyScheduleComponents.buildEmptyDayView(day);
-        }
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child: ListView.builder(
-            itemCount: courses.length,
-            padding: const EdgeInsets.only(bottom: 15),
-            itemBuilder: (context, index) {
-              final course = courses[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 15),
-                child: DailyScheduleComponents.buildCourseCard(
-                  course,
-                  _dailyController.courseColors[course.id] ??
-                      const Color(0xFFF5F3FF),
-                  _dailyController.courseBorderColors[course.id] ??
-                      const Color(0xFF6366F1),
-                  () => _showDailyCourseDetails(course, context),
-                ),
-              );
-            },
-          ),
-        );
-      }).toList(),
-    );
+  /// عرض تفاصيل المادة في العرض اليومي
+  void _showDailyCourseDetails(Course course) {
+    _showCourseDetails(course, context);
   }
 
-  /// عرض تفاصيل المادة في العرض اليومي
-  void _showDailyCourseDetails(Course course, BuildContext context) {
-    // تحديد الحد الأقصى للارتفاع
-    final screenHeight = MediaQuery.of(context).size.height;
-    final maxHeight = screenHeight * 0.7; // بحد أقصى 70% من ارتفاع الشاشة
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: maxHeight,
-      ),
-      builder: (context) => SingleChildScrollView(
-        child: DailyScheduleComponents.buildCourseDetailsSheet(context, course),
+  /// بناء عنصر تفاصيل المادة
+  Widget _buildDetailItem({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F3FF),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF4338CA),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

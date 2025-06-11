@@ -82,6 +82,7 @@ class _DailyScheduleViewState extends State<DailyScheduleView>
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15.0),
                     child: DailyScheduleComponents.buildCourseCard(
+                      context,
                       course,
                       _controller.courseColors[course.id] ?? Colors.grey[100]!,
                       _controller.courseBorderColors[course.id] ?? Colors.grey,

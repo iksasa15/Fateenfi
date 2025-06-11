@@ -1,72 +1,108 @@
 import 'package:flutter/material.dart';
 import '../constants/schedule_header_constants.dart';
 import '../controllers/schedule_view_controller.dart';
-import '../components/schedule_header_component.dart';
 
-/// واجهة متكاملة للهيدر الخاص بالجدول الدراسي
 class ScheduleHeaderWidget extends StatelessWidget {
-  // وحدة التحكم بعرض الجدول
   final ScheduleViewController controller;
-
-  // دالة تنفذ عند تغيير نوع العرض
   final Function(bool)? onViewModeChanged;
-
-  // دالة تنفذ عند طلب تحديث البيانات - نحتفظ بها كمعلمة للاستخدام في المستقبل إذا لزم الأمر
-  final VoidCallback? onRefresh;
 
   const ScheduleHeaderWidget({
     Key? key,
     required this.controller,
     this.onViewModeChanged,
-    this.onRefresh,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // هيدر الجدول الدراسي - لا نمرر دالة التحديث لإخفاء الزر
-        ScheduleHeaderComponent.buildHeader(context, controller, null),
+    // استخدام دالة قياس حجم الشاشة
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
 
-        // خط فاصل
-        Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+    final double titleSize =
+        isSmallScreen ? 20.0 : (isMediumScreen ? 22.0 : 24.0);
+    final double iconSize =
+        isSmallScreen ? 18.0 : (isMediumScreen ? 20.0 : 22.0);
+    final double buttonSize =
+        isSmallScreen ? 38.0 : (isMediumScreen ? 42.0 : 46.0);
+    final double horizontalPadding = screenSize.width * 0.04;
+    final double verticalPadding = screenSize.height * 0.02;
 
-        // نضيف مستمع للتغييرات في نوع العرض
-        ListenableBuilder(
-          listenable: controller,
-          builder: (context, _) {
-            // استدعاء الدالة الخارجية إذا كانت موجودة
-            if (onViewModeChanged != null) {
-              onViewModeChanged!(controller.showCalendarView);
-            }
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // عنوان صفحة الجدول الدراسي
+          Text(
+            ScheduleHeaderConstants.screenTitle,
+            style: TextStyle(
+              fontSize: titleSize,
+              fontWeight: FontWeight.bold,
+              color: ScheduleHeaderConstants.kTextColor,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+          ),
 
-            return const SizedBox.shrink();
-          },
-        ),
-      ],
-    );
-  }
-
-  /// طريقة استخدام الواجهة كاملة مع الاستماع للتغييرات
-  static Widget withController({
-    required BuildContext context,
-    required Function(bool) onViewModeChanged,
-    VoidCallback? onRefresh,
-  }) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        final controller = ScheduleViewController();
-
-        // إضافة مستمع للتغييرات في وحدة التحكم
-        controller.addListener(() {
-          onViewModeChanged(controller.showCalendarView);
-        });
-
-        return ScheduleHeaderWidget(
-          controller: controller,
-          onRefresh: onRefresh,
-        );
-      },
+          // زر تبديل نوع العرض (يومي/أسبوعي)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: buttonSize,
+            height: buttonSize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  spreadRadius: 0,
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  controller.toggleViewMode();
+                  if (onViewModeChanged != null) {
+                    onViewModeChanged!(controller.showCalendarView);
+                  }
+                },
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Icon(
+                    controller.showCalendarView
+                        ? Icons.view_list_rounded
+                        : Icons.calendar_view_week_rounded,
+                    key: ValueKey(controller.showCalendarView),
+                    color: ScheduleHeaderConstants.kDarkPurple,
+                    size: iconSize,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

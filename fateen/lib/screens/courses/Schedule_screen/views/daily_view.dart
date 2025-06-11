@@ -8,16 +8,22 @@ class DailyView extends StatelessWidget {
   final DailyScheduleController controller;
   final TabController tabController;
   final Function(Course)? onCourseSelected;
+  final bool isLoading;
 
   const DailyView({
     Key? key,
     required this.controller,
     required this.tabController,
     this.onCourseSelected,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return DailyScheduleComponents.buildShimmerLoading();
+    }
+
     return TabBarView(
       controller: tabController,
       physics: const BouncingScrollPhysics(),
@@ -37,48 +43,45 @@ class DailyView extends StatelessWidget {
       return DailyScheduleComponents.buildEmptyDayView(day);
     }
 
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final double cardSpacing = screenSize.height * 0.015;
+    final double horizontalPadding = screenSize.width * 0.04;
+
     // عرض قائمة المحاضرات
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: cardSpacing,
+      ),
       child: ListView.builder(
         itemCount: courses.length,
-        padding: const EdgeInsets.only(bottom: 15),
+        padding: EdgeInsets.only(bottom: cardSpacing),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
           final course = courses[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: DailyScheduleComponents.buildCourseCard(
-              course,
-              controller.courseColors[course.id] ?? const Color(0xFFF5F3FF),
-              controller.courseBorderColors[course.id] ??
-                  const Color(0xFF6366F1),
-              () => onCourseSelected?.call(course),
+
+          // استخدام Hero لإضافة انتقال سلس عند فتح التفاصيل
+          return Hero(
+            tag: 'course_${course.id}',
+            child: Material(
+              // استخدام Material للحفاظ على النص أثناء انتقال Hero
+              color: Colors.transparent,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: cardSpacing),
+                child: DailyScheduleComponents.buildCourseCard(
+                  context,
+                  course,
+                  controller.courseColors[course.id] ?? const Color(0xFFF5F3FF),
+                  controller.courseBorderColors[course.id] ??
+                      const Color(0xFF6366F1),
+                  () => onCourseSelected?.call(course),
+                ),
+              ),
             ),
           );
         },
       ),
     );
-  }
-
-  /// عرض تفاصيل المادة
-  static void showCourseDetails(BuildContext context, Course course) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.7,
-      ),
-      builder: (context) => SingleChildScrollView(
-        child: DailyScheduleComponents.buildCourseDetailsSheet(context, course),
-      ),
-    );
-  }
-
-  /// إنشاء واجهة التحميل
-  static Widget buildLoadingView() {
-    return DailyScheduleComponents.buildShimmerLoading();
   }
 }

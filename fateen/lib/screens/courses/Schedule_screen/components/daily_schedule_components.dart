@@ -18,35 +18,9 @@ class DailyScheduleComponents {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // عنوان وهمي للقائمة
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 130,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              Container(
-                width: 80,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ],
-          ),
-        ),
-
         // بطاقات وهمية
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Column(
             children: List.generate(
               4, // 4 بطاقات وهمية
@@ -56,8 +30,7 @@ class DailyScheduleComponents {
                 margin: const EdgeInsets.only(bottom: 15),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                      16), // تعديل لتوحيد أنصاف أقطار الحواف
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
             ),
@@ -75,121 +48,203 @@ class DailyScheduleComponents {
         children: [
           Icon(
             Icons.event_busy,
-            size: 60,
+            size: 70,
             color: Colors.grey.shade300,
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 20),
           Text(
             '${DailyScheduleConstants.noLecturesMessage} $day',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               color: Colors.grey.shade500,
+              fontWeight: FontWeight.bold,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 8),
+          Text(
+            'يمكنك إضافة محاضرات جديدة من صفحة المقررات',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
   }
 
   /// بناء بطاقة المادة للعرض في قائمة المحاضرات
-  static Widget buildCourseCard(
-      Course course, Color bgColor, Color borderColor, VoidCallback onTap) {
+  static Widget buildCourseCard(BuildContext context, Course course,
+      Color bgColor, Color borderColor, VoidCallback onTap) {
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
+
+    final double titleSize =
+        isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
+    final double subtitleSize =
+        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
+    final double iconSize =
+        isSmallScreen ? 14.0 : (isMediumScreen ? 16.0 : 18.0);
+    final double padding =
+        isSmallScreen ? 12.0 : (isMediumScreen ? 14.0 : 16.0);
+
     return InkWell(
       onTap: onTap,
-      borderRadius:
-          BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius:
-              BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: borderColor.withOpacity(0.15),
+              spreadRadius: 0,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
             children: [
-              // الصف الأول: الوقت واسم المادة
-              Row(
-                children: [
-                  // أيقونة ووقت المحاضرة
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: borderColor, width: 1.5),
-                    ),
-                    child: Row(
+              // خلفية زخرفية
+              Positioned(
+                right: -30,
+                top: -20,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                ),
+              ),
+
+              Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // الصف الأول: الوقت واسم المادة
+                    Row(
                       children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: const Color(
-                              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                        // أيقونة ووقت المحاضرة
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: padding * 0.7,
+                            vertical: padding * 0.4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: borderColor.withOpacity(0.2),
+                                spreadRadius: 0,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time_rounded,
+                                size: iconSize,
+                                color: const Color(0xFF4338CA),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                course.lectureTime ??
+                                    DailyScheduleConstants.undefinedTime,
+                                style: TextStyle(
+                                  fontSize: subtitleSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF4338CA),
+                                  fontFamily: 'SYMBIOAR+LT',
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          course.lectureTime ??
-                              DailyScheduleConstants.undefinedTime,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(
-                                0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-                            fontFamily: 'SYMBIOAR+LT',
+
+                        const SizedBox(width: 12),
+
+                        // اسم المادة
+                        Expanded(
+                          child: Text(
+                            course.courseName,
+                            style: TextStyle(
+                              fontSize: titleSize,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF374151),
+                              fontFamily: 'SYMBIOAR+LT',
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                  ),
 
-                  const SizedBox(width: 10),
+                    SizedBox(height: padding * 0.8),
 
-                  // اسم المادة
-                  Expanded(
-                    child: Text(
-                      course.courseName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(
-                            0xFF374151), // استخدام لون kTextColor من صفحات التسجيل
-                        fontFamily: 'SYMBIOAR+LT',
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    // الصف الثاني: القاعة والساعات المعتمدة
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // معلومات القاعة
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_outlined,
+                              size: iconSize,
+                              color: Colors.grey.shade700,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              course.classroom != null &&
+                                      course.classroom!.isNotEmpty
+                                  ? '${DailyScheduleConstants.roomPrefix} ${course.classroom}'
+                                  : '${DailyScheduleConstants.roomPrefix} ${DailyScheduleConstants.undefinedRoom}',
+                              style: TextStyle(
+                                fontSize: subtitleSize,
+                                color: Colors.grey.shade700,
+                                fontFamily: 'SYMBIOAR+LT',
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // عرض الساعات المعتمدة إذا كانت متوفرة
+                        if (course.creditHours != null)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: padding * 0.5,
+                              vertical: padding * 0.2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: borderColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${course.creditHours} ساعات',
+                              style: TextStyle(
+                                fontSize: subtitleSize - 1,
+                                color: borderColor,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'SYMBIOAR+LT',
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // الصف الثاني: القاعة فقط
-              Row(
-                children: [
-                  // معلومات القاعة
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    course.classroom != null && course.classroom!.isNotEmpty
-                        ? '${DailyScheduleConstants.roomPrefix} ${course.classroom}'
-                        : '${DailyScheduleConstants.roomPrefix} ${DailyScheduleConstants.undefinedRoom}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -208,17 +263,20 @@ class DailyScheduleComponents {
     String todayEnglish,
     List<String> englishDays,
   ) {
-    // ضبط الحجم ليكون متجاوبًا
-    final tabHeight =
-        DailyScheduleConstants.getResponsiveSize(context, 35.0, 40.0, 45.0);
-    final fontSize =
-        DailyScheduleConstants.getResponsiveSize(context, 12.0, 14.0, 16.0);
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
+
+    final double tabHeight =
+        isSmallScreen ? 36.0 : (isMediumScreen ? 40.0 : 44.0);
+    final double fontSize =
+        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
+    final double horizontalPadding = screenSize.width * 0.04;
 
     // حساب عرض كل تاب بناءً على عرض الشاشة
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding =
-        DailyScheduleConstants.getResponsiveSize(context, 12.0, 16.0, 20.0);
-    final availableWidth = screenWidth - (horizontalPadding * 2);
+    final availableWidth = screenSize.width - (horizontalPadding * 2);
     final tabWidth = availableWidth / days.length;
 
     return Container(
@@ -227,12 +285,18 @@ class DailyScheduleComponents {
       child: TabBar(
         controller: tabController,
         labelColor: Colors.white,
-        unselectedLabelColor:
-            const Color(0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+        unselectedLabelColor: const Color(0xFF4338CA),
         indicator: BoxDecoration(
-          color: const Color(
-              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+          color: const Color(0xFF4338CA),
           borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4338CA).withOpacity(0.3),
+              spreadRadius: 0,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         tabs: days.asMap().entries.map((entry) {
           final index = entry.key;
@@ -243,14 +307,12 @@ class DailyScheduleComponents {
 
           return Tab(
             child: Container(
-              width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
+              width: tabWidth - 1,
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
               decoration: isToday && index != selectedDayIndex
                   ? BoxDecoration(
-                      border: Border.all(
-                          color: const Color(
-                              0xFF4338CA)), // استخدام لون kDarkPurple من صفحات التسجيل
+                      border: Border.all(color: const Color(0xFF4338CA)),
                       borderRadius: BorderRadius.circular(12),
                     )
                   : null,
@@ -258,16 +320,18 @@ class DailyScheduleComponents {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   day,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'SYMBIOAR+LT',
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
           );
         }).toList(),
-        isScrollable: false, // جعل التابات ثابتة
-        labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
+        isScrollable: false,
+        labelPadding: EdgeInsets.zero,
         indicatorSize: TabBarIndicatorSize.tab,
       ),
     );
@@ -280,125 +344,73 @@ class DailyScheduleComponents {
     int selectedDayIndex,
     int coursesCount,
   ) {
-    // استخدام دالة قياس حجم الشاشة
-    final titleSize = DailyScheduleConstants.getResponsiveSize(
-      context,
-      14.0, // للشاشات الصغيرة
-      16.0, // للشاشات المتوسطة
-      18.0, // للشاشات الكبيرة
-    );
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
 
-    final countSize = DailyScheduleConstants.getResponsiveSize(
-      context,
-      10.0, // للشاشات الصغيرة
-      12.0, // للشاشات المتوسطة
-      14.0, // للشاشات الكبيرة
-    );
-
-    final padding = DailyScheduleConstants.getResponsiveSize(
-      context,
-      12.0, // للشاشات الصغيرة
-      15.0, // للشاشات المتوسطة
-      20.0, // للشاشات الكبيرة
-    );
+    final double titleSize =
+        isSmallScreen ? 14.0 : (isMediumScreen ? 16.0 : 18.0);
+    final double countSize =
+        isSmallScreen ? 10.0 : (isMediumScreen ? 12.0 : 14.0);
+    final double padding =
+        isSmallScreen ? 10.0 : (isMediumScreen ? 12.0 : 15.0);
 
     return Container(
       padding: EdgeInsets.all(padding),
-      color:
-          Colors.white, // خلفية بيضاء لضمان التمييز عن المحتوى الذي يأتي بعده
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            spreadRadius: 0,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // استخدام selectedDayIndex حتى يتغير العنوان مع تغير المحتوى
           Expanded(
             child: Text(
               '${DailyScheduleConstants.dayLecturesPrefix} ${days[selectedDayIndex]}',
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                color: const Color(0xFF4338CA),
                 fontFamily: 'SYMBIOAR+LT',
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          // عدد المحاضرات في هذا اليوم
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: DailyScheduleConstants.getResponsiveSize(
-                  context, 8.0, 10.0, 12.0),
-              vertical: DailyScheduleConstants.getResponsiveSize(
-                  context, 4.0, 5.0, 6.0),
+              horizontal: isSmallScreen ? 8.0 : (isMediumScreen ? 10.0 : 12.0),
+              vertical: isSmallScreen ? 4.0 : (isMediumScreen ? 5.0 : 6.0),
             ),
             decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
+              color: const Color(0xFFF5F3FF),
               borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  spreadRadius: 0,
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Text(
               '$coursesCount ${DailyScheduleConstants.lectureCountSuffix}',
               style: TextStyle(
                 fontSize: countSize,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-                fontWeight: FontWeight.w500,
+                color: const Color(0xFF4338CA),
+                fontWeight: FontWeight.w600,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// بناء عنصر تفاصيل المادة
-  static Widget buildDetailItem({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: const Color(
-                  0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -410,104 +422,194 @@ class DailyScheduleComponents {
     BuildContext context,
     Course course,
   ) {
-    // تحديد حجم الخط حسب حجم الشاشة
-    final titleFontSize =
-        DailyScheduleConstants.getResponsiveSize(context, 16.0, 18.0, 20.0);
-    final subtitleFontSize =
-        DailyScheduleConstants.getResponsiveSize(context, 12.0, 14.0, 16.0);
-    final padding =
-        DailyScheduleConstants.getResponsiveSize(context, 15.0, 20.0, 25.0);
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
 
-    return Container(
-      margin: EdgeInsets.all(
-          DailyScheduleConstants.getResponsiveSize(context, 8.0, 10.0, 12.0)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // هيدر
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(padding),
-            decoration: BoxDecoration(
-              color: const Color(
-                  0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+    final double titleSize =
+        isSmallScreen ? 16.0 : (isMediumScreen ? 18.0 : 20.0);
+    final double subtitleSize =
+        isSmallScreen ? 12.0 : (isMediumScreen ? 14.0 : 16.0);
+    final double padding =
+        isSmallScreen ? 15.0 : (isMediumScreen ? 20.0 : 25.0);
+
+    return Hero(
+      tag: 'course_${course.id}',
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: EdgeInsets.all(screenSize.width * 0.025),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 0,
+                blurRadius: 15,
+                offset: const Offset(0, 5),
               ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  course.courseName,
-                  style: TextStyle(
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'SYMBIOAR+LT',
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // هيدر
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(padding),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF4338CA),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                SizedBox(
-                    height: DailyScheduleConstants.getResponsiveSize(
-                        context, 3.0, 5.0, 7.0)),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   children: [
-                    Icon(Icons.access_time,
-                        size: subtitleFontSize, color: Colors.white70),
-                    SizedBox(
-                        width: DailyScheduleConstants.getResponsiveSize(
-                            context, 4.0, 6.0, 8.0)),
                     Text(
-                      course.lectureTime ??
-                          DailyScheduleConstants.undefinedTime,
+                      course.courseName,
                       style: TextStyle(
-                        fontSize: subtitleFontSize,
-                        color: Colors.white70,
+                        fontSize: titleSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.access_time_rounded,
+                            size: subtitleSize, color: Colors.white70),
+                        const SizedBox(width: 6),
+                        Text(
+                          course.lectureTime ??
+                              DailyScheduleConstants.undefinedTime,
+                          style: TextStyle(
+                            fontSize: subtitleSize - 2,
+                            color: Colors.white70,
+                            fontFamily: 'SYMBIOAR+LT',
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // تفاصيل
-          Padding(
-            padding: EdgeInsets.all(padding),
+              // تفاصيل
+              Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  children: [
+                    buildDetailItem(
+                      context: context,
+                      icon: Icons.location_on_outlined,
+                      title: DailyScheduleConstants.roomTitle,
+                      value: course.classroom ??
+                          DailyScheduleConstants.undefinedRoom,
+                    ),
+                    buildDetailItem(
+                      context: context,
+                      icon: Icons.calendar_today_outlined,
+                      title: DailyScheduleConstants.daysTitle,
+                      value: course.days.join(' - '),
+                    ),
+                    if (course.creditHours != null)
+                      buildDetailItem(
+                        context: context,
+                        icon: Icons.book_outlined,
+                        title: DailyScheduleConstants.creditHoursTitle,
+                        value:
+                            '${course.creditHours} ${DailyScheduleConstants.creditHoursSuffix}',
+                      ),
+                  ],
+                ),
+              ),
+              SizedBox(height: screenSize.height * 0.02),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// بناء عنصر تفاصيل المادة
+  static Widget buildDetailItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    final bool isMediumScreen =
+        screenSize.width >= 360 && screenSize.width < 400;
+
+    final double titleSize =
+        isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 13.0);
+    final double valueSize =
+        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    final double iconSize =
+        isSmallScreen ? 18.0 : (isMediumScreen ? 20.0 : 22.0);
+    final double containerSize =
+        isSmallScreen ? 36.0 : (isMediumScreen ? 40.0 : 44.0);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        children: [
+          Container(
+            width: containerSize,
+            height: containerSize,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F3FF),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  spreadRadius: 0,
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF4338CA),
+              size: iconSize,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildDetailItem(
-                  icon: Icons.location_on_outlined,
-                  title: DailyScheduleConstants.roomTitle,
-                  value:
-                      course.classroom ?? DailyScheduleConstants.undefinedRoom,
-                ),
-                buildDetailItem(
-                  icon: Icons.calendar_today_outlined,
-                  title: DailyScheduleConstants.daysTitle,
-                  value: course.days.join(' - '),
-                ),
-                if (course.creditHours != null)
-                  buildDetailItem(
-                    icon: Icons.book_outlined,
-                    title: DailyScheduleConstants.creditHoursTitle,
-                    value:
-                        '${course.creditHours} ${DailyScheduleConstants.creditHoursSuffix}',
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: titleSize,
+                    color: Colors.grey.shade600,
+                    fontFamily: 'SYMBIOAR+LT',
                   ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: valueSize,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'SYMBIOAR+LT',
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(
-              height: DailyScheduleConstants.getResponsiveSize(
-                  context, 10.0, 15.0, 20.0)),
         ],
       ),
     );

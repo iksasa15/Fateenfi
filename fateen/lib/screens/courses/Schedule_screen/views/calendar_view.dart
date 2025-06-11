@@ -7,15 +7,22 @@ import '../../../../models/course.dart';
 class CalendarView extends StatelessWidget {
   final ScheduleCalendarViewController controller;
   final Function(Course, BuildContext)? onCourseSelected;
+  final bool isLoading;
 
   const CalendarView({
     Key? key,
     required this.controller,
     this.onCourseSelected,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // عرض حالة التحميل
+    if (isLoading) {
+      return ScheduleCalendarComponents.buildShimmerLoading();
+    }
+
     // التحقق من وجود مواد
     if (controller.allCourses.isEmpty) {
       return ScheduleCalendarComponents.buildEmptyCoursesView();
@@ -26,14 +33,25 @@ class CalendarView extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Text(
-            'لا توجد مواعيد محاضرات محددة',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-              fontFamily: 'SYMBIOAR+LT',
-            ),
-            textAlign: TextAlign.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                size: 60,
+                color: Colors.grey.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'لا توجد مواعيد محاضرات محددة',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
+                  fontFamily: 'SYMBIOAR+LT',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       );
@@ -45,16 +63,26 @@ class CalendarView extends StatelessWidget {
 
   /// بناء تخطيط الجدول الأسبوعي
   Widget _buildWeeklySchedule(BuildContext context) {
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final double titleSize = screenSize.width < 360 ? 16.0 : 18.0;
+    final double horizontalPadding = screenSize.width * 0.04;
+    final double verticalPadding = screenSize.height * 0.02;
+
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      padding: EdgeInsets.symmetric(
+        vertical: verticalPadding,
+        horizontal: horizontalPadding,
+      ),
+      physics: const BouncingScrollPhysics(),
       children: [
         // عنوان الجدول
         Padding(
-          padding: const EdgeInsets.only(bottom: 15),
+          padding: EdgeInsets.only(bottom: verticalPadding * 0.8),
           child: Text(
             'جدول المحاضرات الأسبوعي',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: titleSize,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF4338CA),
               fontFamily: 'SYMBIOAR+LT',
@@ -82,33 +110,52 @@ class CalendarView extends StatelessWidget {
 
   /// بناء جدول قابل للتمرير أفقيًا (للشاشات الصغيرة)
   Widget _buildScrollableTable(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: _buildTableContent(context, 500),
-    );
-  }
-
-  /// بناء جدول بعرض كامل (للشاشات الكبيرة)
-  Widget _buildFullWidthTable(BuildContext context) {
-    return _buildTableContent(context, null);
-  }
-
-  /// بناء محتوى الجدول
-  Widget _buildTableContent(BuildContext context, double? fixedWidth) {
     return Container(
-      width: fixedWidth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 6,
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 0,
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: _buildTableContent(context, 550), // عرض ثابت للجدول
+      ),
+    );
+  }
+
+  /// بناء جدول بعرض كامل (للشاشات الكبيرة)
+  Widget _buildFullWidthTable(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: _buildTableContent(context, null),
+    );
+  }
+
+  /// بناء محتوى الجدول
+  Widget _buildTableContent(BuildContext context, double? fixedWidth) {
+    return SizedBox(
+      width: fixedWidth,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // صف العناوين (الأيام)
           ScheduleCalendarComponents.buildHeaderRow(
@@ -127,8 +174,12 @@ class CalendarView extends StatelessWidget {
   Widget _buildTimeRow(BuildContext context, String timeSlot) {
     final isCurrentTime = controller.isCurrentTime(timeSlot);
 
+    // استخدام MediaQuery للتجاوب
+    final Size screenSize = MediaQuery.of(context).size;
+    final double rowHeight = screenSize.height * 0.1; // 10% من ارتفاع الشاشة
+
     return Container(
-      height: 80,
+      height: rowHeight,
       decoration: BoxDecoration(
         color: isCurrentTime ? const Color(0xFFF5F3FF).withOpacity(0.3) : null,
         border: const Border(
@@ -147,6 +198,7 @@ class CalendarView extends StatelessWidget {
 
             return Expanded(
               child: ScheduleCalendarComponents.buildDayCell(
+                context,
                 course,
                 isToday && isCurrentTime,
                 course != null ? controller.courseColors[course.id] : null,
@@ -162,107 +214,5 @@ class CalendarView extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// عرض تفاصيل المادة عند النقر عليها
-  static void showCourseDetails(BuildContext context, Course course) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.7,
-      ),
-      builder: (context) => SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // هيدر
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF4338CA),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      course.courseName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'SYMBIOAR+LT',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.access_time,
-                            size: 14, color: Colors.white70),
-                        const SizedBox(width: 5),
-                        Text(
-                          course.lectureTime ?? 'وقت غير محدد',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white70,
-                            fontFamily: 'SYMBIOAR+LT',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // تفاصيل
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    ScheduleCalendarComponents.buildDetailItem(
-                      icon: Icons.location_on_outlined,
-                      title: 'القاعة',
-                      value: course.classroom ?? 'غير محدد',
-                    ),
-                    ScheduleCalendarComponents.buildDetailItem(
-                      icon: Icons.calendar_today_outlined,
-                      title: 'أيام المحاضرة',
-                      value: course.days.join(' - '),
-                    ),
-                    if (course.creditHours != null)
-                      ScheduleCalendarComponents.buildDetailItem(
-                        icon: Icons.book_outlined,
-                        title: 'الساعات المعتمدة',
-                        value: '${course.creditHours} ساعات',
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// إنشاء واجهة التحميل
-  static Widget buildLoadingView() {
-    return ScheduleCalendarComponents.buildShimmerLoading();
   }
 }
