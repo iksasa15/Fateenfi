@@ -11,7 +11,7 @@ class ScheduleHeaderWidget extends StatelessWidget {
   // دالة تنفذ عند تغيير نوع العرض
   final Function(bool)? onViewModeChanged;
 
-  // دالة تنفذ عند طلب تحديث البيانات - نحتفظ بها كمعلمة للاستخدام في المستقبل إذا لزم الأمر
+  // دالة تنفذ عند طلب تحديث البيانات
   final VoidCallback? onRefresh;
 
   const ScheduleHeaderWidget({
@@ -25,11 +25,25 @@ class ScheduleHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // هيدر الجدول الدراسي - لا نمرر دالة التحديث لإخفاء الزر
+        // هيدر الجدول الدراسي - نرسل null بدلاً من دالة التحديث
         ScheduleHeaderComponent.buildHeader(context, controller, null),
 
-        // خط فاصل
-        Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+        // خط فاصل أنيق
+        Container(
+          height: 1,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.grey.shade300,
+                Colors.grey.shade100,
+                Colors.grey.shade300,
+              ],
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+            ),
+          ),
+        ),
 
         // نضيف مستمع للتغييرات في نوع العرض
         ListenableBuilder(

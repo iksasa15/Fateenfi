@@ -48,36 +48,78 @@ class ScheduleHeaderComponent {
             style: TextStyle(
               fontSize: titleSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF374151),
-              fontFamily: 'SYMBIOAR+LT',
+              color: ScheduleHeaderConstants.kTextColor,
+              fontFamily: ScheduleHeaderConstants.fontFamily,
             ),
           ),
 
-          // زر تبديل نوع العرض (يومي/أسبوعي)
-          Container(
-            width: buttonSize,
-            height: buttonSize,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: IconButton(
-              onPressed: () => controller.toggleViewMode(),
-              icon: Icon(
-                controller.showCalendarView
-                    ? Icons.view_list_outlined
-                    : Icons.calendar_view_week_outlined,
-                color: const Color(0xFF4338CA),
-                size: iconSize,
-              ),
-              tooltip: controller.showCalendarView
-                  ? ScheduleHeaderConstants.listViewTooltip
-                  : ScheduleHeaderConstants.calendarViewTooltip,
-              padding: EdgeInsets.zero,
-            ),
+          // زر تبديل نوع العرض (يومي/أسبوعي) فقط
+          _buildActionButton(
+            context: context,
+            icon: controller.showCalendarView
+                ? Icons.view_list_rounded
+                : Icons.calendar_view_week_rounded,
+            tooltip: controller.showCalendarView
+                ? ScheduleHeaderConstants.listViewTooltip
+                : ScheduleHeaderConstants.calendarViewTooltip,
+            onPressed: () => controller.toggleViewMode(),
+            size: buttonSize,
+            iconSize: iconSize,
+            color: ScheduleHeaderConstants.kDarkPurple,
+            margin: EdgeInsets.zero,
           ),
         ],
+      ),
+    );
+  }
+
+  /// بناء زر إجراء موحد
+  static Widget _buildActionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+    required double size,
+    required double iconSize,
+    required Color color,
+    required EdgeInsets margin,
+  }) {
+    return Container(
+      margin: margin,
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius:
+            BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
+        border: Border.all(color: ScheduleHeaderConstants.kBorderColor),
+        boxShadow: [
+          BoxShadow(
+            color: ScheduleHeaderConstants.kShadowColor,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius:
+            BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
+        child: InkWell(
+          borderRadius:
+              BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
+          onTap: onPressed,
+          child: Tooltip(
+            message: tooltip,
+            child: Center(
+              child: Icon(
+                icon,
+                color: color,
+                size: iconSize,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -101,8 +143,8 @@ class ScheduleHeaderComponent {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF4338CA),
-          fontFamily: 'SYMBIOAR+LT',
+          color: ScheduleHeaderConstants.kDarkPurple,
+          fontFamily: ScheduleHeaderConstants.fontFamily,
         ),
         textAlign: TextAlign.center,
       ),

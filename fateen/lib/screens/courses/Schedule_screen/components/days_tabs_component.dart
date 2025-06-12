@@ -20,55 +20,71 @@ class DaysTabsComponent {
     final availableWidth = screenWidth - (horizontalPadding * 2);
     final tabWidth = availableWidth / controller.allDays.length;
 
-    return Container(
+    return AnimatedContainer(
+      duration: DaysTabsConstants.tabAnimationDuration,
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       height: tabHeight,
-      child: TabBar(
-        controller: tabController,
-        labelColor: Colors.white,
-        unselectedLabelColor:
-            const Color(0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-        indicator: BoxDecoration(
-          color: const Color(
-              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-          borderRadius: BorderRadius.circular(12),
-        ),
-        tabs: controller.allDays.asMap().entries.map((entry) {
-          final index = entry.key;
-          final day = entry.value;
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: DaysTabsConstants.kShadowColor,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+        child: TabBar(
+          controller: tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: DaysTabsConstants.kDarkPurple,
+          indicator: BoxDecoration(
+            color: DaysTabsConstants.kDarkPurple,
+            borderRadius:
+                BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+          ),
+          tabs: controller.allDays.asMap().entries.map((entry) {
+            final index = entry.key;
+            final day = entry.value;
 
-          // التحقق إذا كان هذا هو اليوم الحالي
-          final isToday = controller.englishDays[index] ==
-              DateFormat('EEEE').format(DateTime.now());
+            // التحقق إذا كان هذا هو اليوم الحالي
+            final isToday = controller.englishDays[index] ==
+                DateFormat('EEEE').format(DateTime.now());
 
-          return Tab(
-            child: Container(
-              width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-              decoration: isToday && index != controller.selectedDayIndex
-                  ? BoxDecoration(
-                      border: Border.all(
-                          color: const Color(
-                              0xFF4338CA)), // استخدام لون kDarkPurple من صفحات التسجيل
-                      borderRadius: BorderRadius.circular(12),
-                    )
-                  : null,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  day,
-                  style: const TextStyle(
-                    fontFamily: 'SYMBIOAR+LT',
+            return Tab(
+              child: AnimatedContainer(
+                duration: DaysTabsConstants.tabAnimationDuration,
+                width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                decoration: isToday && index != controller.selectedDayIndex
+                    ? BoxDecoration(
+                        border:
+                            Border.all(color: DaysTabsConstants.kDarkPurple),
+                        borderRadius: BorderRadius.circular(
+                            DaysTabsConstants.tabBorderRadius),
+                      )
+                    : null,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    day,
+                    style: TextStyle(
+                      fontFamily: DaysTabsConstants.fontFamily,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
-        isScrollable: false, // جعل التابات ثابتة
-        labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
-        indicatorSize: TabBarIndicatorSize.tab,
+            );
+          }).toList(),
+          isScrollable: false, // جعل التابات ثابتة
+          labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
+          indicatorSize: TabBarIndicatorSize.tab,
+        ),
       ),
     );
   }
@@ -98,10 +114,19 @@ class DaysTabsComponent {
       20.0, // للشاشات الكبيرة
     );
 
-    return Container(
+    return AnimatedContainer(
+      duration: DaysTabsConstants.animationDuration,
       padding: EdgeInsets.all(padding),
-      color:
-          Colors.white, // خلفية بيضاء لضمان التمييز عن المحتوى الذي يأتي بعده
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: DaysTabsConstants.kShadowColor,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -112,9 +137,8 @@ class DaysTabsComponent {
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-                fontFamily: 'SYMBIOAR+LT',
+                color: DaysTabsConstants.kDarkPurple,
+                fontFamily: DaysTabsConstants.fontFamily,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -128,18 +152,24 @@ class DaysTabsComponent {
                   DaysTabsConstants.getResponsiveSize(context, 4.0, 5.0, 6.0),
             ),
             decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
-              borderRadius: BorderRadius.circular(30),
+              color: DaysTabsConstants.kLightPurple,
+              borderRadius:
+                  BorderRadius.circular(DaysTabsConstants.counterBorderRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: DaysTabsConstants.kShadowColor,
+                  blurRadius: 2,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
             child: Text(
               '${controller.getCoursesCountForDay(controller.allDays[controller.selectedDayIndex])} ${DaysTabsConstants.lectureCountSuffix}',
               style: TextStyle(
                 fontSize: countSize,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                color: DaysTabsConstants.kDarkPurple,
                 fontWeight: FontWeight.w500,
-                fontFamily: 'SYMBIOAR+LT',
+                fontFamily: DaysTabsConstants.fontFamily,
               ),
             ),
           ),

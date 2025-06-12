@@ -9,6 +9,17 @@ class DailyScheduleConstants {
   static const Color kBackgroundColor = Color(0xFFFDFDFF);
   static const Color kTextColor = Color(0xFF374151);
   static const Color kHintColor = Color(0xFF9CA3AF);
+  static const Color kBorderColor = Color(0xFFE5E7EB);
+  static const Color kShadowColor = Color(0x0F000000);
+
+  // ثوابت الزوايا
+  static const double cardBorderRadius = 16.0;
+  static const double tabBorderRadius = 12.0;
+  static const double badgeBorderRadius = 30.0;
+  static const double detailIconBorderRadius = 8.0;
+
+  // ثابت خط التطبيق
+  static const String fontFamily = 'SYMBIOAR+LT';
 
   // مصفوفة من الألوان للمواد (ألوان فاتحة)
   static const List<Color> courseColorPalette = [
@@ -47,12 +58,19 @@ class DailyScheduleConstants {
   static const String roomPrefix = 'القاعة:';
   static const String undefinedRoom = 'غير محدد';
   static const String undefinedTime = 'وقت غير محدد';
+  static const String emptyScheduleTitle = 'الجدول فارغ';
+  static const String emptyScheduleMessage = 'لم تقم بإضافة أي محاضرات بعد';
 
   // أسماء عناصر واجهة التفاصيل
   static const String roomTitle = 'القاعة';
   static const String daysTitle = 'أيام المحاضرة';
   static const String creditHoursTitle = 'الساعات المعتمدة';
   static const String creditHoursSuffix = 'ساعات';
+
+  // ثوابت الأنميشن
+  static const Duration animationDuration = Duration(milliseconds: 300);
+  static const Duration cardAnimationDuration = Duration(milliseconds: 400);
+  static const Curve animationCurve = Curves.easeInOut;
 
   // مصفوفة الأيام التي سنعرضها في التقويم
   static const List<String> arabicDays = [
@@ -84,5 +102,27 @@ class DailyScheduleConstants {
     } else {
       return large;
     }
+  }
+
+  // دالة للحصول على ظل موحد
+  static List<BoxShadow> getUnifiedShadow() {
+    return [
+      BoxShadow(
+        color: kShadowColor,
+        blurRadius: 10,
+        offset: const Offset(0, 2),
+        spreadRadius: 0,
+      ),
+    ];
+  }
+
+  // دالة لحساب التباعد العمودي النسبي
+  static double getVerticalPadding(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * percentage / 100;
+  }
+
+  // دالة لحساب التباعد الأفقي النسبي
+  static double getHorizontalPadding(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * percentage / 100;
   }
 }

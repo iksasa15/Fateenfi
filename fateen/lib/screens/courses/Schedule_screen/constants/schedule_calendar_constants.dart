@@ -9,6 +9,18 @@ class ScheduleCalendarConstants {
   static const Color kTextColor = Color(0xFF374151);
   static const Color kAccentColor = Color(0xFFEC4899);
   static const Color kHintColor = Color(0xFF9CA3AF);
+  static const Color kBorderColor = Color(0xFFE5E7EB);
+  static const Color kShadowColor = Color(0x0F000000);
+
+  // ثوابت الزوايا والتباعد
+  static const double cardBorderRadius = 16.0;
+  static const double itemBorderRadius = 12.0;
+  static const double defaultPadding = 16.0;
+  static const double timeColumnWidth = 60.0;
+  static const double rowHeight = 80.0;
+
+  // ثابت خط التطبيق
+  static const String fontFamily = 'SYMBIOAR+LT';
 
   // مصفوفة من الألوان للمواد (ألوان فاتحة)
   static const List<Color> courseColorPalette = [
@@ -45,6 +57,7 @@ class ScheduleCalendarConstants {
   static const String noTimesMessage = 'لا توجد مواعيد محاضرات محددة';
   static const String undefinedRoom = 'غير محدد';
   static const String undefinedTime = 'وقت غير محدد';
+  static const String timeHeaderLabel = 'الوقت/\nاليوم';
 
   // أسماء عناصر واجهة التفاصيل
   static const String roomTitle = 'القاعة';
@@ -52,7 +65,10 @@ class ScheduleCalendarConstants {
   static const String creditHoursTitle = 'الساعات المعتمدة';
   static const String creditHoursSuffix = 'ساعات';
 
-  // ثوابت الأحجام المتجاوبة
+  // ثوابت الأنميشن
+  static const Duration animationDuration = Duration(milliseconds: 300);
+
+  // دالة للحصول على حجم متجاوب مع حجم الشاشة
   static double getResponsiveSize(
       BuildContext context, double small, double medium, double large) {
     final width = MediaQuery.of(context).size.width;
@@ -64,6 +80,18 @@ class ScheduleCalendarConstants {
     } else {
       return large;
     }
+  }
+
+  // دالة للحصول على ظل موحد
+  static List<BoxShadow> getUnifiedShadow() {
+    return [
+      BoxShadow(
+        color: kShadowColor,
+        blurRadius: 10,
+        offset: const Offset(0, 2),
+        spreadRadius: 0,
+      ),
+    ];
   }
 
   // مصفوفة الأيام التي سنعرضها في التقويم

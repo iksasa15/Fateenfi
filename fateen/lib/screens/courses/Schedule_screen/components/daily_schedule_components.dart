@@ -57,7 +57,7 @@ class DailyScheduleComponents {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(
-                      16), // تعديل لتوحيد أنصاف أقطار الحواف
+                      DailyScheduleConstants.cardBorderRadius),
                 ),
               ),
             ),
@@ -69,26 +69,40 @@ class DailyScheduleComponents {
 
   /// بناء عرض اليوم الفارغ (بدون محاضرات)
   static Widget buildEmptyDayView(String day) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.event_busy,
-            size: 60,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 15),
-          Text(
-            '${DailyScheduleConstants.noLecturesMessage} $day',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade500,
-              fontFamily: 'SYMBIOAR+LT',
+    return AnimatedOpacity(
+      opacity: 1.0,
+      duration: DailyScheduleConstants.animationDuration,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_busy,
+              size: 60,
+              color: Colors.grey.shade300,
             ),
-          ),
-          const SizedBox(height: 25),
-        ],
+            const SizedBox(height: 15),
+            Text(
+              '${DailyScheduleConstants.noLecturesMessage} $day',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.bold,
+                fontFamily: DailyScheduleConstants.fontFamily,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              DailyScheduleConstants.emptyScheduleMessage,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade500,
+                fontFamily: DailyScheduleConstants.fontFamily,
+              ),
+            ),
+            const SizedBox(height: 25),
+          ],
+        ),
       ),
     );
   }
@@ -96,102 +110,115 @@ class DailyScheduleComponents {
   /// بناء بطاقة المادة للعرض في قائمة المحاضرات
   static Widget buildCourseCard(
       Course course, Color bgColor, Color borderColor, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius:
-          BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius:
-              BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
-          border: Border.all(color: borderColor),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // الصف الأول: الوقت واسم المادة
-              Row(
+    return Hero(
+      tag: 'course_${course.id}',
+      child: Material(
+        color: Colors.transparent,
+        child: AnimatedContainer(
+          duration: DailyScheduleConstants.cardAnimationDuration,
+          curve: DailyScheduleConstants.animationCurve,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius:
+                BorderRadius.circular(DailyScheduleConstants.cardBorderRadius),
+            border: Border.all(color: borderColor),
+            boxShadow: DailyScheduleConstants.getUnifiedShadow(),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius:
+                BorderRadius.circular(DailyScheduleConstants.cardBorderRadius),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // أيقونة ووقت المحاضرة
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: borderColor, width: 1.5),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: const Color(
-                              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                  // الصف الأول: الوقت واسم المادة
+                  Row(
+                    children: [
+                      // أيقونة ووقت المحاضرة
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: borderColor, width: 1.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: borderColor.withOpacity(0.2),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          course.lectureTime ??
-                              DailyScheduleConstants.undefinedTime,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(
-                                0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-                            fontFamily: 'SYMBIOAR+LT',
-                          ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              size: 14,
+                              color: DailyScheduleConstants.kDarkPurple,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              course.lectureTime ??
+                                  DailyScheduleConstants.undefinedTime,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: DailyScheduleConstants.kDarkPurple,
+                                fontFamily: DailyScheduleConstants.fontFamily,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  // اسم المادة
-                  Expanded(
-                    child: Text(
-                      course.courseName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(
-                            0xFF374151), // استخدام لون kTextColor من صفحات التسجيل
-                        fontFamily: 'SYMBIOAR+LT',
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+
+                      const SizedBox(width: 10),
+
+                      // اسم المادة
+                      Expanded(
+                        child: Text(
+                          course.courseName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: DailyScheduleConstants.kTextColor,
+                            fontFamily: DailyScheduleConstants.fontFamily,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // الصف الثاني: القاعة فقط
+                  Row(
+                    children: [
+                      // معلومات القاعة
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        course.classroom != null && course.classroom!.isNotEmpty
+                            ? '${DailyScheduleConstants.roomPrefix} ${course.classroom}'
+                            : '${DailyScheduleConstants.roomPrefix} ${DailyScheduleConstants.undefinedRoom}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                          fontFamily: DailyScheduleConstants.fontFamily,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-
-              const SizedBox(height: 12),
-
-              // الصف الثاني: القاعة فقط
-              Row(
-                children: [
-                  // معلومات القاعة
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    course.classroom != null && course.classroom!.isNotEmpty
-                        ? '${DailyScheduleConstants.roomPrefix} ${course.classroom}'
-                        : '${DailyScheduleConstants.roomPrefix} ${DailyScheduleConstants.undefinedRoom}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -224,51 +251,79 @@ class DailyScheduleComponents {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       height: tabHeight,
-      child: TabBar(
-        controller: tabController,
-        labelColor: Colors.white,
-        unselectedLabelColor:
-            const Color(0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-        indicator: BoxDecoration(
-          color: const Color(
-              0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-          borderRadius: BorderRadius.circular(12),
-        ),
-        tabs: days.asMap().entries.map((entry) {
-          final index = entry.key;
-          final day = entry.value;
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.circular(DailyScheduleConstants.tabBorderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: DailyScheduleConstants.kShadowColor,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius:
+            BorderRadius.circular(DailyScheduleConstants.tabBorderRadius),
+        child: Material(
+          color: Colors.white,
+          child: TabBar(
+            controller: tabController,
+            labelColor: Colors.white,
+            unselectedLabelColor: DailyScheduleConstants.kDarkPurple,
+            indicator: BoxDecoration(
+              color: DailyScheduleConstants.kDarkPurple,
+              borderRadius:
+                  BorderRadius.circular(DailyScheduleConstants.tabBorderRadius),
+            ),
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+                return states.contains(MaterialState.focused)
+                    ? null
+                    : Colors.transparent;
+              },
+            ),
+            tabs: days.asMap().entries.map((entry) {
+              final index = entry.key;
+              final day = entry.value;
 
-          // التحقق إذا كان هذا هو اليوم الحالي
-          final isToday = englishDays[index] == todayEnglish;
+              // التحقق إذا كان هذا هو اليوم الحالي
+              final isToday = englishDays[index] == todayEnglish;
 
-          return Tab(
-            child: Container(
-              width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-              decoration: isToday && index != selectedDayIndex
-                  ? BoxDecoration(
-                      border: Border.all(
-                          color: const Color(
-                              0xFF4338CA)), // استخدام لون kDarkPurple من صفحات التسجيل
-                      borderRadius: BorderRadius.circular(12),
-                    )
-                  : null,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  day,
-                  style: const TextStyle(
-                    fontFamily: 'SYMBIOAR+LT',
+              return Tab(
+                child: AnimatedContainer(
+                  duration: DailyScheduleConstants.animationDuration,
+                  width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
+                  alignment: Alignment.center,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                  decoration: isToday && index != selectedDayIndex
+                      ? BoxDecoration(
+                          border: Border.all(
+                              color: DailyScheduleConstants.kDarkPurple),
+                          borderRadius: BorderRadius.circular(
+                              DailyScheduleConstants.tabBorderRadius),
+                        )
+                      : null,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      day,
+                      style: TextStyle(
+                        fontFamily: DailyScheduleConstants.fontFamily,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
-        isScrollable: false, // جعل التابات ثابتة
-        labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
-        indicatorSize: TabBarIndicatorSize.tab,
+              );
+            }).toList(),
+            isScrollable: false, // جعل التابات ثابتة
+            labelPadding: EdgeInsets.zero, // إزالة المسافات بين التابات
+            indicatorSize: TabBarIndicatorSize.tab,
+          ),
+        ),
       ),
     );
   }
@@ -302,10 +357,19 @@ class DailyScheduleComponents {
       20.0, // للشاشات الكبيرة
     );
 
-    return Container(
+    return AnimatedContainer(
+      duration: DailyScheduleConstants.animationDuration,
       padding: EdgeInsets.all(padding),
-      color:
-          Colors.white, // خلفية بيضاء لضمان التمييز عن المحتوى الذي يأتي بعده
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: DailyScheduleConstants.kShadowColor,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -316,9 +380,8 @@ class DailyScheduleComponents {
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-                fontFamily: 'SYMBIOAR+LT',
+                color: DailyScheduleConstants.kDarkPurple,
+                fontFamily: DailyScheduleConstants.fontFamily,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -332,18 +395,24 @@ class DailyScheduleComponents {
                   context, 4.0, 5.0, 6.0),
             ),
             decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
-              borderRadius: BorderRadius.circular(30),
+              color: DailyScheduleConstants.kLightPurple,
+              borderRadius: BorderRadius.circular(
+                  DailyScheduleConstants.badgeBorderRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: DailyScheduleConstants.kShadowColor,
+                  blurRadius: 2,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
             child: Text(
               '$coursesCount ${DailyScheduleConstants.lectureCountSuffix}',
               style: TextStyle(
                 fontSize: countSize,
-                color: const Color(
-                    0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                color: DailyScheduleConstants.kDarkPurple,
                 fontWeight: FontWeight.w500,
-                fontFamily: 'SYMBIOAR+LT',
+                fontFamily: DailyScheduleConstants.fontFamily,
               ),
             ),
           ),
@@ -366,14 +435,13 @@ class DailyScheduleComponents {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
-              borderRadius: BorderRadius.circular(8),
+              color: DailyScheduleConstants.kLightPurple,
+              borderRadius: BorderRadius.circular(
+                  DailyScheduleConstants.detailIconBorderRadius),
             ),
             child: Icon(
               icon,
-              color: const Color(
-                  0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+              color: DailyScheduleConstants.kDarkPurple,
               size: 20,
             ),
           ),
@@ -386,16 +454,16 @@ class DailyScheduleComponents {
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade600,
-                  fontFamily: 'SYMBIOAR+LT',
+                  fontFamily: DailyScheduleConstants.fontFamily,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'SYMBIOAR+LT',
+                  fontFamily: DailyScheduleConstants.fontFamily,
                 ),
               ),
             ],
@@ -418,97 +486,105 @@ class DailyScheduleComponents {
     final padding =
         DailyScheduleConstants.getResponsiveSize(context, 15.0, 20.0, 25.0);
 
-    return Container(
-      margin: EdgeInsets.all(
-          DailyScheduleConstants.getResponsiveSize(context, 8.0, 10.0, 12.0)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // هيدر
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(padding),
-            decoration: BoxDecoration(
-              color: const Color(
-                  0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  course.courseName,
-                  style: TextStyle(
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'SYMBIOAR+LT',
+    return Hero(
+      tag: 'course_${course.id}',
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: EdgeInsets.all(DailyScheduleConstants.getResponsiveSize(
+              context, 8.0, 10.0, 12.0)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.circular(DailyScheduleConstants.cardBorderRadius),
+            boxShadow: DailyScheduleConstants.getUnifiedShadow(),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // هيدر
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(padding),
+                decoration: BoxDecoration(
+                  color: DailyScheduleConstants.kDarkPurple,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(
+                        DailyScheduleConstants.cardBorderRadius),
+                    topRight: Radius.circular(
+                        DailyScheduleConstants.cardBorderRadius),
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                SizedBox(
-                    height: DailyScheduleConstants.getResponsiveSize(
-                        context, 3.0, 5.0, 7.0)),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   children: [
-                    Icon(Icons.access_time,
-                        size: subtitleFontSize, color: Colors.white70),
-                    SizedBox(
-                        width: DailyScheduleConstants.getResponsiveSize(
-                            context, 4.0, 6.0, 8.0)),
                     Text(
-                      course.lectureTime ??
-                          DailyScheduleConstants.undefinedTime,
+                      course.courseName,
                       style: TextStyle(
-                        fontSize: subtitleFontSize,
-                        color: Colors.white70,
-                        fontFamily: 'SYMBIOAR+LT',
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: DailyScheduleConstants.fontFamily,
                       ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                        height: DailyScheduleConstants.getResponsiveSize(
+                            context, 3.0, 5.0, 7.0)),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.access_time,
+                            size: subtitleFontSize, color: Colors.white70),
+                        SizedBox(
+                            width: DailyScheduleConstants.getResponsiveSize(
+                                context, 4.0, 6.0, 8.0)),
+                        Text(
+                          course.lectureTime ??
+                              DailyScheduleConstants.undefinedTime,
+                          style: TextStyle(
+                            fontSize: subtitleFontSize,
+                            color: Colors.white70,
+                            fontFamily: DailyScheduleConstants.fontFamily,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // تفاصيل
-          Padding(
-            padding: EdgeInsets.all(padding),
-            child: Column(
-              children: [
-                buildDetailItem(
-                  icon: Icons.location_on_outlined,
-                  title: DailyScheduleConstants.roomTitle,
-                  value:
-                      course.classroom ?? DailyScheduleConstants.undefinedRoom,
+              // تفاصيل
+              Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  children: [
+                    buildDetailItem(
+                      icon: Icons.location_on_outlined,
+                      title: DailyScheduleConstants.roomTitle,
+                      value: course.classroom ??
+                          DailyScheduleConstants.undefinedRoom,
+                    ),
+                    buildDetailItem(
+                      icon: Icons.calendar_today_outlined,
+                      title: DailyScheduleConstants.daysTitle,
+                      value: course.days.join(' - '),
+                    ),
+                    if (course.creditHours != null)
+                      buildDetailItem(
+                        icon: Icons.book_outlined,
+                        title: DailyScheduleConstants.creditHoursTitle,
+                        value:
+                            '${course.creditHours} ${DailyScheduleConstants.creditHoursSuffix}',
+                      ),
+                  ],
                 ),
-                buildDetailItem(
-                  icon: Icons.calendar_today_outlined,
-                  title: DailyScheduleConstants.daysTitle,
-                  value: course.days.join(' - '),
-                ),
-                if (course.creditHours != null)
-                  buildDetailItem(
-                    icon: Icons.book_outlined,
-                    title: DailyScheduleConstants.creditHoursTitle,
-                    value:
-                        '${course.creditHours} ${DailyScheduleConstants.creditHoursSuffix}',
-                  ),
-              ],
-            ),
+              ),
+              SizedBox(
+                  height: DailyScheduleConstants.getResponsiveSize(
+                      context, 10.0, 15.0, 20.0)),
+            ],
           ),
-          SizedBox(
-              height: DailyScheduleConstants.getResponsiveSize(
-                  context, 10.0, 15.0, 20.0)),
-        ],
+        ),
       ),
     );
   }

@@ -18,6 +18,10 @@ import 'package:fateen/screens/courses/Schedule_screen/components/daily_schedule
 // استيراد نموذج المادة
 import 'package:fateen/models/course.dart';
 
+// استيراد الثوابت
+import 'package:fateen/screens/courses/Schedule_screen/constants/schedule_calendar_constants.dart';
+import 'package:fateen/screens/courses/Schedule_screen/constants/daily_schedule_constants.dart';
+
 /// شاشة الجدول الدراسي
 ///
 /// تعرض جدول المحاضرات بطريقتين:
@@ -42,6 +46,7 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   // متغيرات تعقب حالة تحميل البيانات
   bool _isCalendarDataLoaded = false;
   bool _isDailyDataLoaded = false;
+  bool _isRefreshing = false;
 
   // متغيرات للاستماع لتغييرات قاعدة البيانات
   StreamSubscription? _calendarStreamSubscription;
@@ -142,18 +147,32 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   }
 
   /// تحديث بيانات الجدول
-  void _refreshScheduleData() {
-    if (_viewController.showCalendarView) {
-      _loadCalendarData();
-    } else {
-      _loadDailyData();
+  Future<void> _refreshScheduleData() async {
+    if (_isRefreshing) return;
+
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    try {
+      if (_viewController.showCalendarView) {
+        await _loadCalendarData();
+      } else {
+        await _loadDailyData();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFF),
+      backgroundColor: ScheduleCalendarConstants.kBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -184,36 +203,41 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           }
         });
       },
+      // لا نمرر دالة التحديث هنا
     );
   }
 
   /// بناء شريط تبويبات الأيام
   Widget _buildDaysTabs() {
-    return ListenableBuilder(
-      listenable: _viewController,
-      builder: (context, _) {
-        // نعرض شريط الأيام فقط في عرض القائمة اليومية
-        if (!_viewController.showCalendarView) {
-          return Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                // شريط الأيام
-                DaysTabsComponent.buildDaysTabs(
-                    context, _daysTabsController, _tabController),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: ListenableBuilder(
+        listenable: _viewController,
+        builder: (context, _) {
+          // نعرض شريط الأيام فقط في عرض القائمة اليومية
+          if (!_viewController.showCalendarView) {
+            return Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                  // شريط الأيام
+                  DaysTabsComponent.buildDaysTabs(
+                      context, _daysTabsController, _tabController),
 
-                // ملخص اليوم
-                if (_isDailyDataLoaded)
-                  DaysTabsComponent.buildDaySummary(
-                      context, _daysTabsController),
-              ],
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+                  // ملخص اليوم
+                  if (_isDailyDataLoaded)
+                    DaysTabsComponent.buildDaySummary(
+                        context, _daysTabsController),
+                ],
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
     );
   }
 
@@ -223,9 +247,14 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
       child: ListenableBuilder(
         listenable: _viewController,
         builder: (context, _) {
-          return _viewController.showCalendarView
-              ? _buildCalendarView(context)
-              : _buildDailyView(context);
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 400),
+            switchInCurve: Curves.easeIn,
+            switchOutCurve: Curves.easeOut,
+            child: _viewController.showCalendarView
+                ? _buildCalendarView(context)
+                : _buildDailyView(context),
+          );
         },
       ),
     );
@@ -247,11 +276,11 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            'لا توجد مواعيد محاضرات محددة',
+            ScheduleCalendarConstants.noTimesMessage,
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey.shade600,
-              fontFamily: 'SYMBIOAR+LT',
+              fontFamily: ScheduleCalendarConstants.fontFamily,
             ),
             textAlign: TextAlign.center,
           ),
@@ -264,28 +293,33 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
     final paddingHorizontal = 10.0;
     final paddingVertical = 10.0;
 
-    return ListView(
-      padding: EdgeInsets.symmetric(
-          vertical: paddingVertical, horizontal: paddingHorizontal),
-      children: [
-        // عنوان الجدول
-        Padding(
-          padding: const EdgeInsets.only(bottom: 15),
-          child: Text(
-            'جدول المحاضرات الأسبوعي',
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF4338CA),
-              fontFamily: 'SYMBIOAR+LT',
+    return RefreshIndicator(
+      onRefresh: _refreshScheduleData,
+      color: ScheduleCalendarConstants.kDarkPurple,
+      backgroundColor: Colors.white,
+      child: ListView(
+        padding: EdgeInsets.symmetric(
+            vertical: paddingVertical, horizontal: paddingHorizontal),
+        children: [
+          // عنوان الجدول
+          Padding(
+            padding: const EdgeInsets.only(bottom: 15),
+            child: Text(
+              ScheduleCalendarConstants.weeklyScheduleTitle,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: ScheduleCalendarConstants.kDarkPurple,
+                fontFamily: ScheduleCalendarConstants.fontFamily,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
-        ),
 
-        // الجدول نفسه
-        _buildResponsiveCalendarTable(context),
-      ],
+          // الجدول نفسه
+          _buildResponsiveCalendarTable(context),
+        ],
+      ),
     );
   }
 
@@ -304,14 +338,9 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           width: minRequiredWidth,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade200,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(
+                ScheduleCalendarConstants.cardBorderRadius),
+            boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
           ),
           child: Column(
             children: [
@@ -330,14 +359,9 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius:
+              BorderRadius.circular(ScheduleCalendarConstants.cardBorderRadius),
+          boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
         ),
         child: Column(
           children: [
@@ -355,17 +379,15 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
 
   /// بناء صفوف الجدول الزمني
   List<Widget> _buildTimeRows(BuildContext context) {
-    // قياس ارتفاع الخلية حسب حجم الشاشة
-    final cellHeight = 80.0;
-
     return _calendarController.timeSlots.map((timeSlot) {
       final isCurrentTime = _calendarController.isCurrentTime(timeSlot);
 
       return Container(
-        height: cellHeight,
+        height: ScheduleCalendarConstants.rowHeight,
         decoration: BoxDecoration(
-          color:
-              isCurrentTime ? const Color(0xFFF5F3FF).withOpacity(0.3) : null,
+          color: isCurrentTime
+              ? ScheduleCalendarConstants.kLightPurple.withOpacity(0.3)
+              : null,
           border: const Border(
             top: BorderSide(color: Color(0xFFEFEFEF)),
           ),
@@ -417,87 +439,7 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
         maxHeight: maxHeight,
       ),
       builder: (context) => SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // هيدر
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF4338CA),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      course.courseName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'SYMBIOAR+LT',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.access_time,
-                            size: 14, color: Colors.white70),
-                        const SizedBox(width: 5),
-                        Text(
-                          course.lectureTime ?? 'وقت غير محدد',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white70,
-                            fontFamily: 'SYMBIOAR+LT',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // تفاصيل
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    ScheduleCalendarComponents.buildDetailItem(
-                      icon: Icons.location_on_outlined,
-                      title: 'القاعة',
-                      value: course.classroom ?? 'غير محدد',
-                    ),
-                    ScheduleCalendarComponents.buildDetailItem(
-                      icon: Icons.calendar_today_outlined,
-                      title: 'أيام المحاضرة',
-                      value: course.days.join(' - '),
-                    ),
-                    if (course.creditHours != null)
-                      ScheduleCalendarComponents.buildDetailItem(
-                        icon: Icons.book_outlined,
-                        title: 'الساعات المعتمدة',
-                        value: '${course.creditHours} ساعات',
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-            ],
-          ),
-        ),
+        child: DailyScheduleComponents.buildCourseDetailsSheet(context, course),
       ),
     );
   }
@@ -509,38 +451,43 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
     }
 
     // عرض القائمة اليومية باستخدام مكونات DailyScheduleComponents
-    return TabBarView(
-      controller: _tabController,
-      physics: const BouncingScrollPhysics(), // للتمرير السلس
-      children: _dailyController.allDays.map((day) {
-        final courses = _dailyController.getCoursesForDaySorted(day);
+    return RefreshIndicator(
+      onRefresh: _refreshScheduleData,
+      color: DailyScheduleConstants.kDarkPurple,
+      backgroundColor: Colors.white,
+      child: TabBarView(
+        controller: _tabController,
+        physics: const BouncingScrollPhysics(), // للتمرير السلس
+        children: _dailyController.allDays.map((day) {
+          final courses = _dailyController.getCoursesForDaySorted(day);
 
-        if (courses.isEmpty) {
-          return DailyScheduleComponents.buildEmptyDayView(day);
-        }
+          if (courses.isEmpty) {
+            return DailyScheduleComponents.buildEmptyDayView(day);
+          }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child: ListView.builder(
-            itemCount: courses.length,
-            padding: const EdgeInsets.only(bottom: 15),
-            itemBuilder: (context, index) {
-              final course = courses[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 15),
-                child: DailyScheduleComponents.buildCourseCard(
-                  course,
-                  _dailyController.courseColors[course.id] ??
-                      const Color(0xFFF5F3FF),
-                  _dailyController.courseBorderColors[course.id] ??
-                      const Color(0xFF6366F1),
-                  () => _showDailyCourseDetails(course, context),
-                ),
-              );
-            },
-          ),
-        );
-      }).toList(),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            child: ListView.builder(
+              itemCount: courses.length,
+              padding: const EdgeInsets.only(bottom: 15),
+              itemBuilder: (context, index) {
+                final course = courses[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: DailyScheduleComponents.buildCourseCard(
+                    course,
+                    _dailyController.courseColors[course.id] ??
+                        DailyScheduleConstants.kLightPurple,
+                    _dailyController.courseBorderColors[course.id] ??
+                        DailyScheduleConstants.kMediumPurple,
+                    () => _showDailyCourseDetails(course, context),
+                  ),
+                );
+              },
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 

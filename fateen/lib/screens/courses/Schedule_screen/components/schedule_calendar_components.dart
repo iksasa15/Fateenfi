@@ -36,8 +36,9 @@ class ScheduleCalendarComponents {
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
+              borderRadius: BorderRadius.circular(
+                  ScheduleCalendarConstants.cardBorderRadius),
+              boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
             ),
             child: Column(
               children: [
@@ -48,9 +49,9 @@ class ScheduleCalendarComponents {
                     color: Colors.white,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(
-                          16), // تعديل لتوحيد أنصاف أقطار الحواف
+                          ScheduleCalendarConstants.cardBorderRadius),
                       topRight: Radius.circular(
-                          16), // تعديل لتوحيد أنصاف أقطار الحواف
+                          ScheduleCalendarConstants.cardBorderRadius),
                     ),
                   ),
                 ),
@@ -59,7 +60,7 @@ class ScheduleCalendarComponents {
                 ...List.generate(
                   6, // 6 صفوف وهمية
                   (index) => Container(
-                    height: 80,
+                    height: ScheduleCalendarConstants.rowHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border(
@@ -79,34 +80,42 @@ class ScheduleCalendarComponents {
   /// بناء عرض المقررات الفارغة (لا توجد محاضرات مضافة)
   static Widget buildEmptyCoursesView() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.event_busy,
-            size: 70,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            ScheduleCalendarConstants.noCoursesMessage,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade500,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'SYMBIOAR+LT',
+      child: AnimatedOpacity(
+        opacity: 1.0,
+        duration: ScheduleCalendarConstants.animationDuration,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_busy,
+              size: 70,
+              color: Colors.grey.shade300,
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            ScheduleCalendarConstants.addCoursesHint,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-              fontFamily: 'SYMBIOAR+LT',
+            const SizedBox(height: 20),
+            Text(
+              ScheduleCalendarConstants.noCoursesMessage,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.bold,
+                fontFamily: ScheduleCalendarConstants.fontFamily,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                ScheduleCalendarConstants.addCoursesHint,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade500,
+                  fontFamily: ScheduleCalendarConstants.fontFamily,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -114,17 +123,27 @@ class ScheduleCalendarComponents {
   /// بناء فقاعة المحاضرة في الجدول
   static Widget buildCourseBubble(
       Course course, Color bgColor, Color borderColor, VoidCallback onTap) {
-    return Container(
+    return AnimatedContainer(
+      duration: ScheduleCalendarConstants.animationDuration,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius:
+            BorderRadius.circular(ScheduleCalendarConstants.itemBorderRadius),
         border: Border.all(color: borderColor, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: borderColor.withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius:
+              BorderRadius.circular(ScheduleCalendarConstants.itemBorderRadius),
           child: Padding(
             padding: const EdgeInsets.all(4),
             child: Column(
@@ -133,13 +152,12 @@ class ScheduleCalendarComponents {
                 // اسم المادة بالكامل
                 Text(
                   course.courseName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(
-                        0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+                    color: ScheduleCalendarConstants.kDarkPurple,
                     height: 1.2,
-                    fontFamily: 'SYMBIOAR+LT',
+                    fontFamily: ScheduleCalendarConstants.fontFamily,
                   ),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
@@ -153,7 +171,7 @@ class ScheduleCalendarComponents {
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.grey.shade700,
-                        fontFamily: 'SYMBIOAR+LT',
+                        fontFamily: ScheduleCalendarConstants.fontFamily,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -180,14 +198,12 @@ class ScheduleCalendarComponents {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(
-                  0xFFF5F3FF), // استخدام لون kLightPurple من صفحات التسجيل
+              color: ScheduleCalendarConstants.kLightPurple,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
-              color: const Color(
-                  0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+              color: ScheduleCalendarConstants.kDarkPurple,
               size: 20,
             ),
           ),
@@ -200,16 +216,16 @@ class ScheduleCalendarComponents {
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade600,
-                  fontFamily: 'SYMBIOAR+LT',
+                  fontFamily: ScheduleCalendarConstants.fontFamily,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'SYMBIOAR+LT',
+                  fontFamily: ScheduleCalendarConstants.fontFamily,
                 ),
               ),
             ],
@@ -223,17 +239,17 @@ class ScheduleCalendarComponents {
   static Widget buildHeaderRow(List<String> days, List<String> englishDays) {
     return Container(
       decoration: BoxDecoration(
-        color:
-            const Color(0xFF4338CA), // استخدام لون kDarkPurple من صفحات التسجيل
+        color: ScheduleCalendarConstants.kDarkPurple,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
-          topRight: Radius.circular(16), // تعديل لتوحيد أنصاف أقطار الحواف
+          topLeft: Radius.circular(ScheduleCalendarConstants.cardBorderRadius),
+          topRight: Radius.circular(ScheduleCalendarConstants.cardBorderRadius),
         ),
       ),
       child: Row(
         children: [
           // عنوان الوقت/اليوم
-          buildHeaderCell('الوقت/\nاليوم', true, true),
+          buildHeaderCell(
+              ScheduleCalendarConstants.timeHeaderLabel, true, true),
 
           // عناوين الأيام
           ...days.map((day) => Expanded(
@@ -252,12 +268,12 @@ class ScheduleCalendarComponents {
   static Widget buildHeaderCell(
       String text, bool isFirstColumn, bool isCurrentDay) {
     return Container(
-      width: isFirstColumn ? 60 : null,
+      width: isFirstColumn ? ScheduleCalendarConstants.timeColumnWidth : null,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       decoration: BoxDecoration(
         color: isCurrentDay && !isFirstColumn
-            ? const Color(0xFF3620c0)
-            : null, // تعديل لتناسب ألوان صفحات التسجيل
+            ? ScheduleCalendarConstants.kMediumPurple
+            : null,
         border: Border(
           right: isFirstColumn
               ? const BorderSide(color: Colors.white38)
@@ -266,11 +282,11 @@ class ScheduleCalendarComponents {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
           color: Colors.white,
-          fontFamily: 'SYMBIOAR+LT',
+          fontFamily: ScheduleCalendarConstants.fontFamily,
         ),
         textAlign: TextAlign.center,
       ),
@@ -280,8 +296,8 @@ class ScheduleCalendarComponents {
   /// بناء خلية الوقت
   static Widget buildTimeCell(String timeSlot, bool isCurrentTime) {
     return Container(
-      width: 60,
-      height: 80,
+      width: ScheduleCalendarConstants.timeColumnWidth,
+      height: ScheduleCalendarConstants.rowHeight,
       decoration: const BoxDecoration(
         border: Border(
           right: BorderSide(color: Color(0xFFEFEFEF)),
@@ -294,10 +310,9 @@ class ScheduleCalendarComponents {
             fontSize: 13,
             fontWeight: isCurrentTime ? FontWeight.bold : FontWeight.normal,
             color: isCurrentTime
-                ? const Color(
-                    0xFF4338CA) // استخدام لون kDarkPurple من صفحات التسجيل
+                ? ScheduleCalendarConstants.kDarkPurple
                 : Colors.grey.shade600,
-            fontFamily: 'SYMBIOAR+LT',
+            fontFamily: ScheduleCalendarConstants.fontFamily,
           ),
           textAlign: TextAlign.center,
         ),
@@ -309,14 +324,13 @@ class ScheduleCalendarComponents {
   static Widget buildDayCell(Course? course, bool highlight, Color? bgColor,
       Color? borderColor, VoidCallback? onTap) {
     return Container(
-      height: 80, // زيادة ارتفاع الخلية لإتاحة مساحة أكبر لعرض الاسم
+      height: ScheduleCalendarConstants.rowHeight,
       decoration: BoxDecoration(
         border: Border(
           right: const BorderSide(color: Color(0xFFEFEFEF)),
           left: highlight
               ? BorderSide(
-                  color: const Color(0xFF4338CA),
-                  width: 2) // استخدام لون kDarkPurple من صفحات التسجيل
+                  color: ScheduleCalendarConstants.kDarkPurple, width: 2)
               : BorderSide.none,
         ),
       ),

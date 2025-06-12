@@ -9,6 +9,16 @@ class DaysTabsConstants {
   static const Color kBackgroundColor = Color(0xFFFDFDFF);
   static const Color kTextColor = Color(0xFF374151);
   static const Color kHintColor = Color(0xFF9CA3AF);
+  static const Color kBorderColor = Color(0xFFE5E7EB);
+  static const Color kShadowColor = Color(0x0F000000);
+
+  // ثوابت الزوايا
+  static const double tabBorderRadius = 12.0;
+  static const double cardBorderRadius = 16.0;
+  static const double counterBorderRadius = 30.0;
+
+  // ثابت خط التطبيق
+  static const String fontFamily = 'SYMBIOAR+LT';
 
   // نصوص الواجهة
   static const String dayLecturesPrefix = 'محاضرات';
@@ -38,6 +48,10 @@ class DaysTabsConstants {
   static const double mediumPadding = 15.0;
   static const double largePadding = 30.0;
 
+  // ثوابت الأنميشن
+  static const Duration animationDuration = Duration(milliseconds: 300);
+  static const Duration tabAnimationDuration = Duration(milliseconds: 200);
+
   // دالة للحصول على حجم متجاوب مع حجم الشاشة
   static double getResponsiveSize(
       BuildContext context, double small, double medium, double large) {
@@ -50,5 +64,17 @@ class DaysTabsConstants {
     } else {
       return large;
     }
+  }
+
+  // دالة للحصول على ظل موحد
+  static List<BoxShadow> getUnifiedShadow() {
+    return [
+      BoxShadow(
+        color: kShadowColor,
+        blurRadius: 10,
+        offset: const Offset(0, 2),
+        spreadRadius: 0,
+      ),
+    ];
   }
 }
