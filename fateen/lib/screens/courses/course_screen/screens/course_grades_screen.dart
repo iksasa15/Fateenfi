@@ -1,4 +1,7 @@
+// course_grades_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../models/course.dart';
 import '../components/grades/course_grades_add_button.dart';
 import '../components/grades/course_grades_dialog.dart';
@@ -6,7 +9,9 @@ import '../components/grades/course_grades_empty_view.dart';
 import '../components/grades/course_grades_list.dart';
 import '../components/grades/course_grades_toolbar.dart';
 import '../components/grades/course_grades_delete_dialog.dart';
+import '../components/grades/course_grades_summary.dart';
 import '../constants/grades/course_grades_constants.dart';
+import '../constants/grades/course_grades_colors.dart';
 import '../controllers/course_grades_controller.dart';
 import '../services/course_grades_helpers.dart';
 
@@ -24,13 +29,17 @@ class CourseGradesScreen extends StatefulWidget {
   _CourseGradesScreenState createState() => _CourseGradesScreenState();
 }
 
-class _CourseGradesScreenState extends State<CourseGradesScreen> {
+class _CourseGradesScreenState extends State<CourseGradesScreen>
+    with SingleTickerProviderStateMixin {
   late CourseGradesController _controller;
   bool _isLoading = false;
   String? _currentEditingAssignment;
   double? _currentGradeValue;
   double? _currentMaxGrade;
   bool _isDeleteLoading = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  bool _showSummary = true;
 
   // الحصول على اسم المادة مع التحقق من القيمة null
   String get _courseName => widget.course.courseName ?? 'المقرر';
@@ -41,57 +50,24 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
     _controller = CourseGradesController();
     _resetForm();
 
-    // اختبار تشخيصي
-    _runDiagnosticChecks();
-  }
+    // إعداد التحريكات
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
 
-  // دالة تشخيص لاختبار تخزين واسترجاع الدرجات
-  void _runDiagnosticChecks() {
-    print("DEBUG SCREEN: Running diagnostic checks");
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
 
-    // طباعة الدرجات الحالية
-    print("DEBUG SCREEN: Current grades in course: ${widget.course.grades}");
-    print(
-        "DEBUG SCREEN: Current maxGrades in course: ${widget.course.maxGrades}");
+    // بدء التحريك
+    _animationController.forward();
 
-    // فحص وجود مشكلات تحويل
-    widget.course.grades.forEach((key, value) {
-      double maxGrade = widget.course.maxGrades[key] ?? 100.0;
-
-      // التحقق من وجود مشكلة تحويل محتملة (20 -> 4)
-      if (maxGrade == 20.0 && value < 10.0 && value > 0) {
-        print(
-            "DEBUG SCREEN: Possible grade scaling issue detected: $key has value $value/20.0. Expected ~${value * 5}/20.0");
-      }
-    });
-
-    // اختبار تخزين درجة محلياً
-    // ملاحظة: هذا اختبار فقط ولا يحفظ في قاعدة البيانات
-    String testAssignment = "_اختبار_تشخيصي";
-
-    print("DEBUG SCREEN: Testing grade storage with grade 20/20");
-    widget.course.createGrade(testAssignment, 20.0, 20.0);
-
-    // التحقق من الدرجة المخزنة
-    if (widget.course.grades.containsKey(testAssignment)) {
-      double storedGrade = widget.course.grades[testAssignment]!;
-      double storedMaxGrade = widget.course.maxGrades[testAssignment]!;
-
-      print("DEBUG SCREEN: Stored grade: $storedGrade/$storedMaxGrade");
-
-      if (storedGrade == 20.0 && storedMaxGrade == 20.0) {
-        print("DEBUG SCREEN: Storage test PASSED ✓");
-      } else {
-        print(
-            "DEBUG SCREEN: Storage test FAILED ✗ - Expected 20/20 but got $storedGrade/$storedMaxGrade");
-      }
-    } else {
-      print("DEBUG SCREEN: Storage test FAILED ✗ - Grade not stored");
-    }
-
-    // تنظيف بعد الاختبار
-    widget.course.deleteGrade(testAssignment);
-    print("DEBUG SCREEN: Diagnostic test complete");
+    // إعداد تأثير اهتزاز خفيف عند العرض
+    HapticFeedback.lightImpact();
   }
 
   void _resetForm() {
@@ -105,9 +81,6 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
 
   Future<void> _saveGrade(String? oldAssignment, String newAssignment,
       double grade, double maxGrade) async {
-    print(
-        "DEBUG SCREEN: _saveGrade called with $grade/$maxGrade for $newAssignment");
-
     setState(() {
       _isLoading = true;
     });
@@ -118,18 +91,13 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
         _controller.saveCustomMaxGrade(widget.course, newAssignment, maxGrade);
       }
 
-      // CRITICAL FIX: استدعاء الخدمة لحفظ الدرجة الفعلية
       final success = await _controller.saveGrade(
-          widget.course,
-          oldAssignment,
-          newAssignment,
-          grade, // الدرجة الفعلية
-          maxGrade); // الدرجة القصوى
-
-      print(
-          "DEBUG SCREEN: After save, grade=${widget.course.grades[newAssignment]}/${widget.course.maxGrades[newAssignment]}");
+          widget.course, oldAssignment, newAssignment, grade, maxGrade);
 
       if (success && mounted) {
+        // تأثير اهتزاز عند النجاح
+        HapticFeedback.mediumImpact();
+
         CourseGradesHelpers.showSnackBar(
           context,
           oldAssignment == null
@@ -163,20 +131,19 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
   }
 
   void _editGrade(String assignment, double actualGrade, double maxGrade) {
-    print(
-        "DEBUG SCREEN: _editGrade called with $actualGrade/$maxGrade for $assignment");
-
-    // CRITICAL FIX: استخدام القيم الفعلية مباشرة
     setState(() {
       _currentEditingAssignment = assignment;
-      _currentGradeValue = actualGrade; // استخدام الدرجة الفعلية مباشرة
-      _currentMaxGrade = maxGrade; // استخدام الدرجة القصوى مباشرة
+      _currentGradeValue = actualGrade;
+      _currentMaxGrade = maxGrade;
     });
 
     _showAddEditGradeDialog(isEdit: true);
   }
 
   void _deleteGrade(String assignment) {
+    // تأثير اهتزاز خفيف عند محاولة الحذف
+    HapticFeedback.lightImpact();
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -197,6 +164,9 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
                 Navigator.of(context).pop();
 
                 if (success) {
+                  // تأثير اهتزاز عند نجاح الحذف
+                  HapticFeedback.mediumImpact();
+
                   // تحديث واجهة المستخدم فوراً بعد حذف الدرجة
                   setState(() {});
 
@@ -251,11 +221,9 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
           controller: _controller,
           course: widget.course,
           currentEditingAssignment: _currentEditingAssignment,
-          currentGradeValue: _currentGradeValue, // الدرجة الفعلية
+          currentGradeValue: _currentGradeValue,
           currentMaxGrade: _currentMaxGrade,
           onSave: (oldAssignment, newAssignment, grade, maxGrade) {
-            print(
-                "DEBUG SCREEN: CourseGradesDialog.onSave called with $grade/$maxGrade");
             Navigator.of(context).pop();
             _saveGrade(oldAssignment, newAssignment, grade, maxGrade);
           },
@@ -269,96 +237,167 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
     );
   }
 
+  void _toggleSummary() {
+    setState(() {
+      _showSummary = !_showSummary;
+    });
+
+    // تأثير اهتزاز خفيف عند تبديل حالة الملخص
+    HapticFeedback.selectionClick();
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(
-        "DEBUG SCREEN: Building CourseGradesScreen with ${widget.course.grades.length} grades");
-
-    // استخدام ListenableBuilder للاستماع للتغييرات في المتحكم
     return AnimatedBuilder(
-        animation: _controller,
+        animation: _animationController,
         builder: (context, _) {
           return Dialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
             insetPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.75,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 15,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Column(
-                  children: [
-                    // علامة السحب
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Center(
-                        child: Container(
-                          width: 40,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                      ),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.75,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 16,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 6),
                     ),
-
-                    // المحتوى الرئيسي
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // شريط العنوان
-                            CourseGradesToolbar(
-                              title: CourseGradesConstants.gradesTabTitle,
-                              subtitle: "قم بإدارة درجات ${_courseName}",
-                              onBackPressed: () => Navigator.pop(context),
-                            ),
-
-                            // محتوى الدرجات أو رسالة فارغة
-                            Expanded(
-                              child: widget.course.grades.isEmpty
-                                  ? const CourseGradesEmptyView()
-                                  : CourseGradesList(
-                                      course: widget.course,
-                                      controller: _controller,
-                                      onEditGrade: _editGrade,
-                                      onDeleteGrade: _deleteGrade,
-                                    ),
-                            ),
-
-                            // زر إضافة درجة جديدة
-                            const SizedBox(height: 16),
-                            CourseGradesAddButton(
-                              text: CourseGradesConstants.addGradeButton,
-                              onPressed: () {
-                                _resetForm();
-                                _showAddEditGradeDialog();
-                              },
-                              isLoading: _isLoading,
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Column(
+                    children: [
+                      // علامة السحب المحسنة
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.only(top: 12, bottom: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
+                        child: Center(
+                          child: Container(
+                            width: 40,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+
+                      // المحتوى الرئيسي
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // شريط العنوان المحسن
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: CourseGradesToolbar(
+                                      title:
+                                          CourseGradesConstants.gradesTabTitle,
+                                      subtitle:
+                                          "قم بإدارة درجات ${_courseName}",
+                                      onBackPressed: () =>
+                                          Navigator.pop(context),
+                                    ),
+                                  ),
+
+                                  // زر إظهار/إخفاء الملخص
+                                  GestureDetector(
+                                    onTap: _toggleSummary,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: CourseGradesColors.lightPurple,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: CourseGradesColors
+                                              .borderLightPurple,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        _showSummary
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                        color: CourseGradesColors.darkPurple,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // قسم ملخص الدرجات - يظهر فقط إذا كانت هناك درجات وإذا كان الملخص مفعلاً
+                              if (widget.course.grades.isNotEmpty &&
+                                  _showSummary)
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  height: 120,
+                                  margin: const EdgeInsets.only(top: 12),
+                                  child: CourseGradesSummary(
+                                    course: widget.course,
+                                    controller: _controller,
+                                  ),
+                                ),
+
+                              // محتوى الدرجات أو رسالة فارغة
+                              Expanded(
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: widget.course.grades.isEmpty
+                                      ? const CourseGradesEmptyView()
+                                      : CourseGradesList(
+                                          course: widget.course,
+                                          controller: _controller,
+                                          onEditGrade: _editGrade,
+                                          onDeleteGrade: _deleteGrade,
+                                        ),
+                                ),
+                              ),
+
+                              // زر إضافة درجة جديدة
+                              const SizedBox(height: 16),
+                              CourseGradesAddButton(
+                                text: CourseGradesConstants.addGradeButton,
+                                onPressed: () {
+                                  _resetForm();
+                                  _showAddEditGradeDialog();
+
+                                  // تأثير اهتزاز خفيف عند الضغط على زر الإضافة
+                                  HapticFeedback.selectionClick();
+                                },
+                                isLoading: _isLoading,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -368,6 +407,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen> {
 
   @override
   void dispose() {
+    _animationController.dispose();
     _controller.dispose();
     super.dispose();
   }

@@ -7,6 +7,12 @@ class CourseOptionsConstants {
   final String gradesTitle = 'الدرجات';
   final String notificationsTitle = 'الإشعارات';
 
+  // وصف الخيارات
+  final String editCourseDescription = 'تعديل معلومات المقرر وجدوله';
+  final String filesDescription = 'عرض وإدارة ملفات المقرر';
+  final String gradesDescription = 'إضافة وتعديل درجات المقرر';
+  final String notificationsDescription = 'ضبط إشعارات وتذكيرات المقرر';
+
   // أزرار
   final String deleteButtonText = 'حذف المقرر';
   final String closeButtonText = 'إغلاق';
@@ -23,4 +29,4 @@ class CourseOptionsConstants {
   final String deleteError = 'حدث خطأ أثناء حذف المقرر';
   final String notificationSuccess = 'تم جدولة الإشعار بنجاح';
   final String notificationError = 'حدث خطأ أثناء جدولة الإشعار';
-}
+} // course_options_constants.dart

@@ -15,11 +15,16 @@ class CourseCardConstants {
   static const String classroomLabel = "القاعة:";
   static const String daysLabel = "الأيام:";
   static const String timeLabel = "الوقت:";
+  static const String roomLabel = "القاعة:";
+  static const String undefinedLabel = "غير محدد";
+  static const String undefinedRoomLabel = "غير محددة";
 
   // رسائل الحالة
   static const String deleteConfirmation = "هل تريد حذف هذا المقرر؟";
   static const String deleteSuccess = "تم حذف المقرر بنجاح";
   static const String deleteError = "حدث خطأ أثناء حذف المقرر";
+  static const String noCoursesMessage = "لا توجد مقررات";
+  static const String addCoursesHint = "قم بإضافة مقررات جديدة ليتم عرضها هنا";
 
   // عناصر قائمة الخيارات
   static const String detailsOption = "تفاصيل المقرر";

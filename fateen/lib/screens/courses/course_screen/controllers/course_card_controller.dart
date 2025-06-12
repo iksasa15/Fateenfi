@@ -163,4 +163,6 @@ class CourseCardController extends ChangeNotifier {
       'border': borderColor,
     };
   }
+
+  Future<void> removeCourse(String id) async {}
 }

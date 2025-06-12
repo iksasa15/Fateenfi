@@ -1,4 +1,4 @@
-// course_screen.dart
+// course_screen.dart (التعديلات المطلوبة)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -108,6 +108,55 @@ class _CourseScreenState extends State<CourseScreen> {
     _classroomError = null;
     _daysError = null;
     _timeError = null;
+  }
+
+  // تحديث مقرر
+  Future<void> _editCourse(Course course) async {
+    // هنا يمكن فتح نافذة تعديل المقرر
+    print("تعديل المقرر: ${course.courseName}");
+    // سيتم تنفيذ منطق التعديل هنا
+  }
+
+  // حذف مقرر
+  Future<void> _deleteCourse(Course course) async {
+    try {
+      // تنفيذ عملية الحذف
+      await _courseCardController.removeCourse(course.id);
+
+      // عرض رسالة نجاح
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              CourseCardConstants.deleteSuccess,
+              style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // عرض رسالة خطأ
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              CourseCardConstants.deleteError,
+              style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   // عرض نموذج إضافة مقرر جديد
@@ -512,28 +561,21 @@ class _CourseScreenState extends State<CourseScreen> {
                     );
                   }
 
-                  // استدعاء عرض رسالة فارغة
-                  if (_courseCardController.courses.isEmpty) {
-                    return CourseCardComponent.buildEmptyCoursesView();
-                  }
-
-                  // استدعاء بناء قائمة المقررات
-                  return ListView.builder(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: _courseCardController.courses.length,
-                    itemBuilder: (ctx, index) {
-                      // استدعاء الحصول على المقرر من المصفوفة
-                      final course = _courseCardController.courses[index];
-
-                      // استدعاء بناء بطاقة المقرر
-                      return CourseCardComponent.buildCourseCard(
-                        course,
-                        index,
-                        () => _showCourseOptions(index),
-                        index,
-                      );
+                  // استخدام مكون القائمة المعدل
+                  return CourseCardComponent.buildCoursesList(
+                    context,
+                    _courseCardController.courses,
+                    onCourseTap: (course) {
+                      // البحث عن مؤشر المقرر في القائمة
+                      final index =
+                          _courseCardController.courses.indexOf(course);
+                      if (index != -1) {
+                        _showCourseOptions(index);
+                      }
                     },
+                    onCourseEdit: _editCourse,
+                    onCourseDelete: _deleteCourse,
+                    onAddCourse: _showAddCourseSheet,
                   );
                 },
               ),
