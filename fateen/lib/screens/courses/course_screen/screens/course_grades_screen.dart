@@ -39,7 +39,6 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
   bool _isDeleteLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  bool _showSummary = true;
 
   // الحصول على اسم المادة مع التحقق من القيمة null
   String get _courseName => widget.course.courseName ?? 'المقرر';
@@ -237,15 +236,6 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
     );
   }
 
-  void _toggleSummary() {
-    setState(() {
-      _showSummary = !_showSummary;
-    });
-
-    // تأثير اهتزاز خفيف عند تبديل حالة الملخص
-    HapticFeedback.selectionClick();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -311,49 +301,15 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // شريط العنوان المحسن
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CourseGradesToolbar(
-                                      title:
-                                          CourseGradesConstants.gradesTabTitle,
-                                      subtitle:
-                                          "قم بإدارة درجات ${_courseName}",
-                                      onBackPressed: () =>
-                                          Navigator.pop(context),
-                                    ),
-                                  ),
-
-                                  // زر إظهار/إخفاء الملخص
-                                  GestureDetector(
-                                    onTap: _toggleSummary,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: CourseGradesColors.lightPurple,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: CourseGradesColors
-                                              .borderLightPurple,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        _showSummary
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
-                                        color: CourseGradesColors.darkPurple,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              // شريط العنوان المحسن (تم إزالة زر إظهار/إخفاء الملخص)
+                              CourseGradesToolbar(
+                                title: CourseGradesConstants.gradesTabTitle,
+                                subtitle: "قم بإدارة درجات ${_courseName}",
+                                onBackPressed: () => Navigator.pop(context),
                               ),
 
-                              // قسم ملخص الدرجات - يظهر فقط إذا كانت هناك درجات وإذا كان الملخص مفعلاً
-                              if (widget.course.grades.isNotEmpty &&
-                                  _showSummary)
+                              // قسم ملخص الدرجات - يظهر دائماً إذا كانت هناك درجات
+                              if (widget.course.grades.isNotEmpty)
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   height: 120,

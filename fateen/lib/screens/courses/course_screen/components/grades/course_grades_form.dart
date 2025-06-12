@@ -1,4 +1,7 @@
+// course_grades_form.dart - تصميم مع قائمة تمرير أفقية
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../constants/grades/course_grades_constants.dart';
 import '../../constants/grades/course_grades_colors.dart';
 import '../../controllers/course_grades_controller.dart';
@@ -54,16 +57,13 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
     if (widget.currentEditingAssignment != null) {
       _selectedAssignmentType = widget.currentEditingAssignment;
 
-      // التحقق إذا كانت الدرجة الحالية غير موجودة في القائمة المحددة مسبقاً
       if (!widget.controller.predefinedAssignments
           .contains(_selectedAssignmentType)) {
-        // إذا كان التقييم غير موجود في القائمة، اعتبره تقييم مخصص
         _isCustomAssignment = true;
         _selectedAssignmentType = 'أخرى';
         _customAssignmentController.text = widget.currentEditingAssignment!;
       }
 
-      // CRITICAL FIX: استخدام الدرجة الفعلية مباشرة بدون تحويل
       if (widget.currentGradeValue != null) {
         _gradeController.text = widget.currentGradeValue!.toString();
       }
@@ -87,7 +87,6 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
 
     // التحقق من اسم التقييم
     if (_isCustomAssignment) {
-      // إذا كان تقييم مخصص، التحقق من اسم التقييم المخصص
       if (_customAssignmentController.text.trim().isEmpty) {
         setState(() {
           _assignmentError = CourseGradesConstants.assignmentEmptyError;
@@ -104,7 +103,6 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         });
       }
     } else {
-      // التحقق من نوع التقييم المحدد مسبقًا
       if (_selectedAssignmentType == null ||
           _selectedAssignmentType!.trim().isEmpty) {
         setState(() {
@@ -112,7 +110,6 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         });
         isValid = false;
       } else {
-        // التحقق من وجود تكرار في اسم التقييم عند الإضافة (ليس عند التعديل)
         if (widget.currentEditingAssignment != _selectedAssignmentType &&
             _isAssignmentNameDuplicate(_selectedAssignmentType!)) {
           setState(() {
@@ -193,14 +190,17 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
   }
 
   void _submitForm() {
-    if (!_validateForm()) return;
+    // إخفاء لوحة المفاتيح
+    FocusScope.of(context).unfocus();
+
+    if (!_validateForm()) {
+      return;
+    }
 
     try {
-      // CRITICAL FIX: استخدام الدرجة الفعلية والقصوى بشكل مباشر
       final double actualGrade = double.parse(_gradeController.text);
       final double maxGrade = double.parse(_maxGradeController.text);
 
-      // تحديد اسم التقييم النهائي
       String finalAssignmentName;
       if (_isCustomAssignment) {
         finalAssignmentName = _customAssignmentController.text.trim();
@@ -214,10 +214,6 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         return;
       }
 
-      print(
-          "DEBUG FORM: Submitting grade $actualGrade/$maxGrade for $finalAssignmentName");
-
-      // تمرير الدرجة الفعلية والقصوى مباشرة
       widget.onSave(
         widget.currentEditingAssignment,
         finalAssignmentName,
@@ -225,214 +221,306 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         maxGrade,
       );
     } catch (e) {
-      // تم التعامل مع أخطاء التنسيق في _validateForm
       debugPrint('خطأ في إرسال النموذج: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // قسم نوع الدرجة
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // عنوان القسم
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // العنوان
+          _buildHeader(),
+
+          const SizedBox(height: 20),
+
+          // قائمة تمرير أفقية لأنواع التقييم
+          _buildAssignmentTypeScroller(),
+
+          // رسالة خطأ لنوع التقييم
+          if (_assignmentError != null && !_isCustomAssignment)
             Padding(
-              padding: const EdgeInsets.only(bottom: 4, right: 4),
+              padding: const EdgeInsets.only(top: 8, right: 4),
               child: Text(
-                CourseGradesConstants.assignmentTypeLabel,
+                _assignmentError!,
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: CourseGradesColors.textColor,
+                  color: CourseGradesColors.accentColor,
+                  fontSize: 12,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
             ),
 
-            // قائمة أنواع الدرجات
-            _buildAssignmentTypeChips(),
-
-            // حقل إدخال نوع التقييم المخصص (يظهر فقط عند اختيار "أخرى")
-            if (_isCustomAssignment)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: _buildCustomAssignmentField(),
-              ),
-
-            // عرض رسالة الخطأ
-            if (_assignmentError != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4, right: 4),
-                child: Text(
-                  _assignmentError!,
-                  style: const TextStyle(
-                    color: CourseGradesColors.accentColor,
-                    fontSize: 12,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                ),
-              ),
+          // حقل التقييم المخصص
+          if (_isCustomAssignment) ...[
+            const SizedBox(height: 16),
+            _buildCustomAssignmentField(),
           ],
+
+          const SizedBox(height: 20),
+
+          // قسم إدخال الدرجات
+          _buildGradeFields(),
+
+          const SizedBox(height: 24),
+
+          // أزرار الإجراءات
+          _buildActionButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: CourseGradesColors.lightPurple,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(
+            Icons.grade_outlined,
+            color: CourseGradesColors.darkPurple,
+            size: 22,
+          ),
         ),
-
-        const SizedBox(height: 12),
-
-        // صف الدرجات
-        _buildGradeFields(),
-
-        const SizedBox(height: 16),
-
-        // زر الحفظ
-        _buildSaveButton(),
+        const SizedBox(width: 14),
+        Text(
+          widget.currentEditingAssignment != null
+              ? 'تعديل درجة'
+              : 'إضافة درجة جديدة',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: CourseGradesColors.textColor,
+            fontFamily: 'SYMBIOAR+LT',
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildAssignmentTypeChips() {
-    return Container(
-      width: double.infinity,
-      height: 54,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _assignmentError != null && !_isCustomAssignment
-              ? CourseGradesColors.accentColor
-              : CourseGradesColors.darkPurple.withOpacity(0.2),
-          width: 1.0,
+  Widget _buildAssignmentTypeScroller() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'نوع التقييم',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: CourseGradesColors.textColor,
+            fontFamily: 'SYMBIOAR+LT',
+          ),
         ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: widget.controller.predefinedAssignments.map((type) {
-            final bool isSelected = _selectedAssignmentType == type;
-            return Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Material(
-                color: Colors.transparent,
+
+        const SizedBox(height: 12),
+
+        // قائمة تمرير أفقية
+        Container(
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _assignmentError != null && !_isCustomAssignment
+                  ? CourseGradesColors.accentColor
+                  : Colors.grey.shade200,
+            ),
+          ),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.controller.predefinedAssignments.length,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            itemBuilder: (context, index) {
+              final type = widget.controller.predefinedAssignments[index];
+              final bool isSelected = _selectedAssignmentType == type;
+
+              return Padding(
+                padding: const EdgeInsets.only(left: 8),
                 child: InkWell(
                   onTap: () {
                     setState(() {
                       _selectedAssignmentType = isSelected ? '' : type;
                       _assignmentError = null;
-
-                      // التحقق ما إذا كان النوع هو "أخرى"
                       _isCustomAssignment = (type == 'أخرى' && !isSelected);
 
-                      // تحديث الدرجة القصوى تلقائياً مع نوع التقييم
-                      if (!isSelected && type.isNotEmpty) {
+                      // تحديث الدرجة القصوى تلقائياً
+                      if (!isSelected && type.isNotEmpty && type != 'أخرى') {
                         _maxGradeController.text = widget.controller
                             .getDefaultMaxGrade(type)
                             .toString();
                       }
                     });
                   },
-                  borderRadius: BorderRadius.circular(8),
-                  child: _buildChoiceChip(
-                    label: type,
-                    isSelected: isSelected,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? CourseGradesColors.darkPurple
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isSelected
+                            ? CourseGradesColors.darkPurple
+                            : Colors.grey.shade300,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: CourseGradesColors.darkPurple
+                                    .withOpacity(0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _getAssignmentIcon(type),
+                          size: 18,
+                          color: isSelected
+                              ? Colors.white
+                              : CourseGradesColors.darkPurple,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          type,
+                          style: TextStyle(
+                            fontFamily: 'SYMBIOAR+LT',
+                            fontSize: 14,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? Colors.white
+                                : CourseGradesColors.textColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            },
+          ),
         ),
-      ),
+      ],
     );
+  }
+
+  IconData _getAssignmentIcon(String type) {
+    if (type.contains('اختبار') || type.contains('امتحان')) {
+      return Icons.quiz_outlined;
+    } else if (type.contains('مشروع')) {
+      return Icons.engineering_outlined;
+    } else if (type.contains('واجب') || type.contains('منزلي')) {
+      return Icons.home_work_outlined;
+    } else if (type.contains('حضور') || type.contains('مشاركة')) {
+      return Icons.people_outline;
+    } else if (type.contains('أخرى')) {
+      return Icons.create_outlined;
+    }
+    return Icons.assignment_outlined;
   }
 
   Widget _buildCustomAssignmentField() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _assignmentError != null
-              ? CourseGradesColors.accentColor
-              : CourseGradesColors.darkPurple.withOpacity(0.2),
-          width: 1.0,
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: TextField(
-        controller: _customAssignmentController,
-        style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
-        decoration: InputDecoration(
-          icon: const Icon(
-            Icons.edit_outlined,
-            color: CourseGradesColors.darkPurple,
-            size: 20,
-          ),
-          border: InputBorder.none,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade400,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'اسم التقييم المخصص',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: CourseGradesColors.textColor,
             fontFamily: 'SYMBIOAR+LT',
           ),
-          fillColor: Colors.white,
-          filled: true,
         ),
-        onChanged: (value) {
-          // حذف رسالة الخطأ عند الكتابة
-          if (_assignmentError != null) {
-            setState(() {
-              _assignmentError = null;
-            });
-          }
-        },
-      ),
-    );
-  }
 
-  Widget _buildChoiceChip({
-    required String label,
-    required bool isSelected,
-  }) {
-    return ChoiceChip(
-      label: Text(
-        label,
-        style: TextStyle(
-          fontFamily: 'SYMBIOAR+LT',
-          color: isSelected ? Colors.white : CourseGradesColors.textColor,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        const SizedBox(height: 8),
+
+        TextField(
+          controller: _customAssignmentController,
+          style: const TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontSize: 15,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            hintText: 'أدخل اسم التقييم',
+            hintStyle: TextStyle(
+              color: Colors.grey.shade400,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: _assignmentError != null
+                    ? CourseGradesColors.accentColor
+                    : Colors.grey.shade300,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: _assignmentError != null
+                    ? CourseGradesColors.accentColor
+                    : Colors.grey.shade300,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: CourseGradesColors.darkPurple,
+                width: 2,
+              ),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            prefixIcon: const Icon(
+              Icons.create_outlined,
+              color: CourseGradesColors.darkPurple,
+              size: 20,
+            ),
+          ),
+          onChanged: (value) {
+            if (_assignmentError != null) {
+              setState(() {
+                _assignmentError = null;
+              });
+            }
+          },
         ),
-      ),
-      selected: isSelected,
-      selectedColor: CourseGradesColors.darkPurple,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: isSelected
-              ? CourseGradesColors.darkPurple
-              : CourseGradesColors.borderColor,
-          width: isSelected ? 1.5 : 1.0,
-        ),
-      ),
-      onSelected: (selected) {
-        setState(() {
-          _selectedAssignmentType = selected ? label : '';
-          _assignmentError = null;
 
-          // التحقق ما إذا كان النوع هو "أخرى"
-          _isCustomAssignment = (label == 'أخرى' && selected);
-
-          // تحديث الدرجة القصوى تلقائياً
-          if (selected) {
-            _maxGradeController.text =
-                widget.controller.getDefaultMaxGrade(label).toString();
-          }
-        });
-      },
-      elevation: isSelected ? 1 : 0,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        // رسالة الخطأ
+        if (_assignmentError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6, right: 4),
+            child: Text(
+              _assignmentError!,
+              style: const TextStyle(
+                color: CourseGradesColors.accentColor,
+                fontSize: 12,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -440,187 +528,197 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // الحقل الأول - الدرجة المحصلة
+        // الدرجة المحصلة
         Expanded(
-          flex: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4, right: 4),
-                child: Text(
-                  CourseGradesConstants.gradeLabel,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: CourseGradesColors.textColor,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _gradeError != null
-                        ? CourseGradesColors.accentColor
-                        : CourseGradesColors.darkPurple.withOpacity(0.2),
-                    width: 1.0,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: TextField(
-                  controller: _gradeController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
-                  decoration: InputDecoration(
-                    icon: const Icon(
-                      Icons.auto_graph,
-                      color: CourseGradesColors.darkPurple,
-                      size: 20,
-                    ),
-                    border: InputBorder.none,
-                    hintText: CourseGradesConstants.gradeLabel,
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                    fillColor: Colors.white,
-                    filled: true,
-                  ),
-                ),
-              ),
-              if (_gradeError != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, right: 4),
-                  child: Text(
-                    _gradeError!,
-                    style: const TextStyle(
-                      color: CourseGradesColors.accentColor,
-                      fontSize: 12,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                  ),
-                ),
-            ],
+          child: _buildGradeField(
+            label: 'الدرجة المحصلة',
+            controller: _gradeController,
+            error: _gradeError,
+            icon: Icons.auto_graph,
           ),
         ),
+
         const SizedBox(width: 12),
-        // الحقل الثاني - الدرجة الكاملة
+
+        // الدرجة الكاملة
         Expanded(
-          flex: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4, right: 4),
-                child: Text(
-                  CourseGradesConstants.maxGradeLabel,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: CourseGradesColors.textColor,
-                    fontFamily: 'SYMBIOAR+LT',
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _maxGradeError != null
-                        ? CourseGradesColors.accentColor
-                        : CourseGradesColors.darkPurple.withOpacity(0.2),
-                    width: 1.0,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: TextField(
-                  controller: _maxGradeController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
-                  decoration: InputDecoration(
-                    icon: const Icon(
-                      Icons.assignment_outlined,
-                      color: CourseGradesColors.darkPurple,
-                      size: 20,
-                    ),
-                    border: InputBorder.none,
-                    hintText: CourseGradesConstants.maxGradeLabel,
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                    fillColor: Colors.white,
-                    filled: true,
-                  ),
-                ),
-              ),
-              if (_maxGradeError != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, right: 4),
-                  child: Text(
-                    _maxGradeError!,
-                    style: const TextStyle(
-                      color: CourseGradesColors.accentColor,
-                      fontSize: 12,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                  ),
-                ),
-            ],
+          child: _buildGradeField(
+            label: 'الدرجة الكاملة',
+            controller: _maxGradeController,
+            error: _maxGradeError,
+            icon: Icons.assignment_outlined,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: widget.isLoading ? null : _submitForm,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: CourseGradesColors.darkPurple,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildGradeField({
+    required String label,
+    required TextEditingController controller,
+    required String? error,
+    required IconData icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: CourseGradesColors.textColor,
+            fontFamily: 'SYMBIOAR+LT',
           ),
-          disabledBackgroundColor:
-              CourseGradesColors.darkPurple.withOpacity(0.6),
         ),
-        child: widget.isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.save_outlined),
-                  const SizedBox(width: 8),
-                  Text(
-                    CourseGradesConstants.saveButton,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      fontFamily: 'SYMBIOAR+LT',
-                    ),
-                  ),
-                ],
+
+        const SizedBox(height: 8),
+
+        TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          style: const TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontSize: 15,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            hintText: 'أدخل الدرجة',
+            hintStyle: TextStyle(
+              color: Colors.grey.shade400,
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: error != null
+                    ? CourseGradesColors.accentColor
+                    : Colors.grey.shade300,
               ),
-      ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: error != null
+                    ? CourseGradesColors.accentColor
+                    : Colors.grey.shade300,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: CourseGradesColors.darkPurple,
+                width: 2,
+              ),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            prefixIcon: Icon(
+              icon,
+              color: CourseGradesColors.darkPurple,
+              size: 20,
+            ),
+          ),
+          onChanged: (value) {
+            setState(() {
+              if (label == 'الدرجة المحصلة') {
+                _gradeError = null;
+              } else {
+                _maxGradeError = null;
+              }
+            });
+          },
+        ),
+
+        // رسالة الخطأ
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6, right: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: CourseGradesColors.accentColor,
+                fontSize: 12,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        // زر الإلغاء
+        Expanded(
+          child: OutlinedButton(
+            onPressed: widget.isLoading ? null : widget.onCancel,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: CourseGradesColors.darkPurple,
+              side: const BorderSide(color: CourseGradesColors.darkPurple),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            child: const Text(
+              'إلغاء',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // زر الحفظ
+        Expanded(
+          flex: 2,
+          child: ElevatedButton(
+            onPressed: widget.isLoading ? null : _submitForm,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CourseGradesColors.darkPurple,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              disabledBackgroundColor:
+                  CourseGradesColors.darkPurple.withOpacity(0.6),
+            ),
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.save_outlined),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'حفظ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ],
     );
   }
 

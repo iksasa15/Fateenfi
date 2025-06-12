@@ -17,189 +17,169 @@ class CourseGradesSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // حساب متوسط الدرجات والدرجة الكلية فوراً
+    // حساب متوسط الدرجات
     final averageInfo = _calculateAverageGrade();
     final double averagePercentage = averageInfo['percentage']!;
-    final double averagePoints = averageInfo['points']!;
-    final String letterGrade = _getLetterGrade(averagePercentage);
     final Color gradeColor = _getGradeColor(averagePercentage);
 
-    // حساب معلومات التقدم
+    // عدد التقييمات
     final int totalAssignments = course.grades.length;
-    final int passedAssignments = _getPassedAssignmentsCount();
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            CourseGradesColors.darkPurple.withOpacity(0.8),
-            CourseGradesColors.mediumPurple,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: CourseGradesColors.darkPurple.withOpacity(0.2),
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
             offset: const Offset(0, 3),
+            spreadRadius: 1,
           ),
         ],
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+        child: Row(
           children: [
-            // العنوان
-            const Row(
-              children: [
-                Icon(
-                  Icons.analytics_outlined,
-                  color: Colors.white,
-                  size: 18,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'ملخص الأداء',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    fontFamily: 'SYMBIOAR+LT',
+            // عرض الدرجة الدائري
+            Container(
+              height: 70,
+              width: 70,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // الدائرة الخارجية
+                  CircularProgressIndicator(
+                    value: averagePercentage / 100,
+                    strokeWidth: 5,
+                    backgroundColor: Colors.grey.shade200,
+                    valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
                   ),
-                ),
-              ],
+                  // الدائرة الداخلية
+                  Container(
+                    height: 54,
+                    width: 54,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.05),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                      border: Border.all(
+                        color: Colors.grey.shade100,
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${averagePercentage.toStringAsFixed(0)}%',
+                        style: TextStyle(
+                          color: gradeColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(width: 18),
 
-            // معلومات الدرجات
-            Row(
-              children: [
-                // عرض الدرجة الدائري
-                Container(
-                  height: 65,
-                  width: 65,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    shape: BoxShape.circle,
+            // تفاصيل التقدم
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // عنوان المتوسط
+                  Text(
+                    'متوسط الدرجات',
+                    style: TextStyle(
+                      color: CourseGradesColors.textColor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
+
+                  const SizedBox(height: 10),
+
+                  // عدد التقييمات
+                  Row(
                     children: [
-                      CircularProgressIndicator(
-                        value: averagePercentage / 100,
-                        strokeWidth: 4,
-                        backgroundColor: Colors.white.withOpacity(0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: CourseGradesColors.lightPurple,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(
+                          Icons.assignment_outlined,
+                          color: CourseGradesColors.darkPurple,
+                          size: 14,
+                        ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '${averagePercentage.toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'SYMBIOAR+LT',
-                            ),
-                          ),
-                          Text(
-                            letterGrade,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              fontFamily: 'SYMBIOAR+LT',
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 8),
+                      Text(
+                        'عدد التقييمات: $totalAssignments',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 13,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // تفاصيل التقدم
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // عدد التقييمات
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.assignment_outlined,
-                            color: Colors.white.withOpacity(0.8),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'التقييمات: $totalAssignments',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 13,
-                              fontFamily: 'SYMBIOAR+LT',
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // عدد التقييمات الناجحة
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            color: Colors.white.withOpacity(0.8),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'النجاح: $passedAssignments/$totalAssignments',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 13,
-                              fontFamily: 'SYMBIOAR+LT',
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // المعدل
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.school_outlined,
-                            color: Colors.white.withOpacity(0.8),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'المعدل: ${averagePoints.toStringAsFixed(2)} نقطة',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 13,
-                              fontFamily: 'SYMBIOAR+LT',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
+
+            // وصف الأداء
+            _buildPerformanceTag(averagePercentage),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPerformanceTag(double percentage) {
+    final String performanceText = _getPerformanceText(percentage);
+    final Color performanceColor = _getGradeColor(percentage);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: performanceColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: performanceColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        performanceText,
+        style: TextStyle(
+          color: performanceColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'SYMBIOAR+LT',
         ),
       ),
     );
@@ -250,19 +230,6 @@ class CourseGradesSummary extends StatelessWidget {
     return 0.0;
   }
 
-  // تحويل النسبة المئوية إلى تقدير حرفي
-  String _getLetterGrade(double percentage) {
-    if (percentage >= 95) return 'A+';
-    if (percentage >= 90) return 'A';
-    if (percentage >= 85) return 'B+';
-    if (percentage >= 80) return 'B';
-    if (percentage >= 75) return 'C+';
-    if (percentage >= 70) return 'C';
-    if (percentage >= 65) return 'D+';
-    if (percentage >= 60) return 'D';
-    return 'F';
-  }
-
   // الحصول على لون الدرجة بناءً على النسبة المئوية
   Color _getGradeColor(double percentage) {
     if (percentage >= 90) return Colors.green;
@@ -272,18 +239,12 @@ class CourseGradesSummary extends StatelessWidget {
     return Colors.redAccent;
   }
 
-  // حساب عدد التقييمات الناجحة (60% فأعلى)
-  int _getPassedAssignmentsCount() {
-    int count = 0;
-    course.grades.forEach((assignment, grade) {
-      final maxGrade = course.maxGrades[assignment] ?? 100.0;
-      if (maxGrade > 0) {
-        final percentage = (grade / maxGrade) * 100;
-        if (percentage >= 60) {
-          count++;
-        }
-      }
-    });
-    return count;
+  // الحصول على وصف مستوى الأداء
+  String _getPerformanceText(double percentage) {
+    if (percentage >= 90) return 'ممتاز';
+    if (percentage >= 80) return 'جيد جداً';
+    if (percentage >= 70) return 'جيد';
+    if (percentage >= 60) return 'مقبول';
+    return 'ضعيف';
   }
 }
