@@ -160,11 +160,15 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           style: TextStyle(
             fontFamily: 'SYMBIOAR+LT',
             fontWeight: FontWeight.bold,
+            fontSize: 16, // تصغير حجم الخط
           ),
         ),
         content: Text(
           'هل أنت متأكد من حذف الملف "${file.fileName}"؟',
-          style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+          style: const TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontSize: 14, // تصغير حجم الخط
+          ),
         ),
         actions: [
           TextButton(
@@ -309,32 +313,32 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8), // تقليل المساحة
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14), // تقليل نصف القطر
         boxShadow: [
           BoxShadow(
             color: kShadowColor,
-            blurRadius: 8,
+            blurRadius: 6, // تقليل التأثير
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14), // تقليل نصف القطر
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14), // تقليل نصف القطر
           onTap: () => _viewFile(file),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0), // تقليل المساحة
             child: Row(
               children: [
                 // أيقونة الملف في حاوية دائرية
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 40, // تصغير الحجم
+                  height: 40, // تصغير الحجم
                   decoration: BoxDecoration(
                     color: kLightPurple,
                     shape: BoxShape.circle,
@@ -342,12 +346,12 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                   child: Center(
                     child: Icon(
                       fileIcon,
-                      size: 24,
+                      size: 20, // تصغير حجم الأيقونة
                       color: iconColor,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10), // تقليل المساحة
 
                 // معلومات الملف
                 Expanded(
@@ -359,7 +363,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                       Text(
                         displayFileName,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14, // تصغير حجم الخط
                           fontWeight: FontWeight.bold,
                           color: kTextColor,
                           fontFamily: 'SYMBIOAR+LT',
@@ -367,7 +371,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2), // تقليل المساحة
 
                       // معلومات الملف
                       Row(
@@ -375,28 +379,29 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                           // نوع الملف
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
+                                horizontal: 6, vertical: 2), // تقليل المساحة
                             decoration: BoxDecoration(
                               color: kLightPurple,
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius:
+                                  BorderRadius.circular(4), // تقليل نصف القطر
                             ),
                             child: Text(
                               file.fileType,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10, // تصغير حجم الخط
                                 fontWeight: FontWeight.bold,
                                 color: kDarkPurple,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6), // تقليل المساحة
 
                           // حجم الملف
                           Text(
                             "${file.fileSize} KB",
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10, // تصغير حجم الخط
                               color: kHintColor,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
@@ -441,10 +446,10 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: 40,
-        height: 40,
+        width: 34, // تصغير الحجم
+        height: 34, // تصغير الحجم
         decoration: BoxDecoration(
           shape: BoxShape.circle,
         ),
@@ -452,7 +457,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           child: Icon(
             icon,
             color: color ?? kDarkPurple,
-            size: 22,
+            size: 18, // تصغير حجم الأيقونة
           ),
         ),
       ),
@@ -473,10 +478,11 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
 
             // العنوان
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6), // تقليل المساحة
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
                 border: Border.all(
                   color: Colors.grey.shade200,
                   width: 1.0,
@@ -485,7 +491,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
               child: Text(
                 CourseFilesConstants.filesTabTitle,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14, // تصغير حجم الخط
                   fontWeight: FontWeight.bold,
                   color: kDarkPurple,
                   fontFamily: 'SYMBIOAR+LT',
@@ -494,32 +500,33 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             ),
 
             // مساحة فارغة للمحاذاة
-            SizedBox(width: 40),
+            SizedBox(width: 34), // تقليل المساحة
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12), // تقليل المساحة
 
         // قسم المعلومات
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+              horizontal: 12, vertical: 10), // تقليل المساحة
           decoration: BoxDecoration(
             color: kLightPurple,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
           ),
           child: Row(
             children: [
               Icon(
                 Icons.info_outline,
                 color: kDarkPurple,
-                size: 20,
+                size: 16, // تصغير حجم الأيقونة
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8), // تقليل المساحة
               Expanded(
                 child: Text(
                   "قم بإدارة ملفات مقرر ${widget.course.courseName} من هنا",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12, // تصغير حجم الخط
                     fontWeight: FontWeight.w500,
                     color: kTextColor,
                     fontFamily: 'SYMBIOAR+LT',
@@ -529,7 +536,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12), // تقليل المساحة
       ],
     );
   }
@@ -538,13 +545,13 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
   Widget _buildBackButton() {
     return InkWell(
       onTap: () => Navigator.pop(context),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
       child: Container(
-        width: 40,
-        height: 40,
+        width: 34, // تصغير الحجم
+        height: 34, // تصغير الحجم
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
           border: Border.all(
             color: Colors.grey.shade200,
             width: 1.0,
@@ -554,7 +561,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           child: Icon(
             Icons.close,
             color: kDarkPurple,
-            size: 22,
+            size: 18, // تصغير حجم الأيقونة
           ),
         ),
       ),
@@ -565,14 +572,14 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
   Widget _buildAddFileButton() {
     return Container(
       width: double.infinity,
-      height: 48, // تعديل الارتفاع ليكون متناسقاً مع الأزرار الأخرى
+      height: 42, // تقليل الارتفاع
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
         boxShadow: [
           BoxShadow(
-            color: kDarkPurple.withOpacity(0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: kDarkPurple.withOpacity(0.2), // تقليل الظل
+            blurRadius: 6, // تقليل التأثير
+            offset: const Offset(0, 2), // تقليل الإزاحة
           ),
         ],
       ),
@@ -586,9 +593,10 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             disabledBackgroundColor: Colors.grey.shade300,
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14), // تقليل المساحة
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -596,26 +604,26 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             children: [
               if (_isLoading)
                 const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 18, // تصغير الحجم
+                  height: 18, // تصغير الحجم
                   child: CircularProgressIndicator(
                     color: Colors.white,
-                    strokeWidth: 2.5,
+                    strokeWidth: 2.0, // تقليل عرض الخط
                   ),
                 )
               else
                 const Icon(
                   Icons.add,
-                  size: 18, // تعديل حجم الأيقونة ليتناسب مع الأزرار الأخرى
+                  size: 16, // تصغير حجم الأيقونة
                 ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6), // تقليل المساحة
               Text(
                 _isLoading
                     ? 'جاري التحميل...'
                     : CourseFilesConstants.addFileButton,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 15, // تعديل حجم الخط ليتناسب مع الأزرار الأخرى
+                  fontSize: 13, // تصغير حجم الخط
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -634,35 +642,36 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 120,
-            height: 120,
+            width: 100, // تصغير الحجم
+            height: 100, // تصغير الحجم
             decoration: BoxDecoration(
               color: kLightPurple,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16), // تقليل نصف القطر
             ),
             child: Icon(
               Icons.folder_outlined,
-              size: 60,
+              size: 48, // تصغير حجم الأيقونة
               color: kMediumPurple,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16), // تقليل المساحة
           Text(
             "لا توجد ملفات لهذا المقرر بعد",
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16, // تصغير حجم الخط
               fontWeight: FontWeight.bold,
               color: kDarkPurple,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6), // تقليل المساحة
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24), // تقليل المساحة
             child: Text(
               "قم بإضافة ملفات للمقرر من خلال الزر أدناه",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13, // تصغير حجم الخط
                 color: kHintColor,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -685,7 +694,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         backgroundColor: kAccentColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
         ),
       ),
     );
@@ -702,7 +711,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
         ),
       ),
     );
@@ -719,7 +728,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         backgroundColor: kMediumPurple,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
         ),
       ),
     );
@@ -727,40 +736,51 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // تحديد أفضل موضع للنافذة
+    final screenHeight = MediaQuery.of(context).size.height;
+    final double topInset =
+        screenHeight * 0.15; // ترك مساحة علوية بنسبة 15% من ارتفاع الشاشة
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      insetPadding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: topInset, // وضع النافذة في موضع أفضل من الأعلى
+        bottom: 16,
+      ),
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.75,
+          maxHeight: MediaQuery.of(context).size.height *
+              0.65, // تقليل الارتفاع الأقصى من 0.75 إلى 0.65
         ),
         decoration: BoxDecoration(
           color: kBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16), // تقليل نصف القطر
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 15,
+              color: Colors.black.withOpacity(0.08), // تقليل شفافية الظل
+              blurRadius: 12, // تقليل التأثير
               spreadRadius: 0,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 3), // تقليل الإزاحة
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16), // تقليل نصف القطر
           child: Column(
             children: [
               // علامة السحب
               Padding(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 8), // تقليل المساحة
                 child: Center(
                   child: Container(
                     width: 40,
-                    height: 5,
+                    height: 4, // تقليل سمك علامة السحب
                     decoration: BoxDecoration(
                       color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(3),
+                      borderRadius: BorderRadius.circular(2), // تقليل نصف القطر
                     ),
                   ),
                 ),
@@ -769,7 +789,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
               // المحتوى الرئيسي
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(16.0), // تقليل المساحة
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -791,7 +811,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                       ),
 
                       // زر إضافة ملف جديد
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12), // تقليل المساحة
                       _buildAddFileButton(),
                     ],
                   ),
