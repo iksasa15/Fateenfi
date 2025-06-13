@@ -197,14 +197,43 @@ class SemesterProgressWidget extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 3),
-                          Text(
-                            controller.getFormattedStartDate(),
-                            style: TextStyle(
-                              fontFamily: SemesterProgressConstants.fontFamily,
-                              fontSize: fontSize - 2,
-                              fontWeight: FontWeight.bold,
-                              color: SemesterProgressConstants.textColor,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                controller.getFormattedStartDate(),
+                                style: TextStyle(
+                                  fontFamily:
+                                      SemesterProgressConstants.fontFamily,
+                                  fontSize: fontSize - 2,
+                                  fontWeight: FontWeight.bold,
+                                  color: SemesterProgressConstants.textColor,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              // زر تعديل تاريخ البداية
+                              InkWell(
+                                onTap: () =>
+                                    _showStartDatePickerDialog(context),
+                                borderRadius: BorderRadius.circular(
+                                    SemesterProgressConstants
+                                        .editButtonBorderRadius),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: SemesterProgressConstants
+                                        .editButtonColor,
+                                    borderRadius: BorderRadius.circular(
+                                        SemesterProgressConstants
+                                            .editButtonBorderRadius),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: SemesterProgressConstants.textColor,
+                                    size: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -238,7 +267,7 @@ class SemesterProgressWidget extends StatelessWidget {
                               const SizedBox(width: 4),
                               // زر تعديل تاريخ النهاية
                               InkWell(
-                                onTap: () => _showDatePickerDialog(context),
+                                onTap: () => _showEndDatePickerDialog(context),
                                 borderRadius: BorderRadius.circular(
                                     SemesterProgressConstants
                                         .editButtonBorderRadius),
@@ -308,13 +337,71 @@ class SemesterProgressWidget extends StatelessWidget {
     );
   }
 
-  // عرض مربع حوار اختيار التاريخ
-  Future<void> _showDatePickerDialog(BuildContext context) async {
+  // عرض مربع حوار اختيار تاريخ البداية
+  Future<void> _showStartDatePickerDialog(BuildContext context) async {
     // تاريخ اليوم
     final now = DateTime.now();
 
-    // تاريخ البداية الافتراضي لمنع اختيار تاريخ قبل البداية
-    final defaultStartDate = controller.startDate ?? DateTime(now.year, 1, 1);
+    // تاريخ البداية الحالي أو تاريخ افتراضي (بداية العام الحالي)
+    final currentStartDate = controller.startDate ?? DateTime(now.year, 1, 1);
+
+    // تاريخ النهاية للتحقق من الصلاحية
+    final endDate = controller.endDate ?? DateTime(now.year, 12, 31);
+
+    // عرض منتقي التاريخ
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: currentStartDate,
+      firstDate:
+          DateTime(now.year - 1, 1, 1), // يمكن اختيار تاريخ من العام الماضي
+      lastDate: endDate, // لا يمكن اختيار تاريخ بعد تاريخ النهاية
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: SemesterProgressConstants.gradientStartColor,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: SemesterProgressConstants.gradientStartColor,
+              ),
+            ),
+            textTheme: const TextTheme(
+              // ضبط الخط للعناصر العربية
+              titleMedium: TextStyle(
+                fontFamily: SemesterProgressConstants.fontFamily,
+              ),
+              bodyMedium: TextStyle(
+                fontFamily: SemesterProgressConstants.fontFamily,
+              ),
+              labelSmall: TextStyle(
+                fontFamily: SemesterProgressConstants.fontFamily,
+              ),
+            ),
+          ),
+          child: Directionality(
+            textDirection: TextDirection.rtl, // لدعم العربية في منتقي التاريخ
+            child: child!,
+          ),
+        );
+      },
+    );
+
+    // إذا تم اختيار تاريخ، قم بتحديثه
+    if (pickedDate != null && pickedDate != currentStartDate) {
+      await controller.updateStartDate(pickedDate);
+    }
+  }
+
+  // عرض مربع حوار اختيار تاريخ النهاية
+  Future<void> _showEndDatePickerDialog(BuildContext context) async {
+    // تاريخ اليوم
+    final now = DateTime.now();
+
+    // تاريخ البداية للتحقق من الصلاحية
+    final startDate = controller.startDate ?? DateTime(now.year, 1, 1);
 
     // تاريخ النهاية الحالي أو تاريخ افتراضي (نهاية العام الحالي)
     final currentEndDate = controller.endDate ?? DateTime(now.year, 12, 31);
@@ -323,7 +410,7 @@ class SemesterProgressWidget extends StatelessWidget {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: currentEndDate,
-      firstDate: defaultStartDate, // لا يمكن اختيار تاريخ قبل تاريخ البداية
+      firstDate: startDate, // لا يمكن اختيار تاريخ قبل تاريخ البداية
       lastDate: DateTime(
           now.year + 2, 12, 31), // يمكن اختيار تاريخ حتى نهاية العام بعد القادم
       builder: (context, child) {

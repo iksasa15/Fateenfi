@@ -94,6 +94,66 @@ class SemesterProgressService {
     }
   }
 
+  // تحديث تاريخ بداية الفصل الدراسي
+  Future<bool> updateSemesterStartDate(DateTime newStartDate) async {
+    try {
+      // الحصول على المستخدم الحالي
+      final User? currentUser = _auth.currentUser;
+
+      // الحصول على البيانات الحالية أولاً
+      final Map<String, dynamic> currentData = await getSemesterData();
+
+      // الحصول على تاريخ النهاية
+      DateTime endDate;
+      if (currentData.containsKey('endDate')) {
+        endDate = DateTime.parse(currentData['endDate']);
+      } else {
+        endDate = DateTime.parse('2025-06-28');
+      }
+
+      // التأكد من أن تاريخ البداية قبل تاريخ النهاية
+      if (newStartDate.isAfter(endDate)) {
+        return false;
+      }
+
+      // حساب إجمالي عدد الأيام بين تاريخ البداية الجديد وتاريخ النهاية
+      final int totalDays = endDate.difference(newStartDate).inDays + 1;
+
+      // حساب عدد الأيام التي مرت منذ بداية الفصل حتى اليوم
+      final int passedDays = DateTime.now().difference(newStartDate).inDays + 1;
+
+      // تحديث البيانات المحلية أولاً
+      final newData = {
+        'totalDays': totalDays,
+        'passedDays': passedDays > 0 ? passedDays : 0,
+        'startDate': newStartDate.toIso8601String().split('T')[0],
+        'endDate': currentData['endDate'] ?? '2025-06-28',
+      };
+
+      // حفظ البيانات المحدثة محلياً
+      await _saveLocalSemesterData(newData);
+
+      // محاولة تحديث البيانات في Firestore
+      if (currentUser != null) {
+        try {
+          await _firestore
+              .collection(_semesterCollection)
+              .doc(currentUser.uid)
+              .set(newData, SetOptions(merge: true));
+          print('تم تحديث بيانات بداية الفصل الدراسي في Firebase بنجاح');
+        } catch (e) {
+          print('تعذر تحديث بيانات بداية الفصل الدراسي في Firebase: $e');
+          print('تم الاعتماد على التخزين المحلي');
+        }
+      }
+
+      return true;
+    } catch (e) {
+      print('خطأ في تحديث تاريخ بداية الفصل الدراسي: $e');
+      return false;
+    }
+  }
+
   // تحديث تاريخ نهاية الفصل الدراسي
   Future<bool> updateSemesterEndDate(DateTime newEndDate) async {
     try {
@@ -111,6 +171,11 @@ class SemesterProgressService {
         startDate = DateTime.parse('2025-03-15');
       }
 
+      // التأكد من أن تاريخ النهاية بعد تاريخ البداية
+      if (newEndDate.isBefore(startDate)) {
+        return false;
+      }
+
       // حساب إجمالي عدد الأيام بين تاريخ البداية وتاريخ النهاية الجديد
       final int totalDays = newEndDate.difference(startDate).inDays + 1;
 
@@ -120,7 +185,7 @@ class SemesterProgressService {
       // تحديث البيانات المحلية أولاً
       final newData = {
         'totalDays': totalDays,
-        'passedDays': passedDays,
+        'passedDays': passedDays > 0 ? passedDays : 0,
         'startDate': currentData['startDate'] ?? '2025-03-15',
         'endDate':
             newEndDate.toIso8601String().split('T')[0], // تخزين التاريخ فقط

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../models/service_item.dart';
-import '../../../ai/AiGptMainPage/ai_gpt_main_screen.dart';
 import '../../../editors/interactive_whiteboard/interactive_whiteboard_screen.dart';
 import '../../../tools/pomodoro_page/pomodoro_screen.dart';
 import '../../../tools/Translate_screen/translate_screen.dart';
-import '../../../tools/stats_screen/stats_screen.dart';
 import '../../../tools/gpa_calculator_screen/gpa_calculator_screen.dart';
 import '../../../tools/notes_screen/notes_screen.dart';
 import '../screens/calendar_screen.dart';
+// حذف استيرادات صفحات الذكاء الاصطناعي والإحصائيات
+// import '../../../ai/AiGptMainPage/ai_gpt_main_screen.dart';
+// import '../../../tools/stats_screen/stats_screen.dart';
 
 class ServicesConstants {
   // الألوان
@@ -25,7 +26,7 @@ class ServicesConstants {
   static const String allServicesTitle = 'كل الخدمات';
   static const String loadingText = 'جاري تحميل الخدمات...';
 
-  // قائمة الخدمات
+  // قائمة الخدمات - حذف خدمتي الذكاء الاصطناعي والإحصائيات
   static final List<ServiceItem> services = [
     // إضافة حاسبة GPA كأول خدمة (أعلى القائمة)
     ServiceItem(
@@ -43,13 +44,7 @@ class ServicesConstants {
       iconColor: const Color(0xFFFFCA28), // أصفر
       destination: const NotesScreen(), // تغيير إلى صفحة الملاحظات الجديدة
     ),
-    ServiceItem(
-      title: 'الذكاء الاصطناعي',
-      description: 'استخدم الذكاء الاصطناعي للإجابة على أسئلتك',
-      icon: Icons.smart_toy_outlined,
-      iconColor: const Color(0xFF6A5ACD), // أرجواني
-      destination: const AiGptMainScreen(),
-    ),
+    // تم حذف خدمة الذكاء الاصطناعي من هنا
     ServiceItem(
       title: 'السبورة التفاعلية',
       description: 'سبورة رقمية للكتابة والرسم',
@@ -71,13 +66,7 @@ class ServicesConstants {
       iconColor: const Color(0xFF29B6F6), // أزرق فاتح
       destination: const TranslateScreen(),
     ),
-    ServiceItem(
-      title: 'الإحصائيات',
-      description: 'إحصائيات ورسوم بيانية للمقررات',
-      icon: Icons.bar_chart_outlined,
-      iconColor: const Color(0xFFFF7043), // برتقالي
-      destination: StatsScreen(courses: []),
-    ),
+    // تم حذف خدمة الإحصائيات من هنا
     ServiceItem(
       title: 'تقويم المواعيد',
       description: 'تنظيم وتذكير بالمواعيد المهمة',

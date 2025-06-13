@@ -161,6 +161,69 @@ class SemesterProgressController extends ChangeNotifier {
     }
   }
 
+  // تحديث تاريخ بداية الفصل الدراسي
+  Future<bool> updateStartDate(DateTime newStartDate) async {
+    try {
+      _isUpdating = true;
+      _errorMessage = null;
+      _successMessage = null;
+      notifyListeners();
+
+      // تحديث التاريخ في قاعدة البيانات أو محلياً
+      final success = await _service.updateSemesterStartDate(newStartDate);
+
+      if (success) {
+        // تحديث البيانات المحلية
+        _startDate = newStartDate;
+
+        // إعادة تحميل البيانات للحصول على القيم المحدثة لعدد الأيام الإجمالي والمنقضي
+        await initialize();
+
+        // عرض رسالة النجاح البسيطة
+        _successMessage = SemesterProgressConstants.dateUpdatedMessage;
+        notifyListeners();
+
+        // مسح رسالة النجاح بعد ثوانٍ
+        Future.delayed(const Duration(seconds: 3), () {
+          _successMessage = null;
+          notifyListeners();
+        });
+
+        return true;
+      } else {
+        _errorMessage = SemesterProgressConstants.dateUpdateErrorMessage;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      // في حالة أي خطأ، نحاول التحديث محلياً على الأقل
+      try {
+        // تحديث البيانات المحلية على الرغم من الخطأ
+        _startDate = newStartDate;
+        await initialize(); // إعادة تحميل البيانات من التخزين المحلي
+
+        // عرض رسالة النجاح البسيطة
+        _successMessage = SemesterProgressConstants.dateUpdatedMessage;
+        notifyListeners();
+
+        // مسح رسالة النجاح بعد ثوانٍ
+        Future.delayed(const Duration(seconds: 3), () {
+          _successMessage = null;
+          notifyListeners();
+        });
+
+        return true;
+      } catch (innerError) {
+        _errorMessage = SemesterProgressConstants.dateUpdateErrorMessage;
+        notifyListeners();
+        return false;
+      }
+    } finally {
+      _isUpdating = false;
+      notifyListeners();
+    }
+  }
+
   // تحديث تاريخ نهاية الفصل الدراسي
   Future<bool> updateEndDate(DateTime newEndDate) async {
     try {

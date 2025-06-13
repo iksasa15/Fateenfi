@@ -31,8 +31,7 @@ import '../../bottom_nav/index.dart';
 // استيراد ملفات ميزة الإحصائيات - سنحتفظ بالاستيراد لكن لن نستخدمه
 import '../home_screen/controllers/stats_controller.dart';
 
-// استيراد ملفات ميزة المهام التي تحتاج اهتمام
-import '../home_screen/controllers/tasks_controller.dart';
+// حذف استيراد ملفات ميزة المهام التي تحتاج اهتمام (تم حذفه)
 
 // استيراد ملفات الصفحات الرئيسية
 import 'package:fateen/screens/courses/course_screen/course_screen.dart';
@@ -215,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final HeaderController _headerController = HeaderController();
   late NextLectureController _nextLectureController;
   late StatsController _statsController;
-  late TasksController _tasksController;
+  // حذف متحكم المهام التي تحتاج اهتمام
 
   // إضافة متحكمات الميزات المستخرجة
   late ProfileCardController _profileCardController;
@@ -331,10 +330,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _statsController = StatsController();
         await _statsController.initialize();
       }),
-      Future(() async {
-        _tasksController = TasksController();
-        await _tasksController.initialize();
-      }),
+      // حذف تهيئة متحكم المهام التي تحتاج اهتمام
     ]);
 
     // تهيئة وحدة تحكم شريط التنقل
@@ -411,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           providers: [
             ChangeNotifierProvider.value(value: _nextLectureController),
             ChangeNotifierProvider.value(value: _statsController),
-            ChangeNotifierProvider.value(value: _tasksController),
+            // حذف متحكم المهام التي تحتاج اهتمام من providers
             ChangeNotifierProvider.value(value: _profileCardController),
             ChangeNotifierProvider.value(value: _semesterProgressController),
             ChangeNotifierProvider.value(
@@ -707,7 +703,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await Future.wait([
         _nextLectureController.refresh(),
         _statsController.refresh(),
-        _tasksController.refresh(),
+        // حذف تحديث متحكم المهام التي تحتاج اهتمام
         _headerController.initialize(),
         _profileCardController.refresh(),
         _semesterProgressController.refresh(),
@@ -738,7 +734,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     _nextLectureController.dispose();
     _statsController.dispose();
-    _tasksController.dispose();
+    // حذف dispose لمتحكم المهام التي تحتاج اهتمام
     _profileCardController.dispose();
     _semesterProgressController.dispose();
     _performanceIndicatorsController.dispose();

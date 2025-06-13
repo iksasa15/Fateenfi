@@ -10,8 +10,8 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _launchEmail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'xfateen1@gmail.com',
-      query: encodeQueryParameters({'subject': 'تواصل مع تطبيق فطين'}),
+      path: 'ahmed2001devv@gmail.com',
+      query: encodeQueryParameters({'subject': 'تواصل مع تطبيق نِكستد'}),
     );
 
     if (!await launchUrl(emailLaunchUri)) {
@@ -29,9 +29,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على مزود الثيم
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Scaffold(
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -51,34 +48,12 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // خيار الوضع الليلي/الفاتح
-                _buildSettingItem(
-                  context,
-                  icon: themeProvider.isDarkMode
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
-                  title: 'الوضع الليلي',
-                  subtitle: themeProvider.isDarkMode ? 'مفعل' : 'غير مفعل',
-                  trailing: Switch(
-                    value: themeProvider.isDarkMode,
-                    onChanged: (_) {
-                      themeProvider.toggleTheme();
-                    },
-                    activeColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onTap: () {
-                    themeProvider.toggleTheme();
-                  },
-                ),
-
-                const SizedBox(height: 12),
-
                 // خيار تواصل معنا
                 _buildSettingItem(
                   context,
                   icon: Icons.email_outlined,
                   title: 'تواصل معنا',
-                  subtitle: 'أرسل لنا بريداً إلكترونياً',
+                  subtitle: 'أرسل لنا رسالة إلكترونية',
                   onTap: _launchEmail,
                 ),
 

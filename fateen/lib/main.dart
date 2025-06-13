@@ -7,12 +7,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+// إضافة استيراد لإشعارات Firebase
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:fateen/screens/authentication/login/screens/login_screen.dart';
 import 'package:fateen/screens/authentication/signup/screens/signup_screen.dart';
 import 'package:fateen/screens/authentication/reset_password/screens/reset_password_screen.dart';
 import 'package:fateen/screens/home/home_screen/home_screen.dart';
 import 'package:fateen/screens/home/home_screen/home_constants.dart';
+
+// معالج الإشعارات في الخلفية
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // تأكد من تهيئة Firebase قبل معالجة الإشعارات في الخلفية
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint('تم استلام إشعار في الخلفية: ${message.messageId}');
+}
 
 // مزود للثيم لدعم الوضع الليلي في التطبيق
 class ThemeProvider extends ChangeNotifier {
@@ -188,6 +198,9 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
+    // تسجيل معالج الإشعارات في الخلفية
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
     // تعيين لغة Firebase
     FirebaseAuth.instance.setLanguageCode('ar');
 
@@ -199,6 +212,9 @@ Future<void> main() async {
       // androidProvider: AndroidProvider.playIntegrity,
       // iosProvider: IOSProvider.appAttest,
     );
+
+    // تهيئة إشعارات Firebase
+    await _initializeFirebaseMessaging();
 
     // تعيين إعدادات Firestore للأداء الأفضل
     FirebaseFirestore.instance.settings = const Settings(
@@ -227,6 +243,75 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+}
+
+/// تهيئة إشعارات Firebase
+Future<void> _initializeFirebaseMessaging() async {
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // طلب أذونات الإشعارات (مطلوب خاصة في iOS)
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+    provisional: false,
+  );
+
+  debugPrint('إعدادات أذونات الإشعارات: ${settings.authorizationStatus}');
+
+  // الحصول على رمز الجهاز لإرسال الإشعارات المستهدفة
+  String? token = await messaging.getToken();
+  debugPrint('رمز الجهاز FCM: $token');
+
+  // تخزين رمز الجهاز في SharedPreferences للاستخدام لاحقًا
+  if (token != null) {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm_token', token);
+
+    // تحديث رمز الجهاز في Firestore عند تسجيل الدخول
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      await _updateFCMTokenInFirestore(currentUser.uid, token);
+    }
+  }
+
+  // الاستماع لتحديثات رمز الجهاز (يحدث عندما يتم تجديد الرمز)
+  messaging.onTokenRefresh.listen((newToken) async {
+    debugPrint('تم تجديد رمز الجهاز FCM: $newToken');
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm_token', newToken);
+
+    // تحديث رمز الجهاز في Firestore إذا كان المستخدم مسجل الدخول
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      await _updateFCMTokenInFirestore(currentUser.uid, newToken);
+    }
+  });
+
+  // إعداد معالج الإشعارات في الواجهة الأمامية
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    debugPrint('تم استلام إشعار في الواجهة الأمامية:');
+    debugPrint('العنوان: ${message.notification?.title}');
+    debugPrint('الرسالة: ${message.notification?.body}');
+    debugPrint('البيانات: ${message.data}');
+
+    // يمكن هنا عرض الإشعار باستخدام مكتبة مثل flutter_local_notifications
+  });
+}
+
+/// تحديث رمز الجهاز في Firestore
+Future<void> _updateFCMTokenInFirestore(String userId, String token) async {
+  try {
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'fcm_tokens': FieldValue.arrayUnion([token]),
+      'last_fcm_token': token,
+      'last_seen': FieldValue.serverTimestamp(),
+    });
+    debugPrint('تم تحديث رمز الجهاز FCM في Firestore');
+  } catch (e) {
+    debugPrint('خطأ في تحديث رمز الجهاز FCM: $e');
+  }
 }
 
 /// StatelessWidget رئيسي للتطبيق
@@ -409,6 +494,9 @@ class AuthChecker extends StatelessWidget {
               debugPrint('تم استرجاع اسم المستخدم: $userName');
               debugPrint('تم استرجاع تخصص المستخدم: $userMajor');
 
+              // تحديث رمز FCM بعد تسجيل الدخول
+              _updateFCMTokenAfterLogin(userId);
+
               return HomeScreen(
                 userName: userName,
                 userMajor: userMajor,
@@ -429,6 +517,9 @@ class AuthChecker extends StatelessWidget {
               );
             } else if (userSnapshot.hasData && userSnapshot.data != null) {
               final userId = userSnapshot.data!.uid;
+
+              // تحديث رمز FCM بعد تسجيل الدخول
+              _updateFCMTokenAfterLogin(userId);
 
               return FutureBuilder<Map<String, dynamic>>(
                 future: _getUserDataCombined(userId),
@@ -462,6 +553,27 @@ class AuthChecker extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// تحديث رمز FCM بعد تسجيل الدخول
+  Future<void> _updateFCMTokenAfterLogin(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('fcm_token');
+
+      if (token != null) {
+        await _updateFCMTokenInFirestore(userId, token);
+      } else {
+        // محاولة الحصول على رمز جديد إذا لم يكن متوفراً
+        final newToken = await FirebaseMessaging.instance.getToken();
+        if (newToken != null) {
+          await prefs.setString('fcm_token', newToken);
+          await _updateFCMTokenInFirestore(userId, newToken);
+        }
+      }
+    } catch (e) {
+      debugPrint('خطأ في تحديث رمز FCM بعد تسجيل الدخول: $e');
+    }
   }
 
   /// التحقق مما إذا كان المستخدم مسجل الدخول بالفعل
@@ -643,6 +755,10 @@ class AuthChecker extends StatelessWidget {
           debugPrint('استخدام اسم العرض من حساب المستخدم: $name');
         }
 
+        // الحصول على رمز FCM الحالي
+        final prefs = await SharedPreferences.getInstance();
+        final fcmToken = prefs.getString('fcm_token');
+
         // إنشاء وثيقة المستخدم بالبيانات المتاحة
         await FirebaseFirestore.instance.collection('users').doc(userId).set({
           'name': name,
@@ -651,12 +767,14 @@ class AuthChecker extends StatelessWidget {
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
           'uid': userId,
+          'fcm_tokens': fcmToken != null ? [fcmToken] : [],
+          'last_fcm_token': fcmToken,
+          'last_seen': FieldValue.serverTimestamp(),
         });
 
         debugPrint('تم إنشاء وثيقة مستخدم جديدة بنجاح');
 
         // تخزين البيانات محلياً
-        final prefs = await SharedPreferences.getInstance();
         await prefs.setString(TabsConstants.prefUserNameKey, name);
         await prefs.setString(TabsConstants.prefUserMajorKey, major);
         await prefs.setString(TabsConstants.prefUserIdKey, userId);
