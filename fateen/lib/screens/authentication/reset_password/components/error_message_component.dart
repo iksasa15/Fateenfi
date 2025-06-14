@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 
 class ErrorMessageComponent extends StatelessWidget {
   final String errorMessage;
@@ -24,7 +24,7 @@ class ErrorMessageComponent extends StatelessWidget {
       padding: EdgeInsets.all(padding),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: ResetPasswordColors.accentColor.withOpacity(0.1),
+        color: AppColors.accent.withOpacity(0.1), // Updated
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -32,7 +32,7 @@ class ErrorMessageComponent extends StatelessWidget {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: ResetPasswordColors.accentColor,
+            color: AppColors.accent, // Updated
             size: iconSize,
           ),
           const SizedBox(width: 10),
@@ -40,7 +40,7 @@ class ErrorMessageComponent extends StatelessWidget {
             child: Text(
               errorMessage,
               style: TextStyle(
-                color: ResetPasswordColors.accentColor,
+                color: AppColors.accent, // Updated
                 fontSize: fontSize,
                 fontFamily: 'SYMBIOAR+LT',
               ),

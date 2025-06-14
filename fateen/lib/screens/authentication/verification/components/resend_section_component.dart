@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/verification_strings.dart';
 
 class ResendSectionComponent extends StatelessWidget {
@@ -37,7 +37,7 @@ class ResendSectionComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: isTablet ? 18.0 : 16.0,
               fontWeight: FontWeight.w600,
-              color: VerificationColors.accentColor.withOpacity(0.8),
+              color: AppColors.accent.withOpacity(0.8), // Updated
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -54,7 +54,7 @@ class ResendSectionComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: textSize,
               fontWeight: FontWeight.w500,
-              color: VerificationColors.textColor,
+              color: AppColors.textPrimary, // Updated
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -69,12 +69,12 @@ class ResendSectionComponent extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: VerificationColors.mediumPurple.withOpacity(0.3),
+              color: AppColors.primaryLight.withOpacity(0.3), // Updated
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: VerificationColors.shadowColor.withOpacity(0.1),
+                color: AppColors.shadow.withOpacity(0.1), // Updated
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -111,10 +111,10 @@ class ResendSectionComponent extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: VerificationColors.lightPurple,
+                  color: AppColors.primaryExtraLight, // Updated
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: VerificationColors.mediumPurple.withOpacity(0.2),
+                    color: AppColors.primaryLight.withOpacity(0.2), // Updated
                     width: 1,
                   ),
                 ),
@@ -122,7 +122,7 @@ class ResendSectionComponent extends StatelessWidget {
                   "يمكنك طلب إرسال رابط جديد بعد ${countdown} ثانية",
                   style: TextStyle(
                     fontSize: buttonTextSize,
-                    color: VerificationColors.darkPurple,
+                    color: AppColors.primaryDark, // Updated
                     fontFamily: 'SYMBIOAR+LT',
                     fontWeight: FontWeight.w500,
                   ),
@@ -136,7 +136,7 @@ class ResendSectionComponent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: VerificationColors.darkPurple.withOpacity(0.1),
+                      color: AppColors.primaryDark.withOpacity(0.1), // Updated
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
@@ -153,7 +153,7 @@ class ResendSectionComponent extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: VerificationColors.mediumPurple,
+                          color: AppColors.primaryLight, // Updated
                           width: 1.5,
                         ),
                       ),
@@ -167,7 +167,7 @@ class ResendSectionComponent extends StatelessWidget {
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
-                                    color: VerificationColors.mediumPurple,
+                                    color: AppColors.primaryLight, // Updated
                                     strokeWidth: 2.5,
                                   ),
                                 ),
@@ -182,7 +182,8 @@ class ResendSectionComponent extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: buttonTextSize,
                                         fontWeight: FontWeight.bold,
-                                        color: VerificationColors.mediumPurple,
+                                        color:
+                                            AppColors.primaryLight, // Updated
                                         fontFamily: 'SYMBIOAR+LT',
                                         letterSpacing: 0.5,
                                       ),
@@ -190,7 +191,7 @@ class ResendSectionComponent extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Icon(
                                       Icons.email_outlined,
-                                      color: VerificationColors.mediumPurple,
+                                      color: AppColors.primaryLight, // Updated
                                       size: isTablet ? 22.0 : 20.0,
                                     ),
                                   ],
@@ -221,7 +222,7 @@ class ResendSectionComponent extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: VerificationColors.mediumPurple,
+            color: AppColors.primaryLight, // Updated
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -229,7 +230,7 @@ class ResendSectionComponent extends StatelessWidget {
               text,
               style: TextStyle(
                 fontSize: textSize,
-                color: VerificationColors.textColor,
+                color: AppColors.textPrimary, // Updated
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -243,7 +244,7 @@ class ResendSectionComponent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Divider(
-        color: VerificationColors.shadowColor.withOpacity(0.3),
+        color: AppColors.shadow.withOpacity(0.3), // Updated
         height: 1,
       ),
     );

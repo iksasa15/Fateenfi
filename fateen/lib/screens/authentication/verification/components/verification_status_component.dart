@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/verification_strings.dart';
 
 class VerificationStatusComponent extends StatelessWidget {
@@ -29,7 +29,7 @@ class VerificationStatusComponent extends StatelessWidget {
           style: TextStyle(
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
-            color: VerificationColors.darkPurple,
+            color: AppColors.primaryDark, // Updated
             fontFamily: 'SYMBIOAR+LT',
           ),
           textAlign: TextAlign.center,

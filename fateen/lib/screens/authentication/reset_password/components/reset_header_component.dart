@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 
 class ResetHeaderComponent extends StatelessWidget {
@@ -31,8 +31,8 @@ class ResetHeaderComponent extends StatelessWidget {
           ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
               colors: [
-                ResetPasswordColors.darkPurple,
-                ResetPasswordColors.mediumPurple.withOpacity(0.9),
+                AppColors.primaryDark, // Updated
+                AppColors.primaryLight.withOpacity(0.9), // Updated
               ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
@@ -54,7 +54,7 @@ class ResetHeaderComponent extends StatelessWidget {
               // أيقونة ترحيبية لطيفة
               Icon(
                 Icons.lock_reset_rounded,
-                color: ResetPasswordColors.accentColor.withOpacity(0.7),
+                color: AppColors.accent.withOpacity(0.7), // Updated
                 size: subtitleSize + 2,
               ),
               const SizedBox(width: 8),
@@ -63,7 +63,7 @@ class ResetHeaderComponent extends StatelessWidget {
                   ResetPasswordStrings.resetSubtitle,
                   style: TextStyle(
                     fontSize: subtitleSize,
-                    color: ResetPasswordColors.hintColor,
+                    color: AppColors.textHint, // Updated
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,
                   ),

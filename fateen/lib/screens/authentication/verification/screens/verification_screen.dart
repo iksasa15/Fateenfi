@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../components/verification_header_component.dart';
 import '../components/verification_icon_component.dart';
 import '../components/verification_status_component.dart';
@@ -9,7 +10,6 @@ import '../components/resend_section_component.dart';
 import '../components/verification_login_button_component.dart';
 import '../components/verification_footer_component.dart';
 import '../controllers/verification_controller.dart';
-import '../constants/verification_colors.dart';
 import '../constants/verification_strings.dart';
 
 class VerificationScreen extends StatefulWidget {
@@ -167,7 +167,7 @@ class _VerificationScreenState extends State<VerificationScreen>
           ),
         ],
       ),
-      backgroundColor: VerificationColors.darkPurple,
+      backgroundColor: AppColors.primaryDark, // Updated
       duration: const Duration(seconds: 4),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
@@ -189,7 +189,7 @@ class _VerificationScreenState extends State<VerificationScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: VerificationColors.backgroundColor,
+      backgroundColor: AppColors.background, // Updated
       resizeToAvoidBottomInset: true,
       body: SlideTransition(
         position: _slideAnimation,
@@ -308,7 +308,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                               if (result.success) {
                                 // عرض رسالة نجاح
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
                                       'تم تسجيل الدخول بنجاح!',
                                       style:
@@ -316,7 +316,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                                       textAlign: TextAlign.center,
                                     ),
                                     backgroundColor:
-                                        VerificationColors.successColor,
+                                        AppColors.success, // Updated
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
@@ -341,7 +341,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                                       textAlign: TextAlign.center,
                                     ),
                                     backgroundColor:
-                                        VerificationColors.accentColor,
+                                        AppColors.accent, // Updated
                                     duration: const Duration(seconds: 3),
                                   ),
                                 );
@@ -356,8 +356,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                                         fontFamily: 'SYMBIOAR+LT'),
                                     textAlign: TextAlign.center,
                                   ),
-                                  backgroundColor:
-                                      VerificationColors.accentColor,
+                                  backgroundColor: AppColors.accent, // Updated
                                   duration: const Duration(seconds: 3),
                                 ),
                               );
@@ -406,7 +405,7 @@ class _VerificationScreenState extends State<VerificationScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: VerificationColors.mediumPurple.withOpacity(0.2),
+            color: AppColors.primaryLight.withOpacity(0.2), // Updated
             blurRadius: 8,
             offset: const Offset(0, 2),
             spreadRadius: -2,
@@ -425,7 +424,7 @@ class _VerificationScreenState extends State<VerificationScreen>
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: VerificationColors.mediumPurple,
+                color: AppColors.primaryLight, // Updated
                 width: 1.5,
               ),
             ),
@@ -439,7 +438,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                          color: VerificationColors.mediumPurple,
+                          color: AppColors.primaryLight, // Updated
                           strokeWidth: 2.5,
                         ),
                       ),
@@ -453,14 +452,14 @@ class _VerificationScreenState extends State<VerificationScreen>
                             style: TextStyle(
                               fontSize: fontSize,
                               fontWeight: FontWeight.bold,
-                              color: VerificationColors.mediumPurple,
+                              color: AppColors.primaryLight, // Updated
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                           const SizedBox(width: 8),
                           Icon(
                             Icons.refresh_rounded,
-                            color: VerificationColors.mediumPurple,
+                            color: AppColors.primaryLight, // Updated
                             size: isTablet ? 22.0 : 20.0,
                           ),
                         ],

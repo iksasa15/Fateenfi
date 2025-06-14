@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 
 class VerificationIconComponent extends StatelessWidget {
   final bool isVerified;
@@ -30,7 +30,7 @@ class VerificationIconComponent extends StatelessWidget {
         width: containerSize,
         height: containerSize,
         decoration: BoxDecoration(
-          color: VerificationColors.lightPurple,
+          color: AppColors.primaryExtraLight, // Updated
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -38,8 +38,8 @@ class VerificationIconComponent extends StatelessWidget {
             isVerified ? Icons.check_circle : Icons.mark_email_unread,
             size: iconSize,
             color: isVerified
-                ? VerificationColors.successColor
-                : VerificationColors.mediumPurple,
+                ? AppColors.success // Updated
+                : AppColors.primaryLight, // Updated
           ),
         ),
       ),

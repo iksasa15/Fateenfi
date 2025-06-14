@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../../shared/helpers/responsive_helper.dart';
 
 class ResetIconComponent extends StatelessWidget {
@@ -34,14 +34,14 @@ class ResetIconComponent extends StatelessWidget {
         width: containerSize,
         height: containerSize,
         decoration: BoxDecoration(
-          color: ResetPasswordColors.lightPurple,
+          color: AppColors.primaryExtraLight, // Updated
           shape: BoxShape.circle,
         ),
         child: Center(
           child: Icon(
             Icons.lock_reset_rounded,
             size: iconSize,
-            color: ResetPasswordColors.darkPurple,
+            color: AppColors.primaryDark, // Updated
           ),
         ),
       ),

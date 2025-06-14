@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/verification_strings.dart';
 
 class VerificationFooterComponent extends StatelessWidget {
@@ -24,13 +24,13 @@ class VerificationFooterComponent extends StatelessWidget {
       onPressed: onLoginPress,
       icon: Icon(
         Icons.arrow_back,
-        color: VerificationColors.darkPurple,
+        color: AppColors.primaryDark, // Updated
         size: iconSize,
       ),
       label: Text(
         VerificationStrings.verificationBackToLogin,
         style: TextStyle(
-          color: VerificationColors.darkPurple,
+          color: AppColors.primaryDark, // Updated
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
           fontFamily: 'SYMBIOAR+LT',

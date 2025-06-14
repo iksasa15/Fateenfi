@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Added import for unified colors
 import '../constants/reset_password_strings.dart';
 import '../controllers/reset_password_controller.dart';
 import '../components/reset_header_component.dart';
@@ -108,7 +108,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
         ResponsiveHelper.getResponsiveHorizontalPadding(context);
 
     return Scaffold(
-      backgroundColor: ResetPasswordColors.backgroundColor,
+      backgroundColor: AppColors
+          .background, // Updated from ResetPasswordColors.backgroundColor
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -198,8 +199,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                                     padding: EdgeInsets.symmetric(
                                         vertical: height * 0.015,
                                         horizontal: width * 0.04),
-                                    foregroundColor:
-                                        ResetPasswordColors.darkPurple,
+                                    foregroundColor: AppColors
+                                        .primaryDark, // Updated from ResetPasswordColors.darkPurple
                                   ),
                                   child: Text(
                                     ResetPasswordStrings.backToLoginText,

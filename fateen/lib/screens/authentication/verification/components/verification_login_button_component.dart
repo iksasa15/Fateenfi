@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/verification_strings.dart';
 
 class VerificationLoginButtonComponent extends StatelessWidget {
@@ -30,7 +30,7 @@ class VerificationLoginButtonComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: VerificationColors.darkPurple.withOpacity(0.3),
+            color: AppColors.primaryDark.withOpacity(0.3), // Updated
             blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: -2,
@@ -50,8 +50,8 @@ class VerificationLoginButtonComponent extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  VerificationColors.mediumPurple,
-                  VerificationColors.darkPurple,
+                  AppColors.primaryLight, // Updated
+                  AppColors.primaryDark, // Updated
                 ],
               ),
               borderRadius: BorderRadius.circular(16),

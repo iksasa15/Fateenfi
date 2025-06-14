@@ -74,6 +74,8 @@ class AppColors {
 
   static var shadowColor;
 
+  static var primaryExtraLight;
+
   // الحصول على مجموعة ألوان ماتيريال من اللون الرئيسي
   static MaterialColor getMaterialPrimary() {
     return MaterialColor(primary.value, {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 import '../../shared/helpers/responsive_helper.dart';
 
@@ -29,7 +29,7 @@ class SuccessViewComponent extends StatelessWidget {
               top: ResponsiveHelper.isLandscape(context) ? 30 : 40, bottom: 20),
           child: Icon(
             Icons.check_circle_outline,
-            color: ResetPasswordColors.mediumPurple,
+            color: AppColors.primaryLight, // Updated
             size: ResponsiveHelper.getResponsiveValue(
               context,
               mobileSmallValue: 80.0,
@@ -50,7 +50,7 @@ class SuccessViewComponent extends StatelessWidget {
               fontSize: ResponsiveHelper.getResponsiveFontSize(context,
                   smallSize: 20, mediumSize: 22, largeSize: 24),
               fontWeight: FontWeight.bold,
-              color: ResetPasswordColors.darkPurple,
+              color: AppColors.primaryDark, // Updated
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -63,11 +63,11 @@ class SuccessViewComponent extends StatelessWidget {
           margin: EdgeInsets.symmetric(
               horizontal: horizontalPadding.horizontal / 2, vertical: 16.0),
           decoration: BoxDecoration(
-            color: ResetPasswordColors.lightPurple,
+            color: AppColors.primaryExtraLight, // Updated
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: ResetPasswordColors.shadowColor,
+                color: AppColors.shadow, // Updated
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -98,7 +98,7 @@ class SuccessViewComponent extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: ResetPasswordColors.darkPurple.withOpacity(0.3),
+                color: AppColors.primaryDark.withOpacity(0.3), // Updated
                 blurRadius: 12,
                 offset: const Offset(0, 4),
                 spreadRadius: -2,
@@ -118,8 +118,8 @@ class SuccessViewComponent extends StatelessWidget {
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
                     colors: [
-                      ResetPasswordColors.mediumPurple,
-                      ResetPasswordColors.darkPurple,
+                      AppColors.primaryLight, // Updated
+                      AppColors.primaryDark, // Updated
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),

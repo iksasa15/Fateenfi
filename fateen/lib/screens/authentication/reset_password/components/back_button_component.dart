@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 
 class BackButtonComponent extends StatelessWidget {
@@ -24,13 +24,13 @@ class BackButtonComponent extends StatelessWidget {
       onPressed: onPressed,
       icon: Icon(
         Icons.arrow_back,
-        color: ResetPasswordColors.darkPurple,
+        color: AppColors.primaryDark, // Updated
         size: iconSize,
       ),
       label: Text(
         ResetPasswordStrings.backToLoginText,
         style: TextStyle(
-          color: ResetPasswordColors.darkPurple,
+          color: AppColors.primaryDark, // Updated
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
           fontFamily: 'SYMBIOAR+LT',

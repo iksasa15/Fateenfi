@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 import '../controllers/reset_password_controller.dart';
 
@@ -29,7 +29,7 @@ class ResetFormComponent extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       textAlign: TextAlign.right,
       style: TextStyle(
-        color: ResetPasswordColors.textColor,
+        color: AppColors.textPrimary, // Updated
         fontSize: fontSize,
         fontFamily: 'SYMBIOAR+LT',
       ),
@@ -37,20 +37,20 @@ class ResetFormComponent extends StatelessWidget {
         hintText: ResetPasswordStrings.emailHint,
         labelText: ResetPasswordStrings.emailLabel,
         labelStyle: TextStyle(
-          color: ResetPasswordColors.textColor.withOpacity(0.7),
+          color: AppColors.textPrimary.withOpacity(0.7), // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         hintStyle: TextStyle(
-          color: ResetPasswordColors.hintColor,
+          color: AppColors.textHint, // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           Icons.email_outlined,
           color: controller.emailController.text.isEmpty
-              ? ResetPasswordColors.hintColor
-              : ResetPasswordColors.mediumPurple,
+              ? AppColors.textHint // Updated
+              : AppColors.primaryLight, // Updated
           size: iconSize,
         ),
         filled: true,
@@ -65,26 +65,26 @@ class ResetFormComponent extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: ResetPasswordColors.mediumPurple,
+            color: AppColors.primaryLight, // Updated
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: ResetPasswordColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: ResetPasswordColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1.5,
           ),
         ),
         errorStyle: TextStyle(
-          color: ResetPasswordColors.accentColor,
+          color: AppColors.accent, // Updated
           fontSize: isSmallScreen ? 10 : 12,
           fontFamily: 'SYMBIOAR+LT',
         ),

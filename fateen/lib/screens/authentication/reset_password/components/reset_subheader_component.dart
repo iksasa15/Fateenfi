@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 import '../../shared/helpers/responsive_helper.dart';
 
@@ -26,7 +26,7 @@ class ResetSubheaderComponent extends StatelessWidget {
           style: TextStyle(
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
-            color: ResetPasswordColors.darkPurple,
+            color: AppColors.primaryDark, // Updated
             fontFamily: 'SYMBIOAR+LT',
           ),
           textAlign: TextAlign.center,

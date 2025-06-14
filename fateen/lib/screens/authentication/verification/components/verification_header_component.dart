@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/verification_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/verification_strings.dart';
 
 class VerificationHeaderComponent extends StatelessWidget {
@@ -31,8 +31,8 @@ class VerificationHeaderComponent extends StatelessWidget {
           ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
               colors: [
-                VerificationColors.darkPurple,
-                VerificationColors.mediumPurple.withOpacity(0.9),
+                AppColors.primaryDark, // Updated
+                AppColors.primaryLight.withOpacity(0.9), // Updated
               ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
@@ -54,7 +54,7 @@ class VerificationHeaderComponent extends StatelessWidget {
               // أيقونة ترحيبية لطيفة
               Icon(
                 Icons.email_outlined,
-                color: VerificationColors.accentColor.withOpacity(0.7),
+                color: AppColors.accent.withOpacity(0.7), // Updated
                 size: subtitleSize + 2,
               ),
               const SizedBox(width: 8),
@@ -63,7 +63,7 @@ class VerificationHeaderComponent extends StatelessWidget {
                   VerificationStrings.verificationSent,
                   style: TextStyle(
                     fontSize: subtitleSize,
-                    color: VerificationColors.hintColor,
+                    color: AppColors.textHint, // Updated
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,
                   ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/reset_password_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Updated import
 import '../constants/reset_password_strings.dart';
 import '../../shared/helpers/responsive_helper.dart';
 
@@ -48,7 +48,7 @@ class ResetButtonComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: ResetPasswordColors.darkPurple.withOpacity(0.3),
+            color: AppColors.primaryDark.withOpacity(0.3), // Updated
             blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: -2,
@@ -68,8 +68,8 @@ class ResetButtonComponent extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  ResetPasswordColors.mediumPurple,
-                  ResetPasswordColors.darkPurple,
+                  AppColors.primaryLight, // Updated
+                  AppColors.primaryDark, // Updated
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
