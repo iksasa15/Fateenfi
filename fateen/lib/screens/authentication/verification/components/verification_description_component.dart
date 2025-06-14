@@ -23,15 +23,16 @@ class VerificationDescriptionComponent extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isTablet ? 24.0 : 20.0),
       decoration: BoxDecoration(
-        color: AppColors.primaryExtraLight, // Updated
+        color: context.colorPrimaryExtraLight, // استخدام Extension
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: context.colorBorder, // استخدام Extension
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.1), // Updated
+            color:
+                context.colorShadowColor.withOpacity(0.1), // استخدام Extension
             blurRadius: 10,
             spreadRadius: 0.5,
             offset: const Offset(0, 2),
@@ -47,8 +48,8 @@ class VerificationDescriptionComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: textSize,
               color: isVerified
-                  ? AppColors.success // Updated
-                  : AppColors.textPrimary, // Updated
+                  ? context.colorSuccess // استخدام Extension
+                  : context.colorTextPrimary, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
               height: 1.5,
               fontWeight: isVerified ? FontWeight.bold : FontWeight.w500,
@@ -60,10 +61,10 @@ class VerificationDescriptionComponent extends StatelessWidget {
               margin: const EdgeInsets.only(top: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSurface, // استخدام Extension
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppColors.shadow, // Updated
+                  color: context.colorShadowColor, // استخدام Extension
                   width: 1,
                 ),
               ),
@@ -72,7 +73,8 @@ class VerificationDescriptionComponent extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: AppColors.accent.withOpacity(0.7), // Updated
+                    color: context.colorAccent
+                        .withOpacity(0.7), // استخدام Extension
                     size: 16,
                   ),
                   const SizedBox(width: 8),
@@ -81,8 +83,8 @@ class VerificationDescriptionComponent extends StatelessWidget {
                       "يرجى التحقق من صندوق الوارد والبريد العشوائي",
                       style: TextStyle(
                         fontSize: subtextSize - 1,
-                        color:
-                            AppColors.textPrimary.withOpacity(0.8), // Updated
+                        color: context.colorTextPrimary
+                            .withOpacity(0.8), // استخدام Extension
                         fontFamily: 'SYMBIOAR+LT',
                         fontWeight: FontWeight.w400,
                       ),
@@ -96,7 +98,8 @@ class VerificationDescriptionComponent extends StatelessWidget {
               margin: const EdgeInsets.only(top: 16),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.primaryLight.withOpacity(0.1), // Updated
+                color: context.colorPrimaryLight
+                    .withOpacity(0.1), // استخدام Extension
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -104,7 +107,7 @@ class VerificationDescriptionComponent extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.refresh,
-                    color: AppColors.primaryLight, // Updated
+                    color: context.colorPrimaryLight, // استخدام Extension
                     size: 16,
                   ),
                   const SizedBox(width: 8),
@@ -112,7 +115,7 @@ class VerificationDescriptionComponent extends StatelessWidget {
                     "نتحقق تلقائيًا من تأكيد بريدك...",
                     style: TextStyle(
                       fontSize: subtextSize,
-                      color: AppColors.primaryLight, // Updated
+                      color: context.colorPrimaryLight, // استخدام Extension
                       fontFamily: 'SYMBIOAR+LT',
                       fontWeight: FontWeight.w500,
                     ),

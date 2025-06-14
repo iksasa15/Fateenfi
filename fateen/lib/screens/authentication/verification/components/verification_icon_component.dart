@@ -30,7 +30,7 @@ class VerificationIconComponent extends StatelessWidget {
         width: containerSize,
         height: containerSize,
         decoration: BoxDecoration(
-          color: AppColors.primaryExtraLight, // Updated
+          color: context.colorPrimaryExtraLight, // استخدام Extension
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -38,8 +38,8 @@ class VerificationIconComponent extends StatelessWidget {
             isVerified ? Icons.check_circle : Icons.mark_email_unread,
             size: iconSize,
             color: isVerified
-                ? AppColors.success // Updated
-                : AppColors.primaryLight, // Updated
+                ? context.colorSuccess // استخدام Extension
+                : context.colorPrimaryLight, // استخدام Extension
           ),
         ),
       ),

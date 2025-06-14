@@ -37,7 +37,7 @@ class ResendSectionComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: isTablet ? 18.0 : 16.0,
               fontWeight: FontWeight.w600,
-              color: AppColors.accent.withOpacity(0.8), // Updated
+              color: context.colorAccent.withOpacity(0.8), // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -54,7 +54,7 @@ class ResendSectionComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: textSize,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary, // Updated
+              color: context.colorTextPrimary, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -66,15 +66,17 @@ class ResendSectionComponent extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.colorSurface, // استخدام Extension
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppColors.primaryLight.withOpacity(0.3), // Updated
+              color: context.colorPrimaryLight
+                  .withOpacity(0.3), // استخدام Extension
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow.withOpacity(0.1), // Updated
+                color: context.colorShadowColor
+                    .withOpacity(0.1), // استخدام Extension
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -87,13 +89,13 @@ class ResendSectionComponent extends StatelessWidget {
                 text: "تحقق من مجلد الرسائل غير المرغوبة (السبام)",
                 context: context,
               ),
-              _buildDivider(),
+              _buildDivider(context),
               _buildSolutionItem(
                 icon: Icons.email_outlined,
                 text: "تأكد من صحة عنوان البريد الإلكتروني",
                 context: context,
               ),
-              _buildDivider(),
+              _buildDivider(context),
               _buildSolutionItem(
                 icon: Icons.refresh,
                 text: "انتظر قليلاً، قد يستغرق وصول الرسالة بعض الوقت",
@@ -111,10 +113,11 @@ class ResendSectionComponent extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryExtraLight, // Updated
+                  color: context.colorPrimaryExtraLight, // استخدام Extension
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.primaryLight.withOpacity(0.2), // Updated
+                    color: context.colorPrimaryLight
+                        .withOpacity(0.2), // استخدام Extension
                     width: 1,
                   ),
                 ),
@@ -122,7 +125,7 @@ class ResendSectionComponent extends StatelessWidget {
                   "يمكنك طلب إرسال رابط جديد بعد ${countdown} ثانية",
                   style: TextStyle(
                     fontSize: buttonTextSize,
-                    color: AppColors.primaryDark, // Updated
+                    color: context.colorPrimaryDark, // استخدام Extension
                     fontFamily: 'SYMBIOAR+LT',
                     fontWeight: FontWeight.w500,
                   ),
@@ -136,7 +139,8 @@ class ResendSectionComponent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryDark.withOpacity(0.1), // Updated
+                      color: context.colorPrimaryDark
+                          .withOpacity(0.1), // استخدام Extension
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
@@ -150,10 +154,10 @@ class ResendSectionComponent extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     child: Ink(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colorSurface, // استخدام Extension
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.primaryLight, // Updated
+                          color: context.colorPrimaryLight, // استخدام Extension
                           width: 1.5,
                         ),
                       ),
@@ -167,7 +171,8 @@ class ResendSectionComponent extends StatelessWidget {
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
-                                    color: AppColors.primaryLight, // Updated
+                                    color: context
+                                        .colorPrimaryLight, // استخدام Extension
                                     strokeWidth: 2.5,
                                   ),
                                 ),
@@ -182,8 +187,8 @@ class ResendSectionComponent extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: buttonTextSize,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            AppColors.primaryLight, // Updated
+                                        color: context
+                                            .colorPrimaryLight, // استخدام Extension
                                         fontFamily: 'SYMBIOAR+LT',
                                         letterSpacing: 0.5,
                                       ),
@@ -191,7 +196,8 @@ class ResendSectionComponent extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Icon(
                                       Icons.email_outlined,
-                                      color: AppColors.primaryLight, // Updated
+                                      color: context
+                                          .colorPrimaryLight, // استخدام Extension
                                       size: isTablet ? 22.0 : 20.0,
                                     ),
                                   ],
@@ -222,7 +228,7 @@ class ResendSectionComponent extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: AppColors.primaryLight, // Updated
+            color: context.colorPrimaryLight, // استخدام Extension
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -230,7 +236,7 @@ class ResendSectionComponent extends StatelessWidget {
               text,
               style: TextStyle(
                 fontSize: textSize,
-                color: AppColors.textPrimary, // Updated
+                color: context.colorTextPrimary, // استخدام Extension
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -240,11 +246,11 @@ class ResendSectionComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Divider(
-        color: AppColors.shadow.withOpacity(0.3), // Updated
+        color: context.colorShadowColor.withOpacity(0.3), // استخدام Extension
         height: 1,
       ),
     );

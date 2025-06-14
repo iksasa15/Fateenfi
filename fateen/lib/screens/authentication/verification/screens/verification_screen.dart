@@ -119,13 +119,14 @@ class _VerificationScreenState extends State<VerificationScreen>
       } else {
         // لم يتم التحقق بعد
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'لم نتمكن من تأكيد البريد الإلكتروني. تأكد من النقر على رابط التفعيل في بريدك.',
               style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
               textAlign: TextAlign.center,
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: context
+                .colorWarning, // استخدام Extension بدلاً من Colors.orange
             duration: Duration(seconds: 4),
           ),
         );
@@ -139,7 +140,8 @@ class _VerificationScreenState extends State<VerificationScreen>
             style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.red,
+          backgroundColor:
+              context.colorError, // استخدام Extension بدلاً من Colors.red
           duration: const Duration(seconds: 3),
         ),
       );
@@ -167,7 +169,7 @@ class _VerificationScreenState extends State<VerificationScreen>
           ),
         ],
       ),
-      backgroundColor: AppColors.primaryDark, // Updated
+      backgroundColor: context.colorPrimaryDark, // استخدام Extension
       duration: const Duration(seconds: 4),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
@@ -189,7 +191,7 @@ class _VerificationScreenState extends State<VerificationScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Updated
+      backgroundColor: context.colorBackground, // استخدام Extension
       resizeToAvoidBottomInset: true,
       body: SlideTransition(
         position: _slideAnimation,
@@ -315,8 +317,8 @@ class _VerificationScreenState extends State<VerificationScreen>
                                           TextStyle(fontFamily: 'SYMBIOAR+LT'),
                                       textAlign: TextAlign.center,
                                     ),
-                                    backgroundColor:
-                                        AppColors.success, // Updated
+                                    backgroundColor: context
+                                        .colorSuccess, // استخدام Extension
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
@@ -340,8 +342,8 @@ class _VerificationScreenState extends State<VerificationScreen>
                                           fontFamily: 'SYMBIOAR+LT'),
                                       textAlign: TextAlign.center,
                                     ),
-                                    backgroundColor:
-                                        AppColors.accent, // Updated
+                                    backgroundColor: context
+                                        .colorAccent, // استخدام Extension
                                     duration: const Duration(seconds: 3),
                                   ),
                                 );
@@ -356,7 +358,8 @@ class _VerificationScreenState extends State<VerificationScreen>
                                         fontFamily: 'SYMBIOAR+LT'),
                                     textAlign: TextAlign.center,
                                   ),
-                                  backgroundColor: AppColors.accent, // Updated
+                                  backgroundColor:
+                                      context.colorAccent, // استخدام Extension
                                   duration: const Duration(seconds: 3),
                                 ),
                               );
@@ -405,7 +408,8 @@ class _VerificationScreenState extends State<VerificationScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryLight.withOpacity(0.2), // Updated
+            color:
+                context.colorPrimaryLight.withOpacity(0.2), // استخدام Extension
             blurRadius: 8,
             offset: const Offset(0, 2),
             spreadRadius: -2,
@@ -421,10 +425,11 @@ class _VerificationScreenState extends State<VerificationScreen>
           highlightColor: Colors.white.withOpacity(0.05),
           child: Ink(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context
+                  .colorSurface, // استخدام Extension بدلاً من Colors.white
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.primaryLight, // Updated
+                color: context.colorPrimaryLight, // استخدام Extension
                 width: 1.5,
               ),
             ),
@@ -438,7 +443,7 @@ class _VerificationScreenState extends State<VerificationScreen>
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                          color: AppColors.primaryLight, // Updated
+                          color: context.colorPrimaryLight, // استخدام Extension
                           strokeWidth: 2.5,
                         ),
                       ),
@@ -452,14 +457,16 @@ class _VerificationScreenState extends State<VerificationScreen>
                             style: TextStyle(
                               fontSize: fontSize,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight, // Updated
+                              color: context
+                                  .colorPrimaryLight, // استخدام Extension
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                           const SizedBox(width: 8),
                           Icon(
                             Icons.refresh_rounded,
-                            color: AppColors.primaryLight, // Updated
+                            color:
+                                context.colorPrimaryLight, // استخدام Extension
                             size: isTablet ? 22.0 : 20.0,
                           ),
                         ],

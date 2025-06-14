@@ -24,13 +24,13 @@ class VerificationFooterComponent extends StatelessWidget {
       onPressed: onLoginPress,
       icon: Icon(
         Icons.arrow_back,
-        color: AppColors.primaryDark, // Updated
+        color: context.colorPrimaryDark, // استخدام Extension
         size: iconSize,
       ),
       label: Text(
         VerificationStrings.verificationBackToLogin,
         style: TextStyle(
-          color: AppColors.primaryDark, // Updated
+          color: context.colorPrimaryDark, // استخدام Extension
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
           fontFamily: 'SYMBIOAR+LT',

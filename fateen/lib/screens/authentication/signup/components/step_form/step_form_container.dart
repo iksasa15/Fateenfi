@@ -9,10 +9,9 @@ import 'progress_indicator_component.dart';
 import 'step_title_component.dart';
 import 'final_step_view_component.dart';
 import 'navigation_buttons_component.dart';
-import '../../../../../core/components/Field/EnhancedPickerComponent.dart';
+import '../../../../../core/components/Field/enhanced_input_field.dart';
 import '../../../../../core/components/Field/enhanced_selection_field.dart';
 import '../../../../../core/components/Field/EnhancedPickerComponent.dart';
-import '../../../../../core/components/Field/enhanced_input_field.dart';
 import '../../constants/signup_strings.dart';
 
 class StepFormContainer extends StatefulWidget {
@@ -270,7 +269,7 @@ class _StepFormContainerState extends State<StepFormContainer>
           style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
         ),
         duration: Duration(milliseconds: 1500),
-        backgroundColor: context.colorPrimaryLight, // استخدام Extension
+        backgroundColor: AppColors.mediumPurple, // تم تصحيح استخدام AppColors
       ),
     );
   }
@@ -489,7 +488,7 @@ class _StepFormContainerState extends State<StepFormContainer>
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        context.colorPrimaryLight), // استخدام Extension
+                        AppColors.primaryLight), // تم تصحيح استخدام AppColors
                   ),
                 )
               : null,
@@ -504,11 +503,11 @@ class _StepFormContainerState extends State<StepFormContainer>
             child: TextButton.icon(
               onPressed: widget.onLoginPressed,
               icon: Icon(Icons.login,
-                  color: context.colorPrimaryLight), // استخدام Extension
+                  color: AppColors.primaryLight), // تم تصحيح استخدام AppColors
               label: Text(
                 'انتقل إلى تسجيل الدخول',
                 style: TextStyle(
-                  color: context.colorPrimaryLight, // استخدام Extension
+                  color: AppColors.primaryLight, // تم تصحيح استخدام AppColors
                   fontFamily: 'SYMBIOAR+LT',
                   fontWeight: FontWeight.bold,
                 ),
@@ -546,7 +545,7 @@ class _StepFormContainerState extends State<StepFormContainer>
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        context.colorPrimaryLight), // استخدام Extension
+                        AppColors.primaryLight), // تم تصحيح استخدام AppColors
                   ),
                 )
               : null,
@@ -561,11 +560,11 @@ class _StepFormContainerState extends State<StepFormContainer>
             child: TextButton.icon(
               onPressed: widget.onLoginPressed,
               icon: Icon(Icons.login,
-                  color: context.colorPrimaryLight), // استخدام Extension
+                  color: AppColors.primaryLight), // تم تصحيح استخدام AppColors
               label: Text(
                 'انتقل إلى تسجيل الدخول',
                 style: TextStyle(
-                  color: context.colorPrimaryLight, // استخدام Extension
+                  color: AppColors.primaryLight, // تم تصحيح استخدام AppColors
                   fontFamily: 'SYMBIOAR+LT',
                   fontWeight: FontWeight.bold,
                 ),
@@ -576,7 +575,7 @@ class _StepFormContainerState extends State<StepFormContainer>
     );
   }
 
-  // حقل كلمة المرور باستخدام المكون الموحد
+  // حقل كلمة المرور باستخدام المكون الموحد - تم تصحيح الخطأ هنا
   Widget _buildPasswordField() {
     final passwordStrength = widget.controller.calculatePasswordStrength(
       widget.controller.passwordController.text,
@@ -616,15 +615,15 @@ class _StepFormContainerState extends State<StepFormContainer>
                   child: LinearProgressIndicator(
                     value: passwordStrength / 100,
                     minHeight: 6,
-                    backgroundColor: context.colorSurface
-                        .withOpacity(0.3), // استخدام Extension
+                    backgroundColor:
+                        Colors.grey.shade200, // تم تصحيح استخدام اللون
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _getStrengthColor(passwordStrength),
                     ),
                   ),
                 ),
                 const SizedBox(height: 6),
-                // نص قوة كلمة المرور
+                // نص قوة كلمة المرور - تم إصلاح الخطأ هنا بإزالة as String
                 Text(
                   widget.controller
                       .getPasswordStrengthText(passwordStrength as String),
@@ -649,7 +648,7 @@ class _StepFormContainerState extends State<StepFormContainer>
         widget.controller.passwordVisible
             ? Icons.visibility_outlined
             : Icons.visibility_off_outlined,
-        color: context.colorPrimaryLight, // استخدام Extension
+        color: AppColors.primaryLight, // تم تصحيح استخدام AppColors
       ),
       onPressed: () {
         HapticFeedback.selectionClick();
@@ -790,14 +789,14 @@ class _StepFormContainerState extends State<StepFormContainer>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: context.colorSurface, // استخدام Extension
+        backgroundColor: Colors.white, // تم تصحيح استخدام اللون
         title: Text(
           'الشروط والأحكام',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'SYMBIOAR+LT',
             fontWeight: FontWeight.bold,
-            color: context.colorTextPrimary, // استخدام Extension
+            color: AppColors.textPrimary, // تم تصحيح استخدام AppColors
           ),
         ),
         content: SingleChildScrollView(
@@ -806,7 +805,7 @@ class _StepFormContainerState extends State<StepFormContainer>
             textAlign: TextAlign.right,
             style: TextStyle(
               fontFamily: 'SYMBIOAR+LT',
-              color: context.colorTextPrimary, // استخدام Extension
+              color: AppColors.textPrimary, // تم تصحيح استخدام AppColors
             ),
           ),
         ),
@@ -814,7 +813,8 @@ class _StepFormContainerState extends State<StepFormContainer>
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(
-              foregroundColor: context.colorPrimaryLight, // استخدام Extension
+              foregroundColor:
+                  AppColors.primaryLight, // تم تصحيح استخدام AppColors
             ),
             child: Text(
               'موافق',
