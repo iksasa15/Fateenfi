@@ -620,9 +620,12 @@ class SignupController extends ChangeNotifier {
     return Student.calculatePasswordStrength(password);
   }
 
-  // الحصول على نص قوة كلمة المرور باستخدام كلاس الطالب
-  String getPasswordStrengthText(String password) {
-    return Student.getPasswordStrengthText(password);
+  // الحصول على نص قوة كلمة المرور - تم تعديل هذه الدالة لتقبل double
+  String getPasswordStrengthText(double strength) {
+    if (strength < 30) return 'ضعيفة جداً';
+    if (strength < 60) return 'ضعيفة';
+    if (strength < 80) return 'متوسطة';
+    return 'قوية';
   }
 
   // تغيير نسبة تقدم التسجيل

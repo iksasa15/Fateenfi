@@ -24,10 +24,10 @@ class FinalStepViewComponent extends StatelessWidget {
       child: Column(
         children: [
           // أيقونة النجاح مع تأثير حركي
-          _buildSuccessIcon(screenWidth, screenHeight),
+          _buildSuccessIcon(context, screenWidth, screenHeight),
 
           // عنوان محسن
-          _buildTitle(screenWidth, screenHeight),
+          _buildTitle(context, screenWidth, screenHeight),
 
           SizedBox(height: screenHeight * 0.02),
 
@@ -37,7 +37,7 @@ class FinalStepViewComponent extends StatelessWidget {
           SizedBox(height: screenHeight * 0.03),
 
           // شروط الاستخدام محسنة
-          _buildTermsContainer(screenWidth, screenHeight),
+          _buildTermsContainer(context, screenWidth, screenHeight),
 
           SizedBox(height: screenHeight * 0.02),
         ],
@@ -45,25 +45,27 @@ class FinalStepViewComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildSuccessIcon(double screenWidth, double screenHeight) {
+  Widget _buildSuccessIcon(
+      BuildContext context, double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.only(
           top: screenHeight * 0.01, bottom: screenHeight * 0.02),
       width: screenWidth * 0.22,
       height: screenWidth * 0.22,
       decoration: BoxDecoration(
-        color: AppColors.primaryPale.withOpacity(0.3), // Updated
+        color: context.colorPrimaryPale.withOpacity(0.3), // استخدام Extension
         shape: BoxShape.circle,
       ),
       child: Icon(
         Icons.check_circle_outline,
-        color: AppColors.primaryDark, // Updated
+        color: context.colorPrimaryDark, // استخدام Extension
         size: screenWidth * 0.15,
       ),
     );
   }
 
-  Widget _buildTitle(double screenWidth, double screenHeight) {
+  Widget _buildTitle(
+      BuildContext context, double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.06,
@@ -76,7 +78,7 @@ class FinalStepViewComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: screenWidth * 0.052,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark, // Updated
+              color: context.colorPrimaryDark, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
               height: 1.3,
             ),
@@ -87,7 +89,7 @@ class FinalStepViewComponent extends StatelessWidget {
             'تأكد من صحة بياناتك قبل المتابعة',
             style: TextStyle(
               fontSize: screenWidth * 0.038,
-              color: AppColors.textHint, // Updated
+              color: context.colorTextHint, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -102,11 +104,12 @@ class FinalStepViewComponent extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface, // استخدام Extension بدلاً من Colors.white
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryLight.withOpacity(0.15), // Updated
+            color: context.colorPrimaryLight
+                .withOpacity(0.15), // استخدام Extension
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -123,8 +126,8 @@ class FinalStepViewComponent extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryLight, // Updated
-                  AppColors.primaryDark, // Updated
+                  context.colorPrimaryLight, // استخدام Extension
+                  context.colorPrimaryDark, // استخدام Extension
                 ],
                 begin: Alignment.centerRight,
                 end: Alignment.centerLeft,
@@ -138,7 +141,7 @@ class FinalStepViewComponent extends StatelessWidget {
               child: Text(
                 'معلومات الحساب',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.white, // يبقى أبيض على الخلفية الملونة
                   fontSize: screenWidth * 0.042,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SYMBIOAR+LT',
@@ -158,28 +161,28 @@ class FinalStepViewComponent extends StatelessWidget {
                   label: 'الاسم',
                   value: controller.nameController.text,
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildFinalStepInfoItem(
                   context: context,
                   icon: Icons.alternate_email,
                   label: 'اسم المستخدم',
                   value: controller.usernameController.text,
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildFinalStepInfoItem(
                   context: context,
                   icon: Icons.email_outlined,
                   label: 'البريد الإلكتروني',
                   value: controller.emailController.text,
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildFinalStepInfoItem(
                   context: context,
                   icon: Icons.school_outlined,
                   label: 'الجامعة',
                   value: controller.universityNameController.text,
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildFinalStepInfoItem(
                   context: context,
                   icon: Icons.book_outlined,
@@ -194,7 +197,8 @@ class FinalStepViewComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildTermsContainer(double screenWidth, double screenHeight) {
+  Widget _buildTermsContainer(
+      BuildContext context, double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
       padding: EdgeInsets.symmetric(
@@ -202,10 +206,11 @@ class FinalStepViewComponent extends StatelessWidget {
         vertical: screenHeight * 0.02,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primaryPale.withOpacity(0.15), // Updated
+        color: context.colorPrimaryPale.withOpacity(0.15), // استخدام Extension
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.primaryLight.withOpacity(0.3), // Updated
+          color:
+              context.colorPrimaryLight.withOpacity(0.3), // استخدام Extension
           width: 1,
         ),
       ),
@@ -233,12 +238,13 @@ class FinalStepViewComponent extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primaryPale.withOpacity(0.2), // Updated
+              color: context.colorPrimaryPale
+                  .withOpacity(0.2), // استخدام Extension
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
-              color: AppColors.primaryDark, // Updated
+              color: context.colorPrimaryDark, // استخدام Extension
               size: 20,
             ),
           ),
@@ -249,7 +255,7 @@ class FinalStepViewComponent extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: AppColors.textHint, // Updated
+                  color: context.colorTextHint, // استخدام Extension
                   fontSize: screenWidth * 0.032,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -259,7 +265,7 @@ class FinalStepViewComponent extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  color: AppColors.textPrimary, // Updated
+                  color: context.colorTextPrimary, // استخدام Extension
                   fontSize: screenWidth * 0.038,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'SYMBIOAR+LT',
@@ -274,9 +280,9 @@ class FinalStepViewComponent extends StatelessWidget {
   }
 
   // دالة مساعدة لإنشاء خط فاصل
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
-      color: AppColors.primaryPale.withOpacity(0.3), // Updated
+      color: context.colorPrimaryPale.withOpacity(0.3), // استخدام Extension
       thickness: 1,
       height: 20,
     );

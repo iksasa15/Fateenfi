@@ -625,8 +625,8 @@ class _StepFormContainerState extends State<StepFormContainer>
                 const SizedBox(height: 6),
                 // نص قوة كلمة المرور - تم إصلاح الخطأ هنا بإزالة as String
                 Text(
-                  widget.controller
-                      .getPasswordStrengthText(passwordStrength as String),
+                  widget.controller.getPasswordStrengthText(
+                      passwordStrength), // تم تعديل هذا السطر
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     color: _getStrengthColor(passwordStrength),
