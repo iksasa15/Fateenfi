@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 import '../../../../../core/constants/app_dimensions.dart';
 
@@ -148,7 +148,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: SignupColors.hintColor,
+                              foregroundColor: AppColors.textHint, // Updated
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
                             ),
@@ -167,7 +167,7 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                             style: TextStyle(
                               fontSize: isTablet ? 18 : 16,
                               fontWeight: FontWeight.bold,
-                              color: SignupColors.darkPurple,
+                              color: AppColors.primaryDark, // Updated
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -186,7 +186,8 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: SignupColors.mediumPurple,
+                              foregroundColor:
+                                  AppColors.primaryLight, // Updated
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
                             ),
@@ -236,8 +237,8 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? SignupColors.mediumPurple
-                                            .withOpacity(0.1)
+                                        ? AppColors.primaryLight
+                                            .withOpacity(0.1) // Updated
                                         : Colors.transparent,
                                     border: Border(
                                       bottom: BorderSide(
@@ -253,12 +254,14 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                                       isSelected
                                           ? Icon(
                                               Icons.check_circle,
-                                              color: SignupColors.mediumPurple,
+                                              color: AppColors
+                                                  .primaryLight, // Updated
                                               size: isTablet ? 24 : 20,
                                             )
                                           : Icon(
                                               Icons.circle_outlined,
-                                              color: SignupColors.hintColor,
+                                              color:
+                                                  AppColors.textHint, // Updated
                                               size: isTablet ? 24 : 20,
                                             ),
 
@@ -270,8 +273,10 @@ class _MajorPickerComponentState extends State<MajorPickerComponent>
                                           style: TextStyle(
                                             fontSize: isTablet ? 16 : 14,
                                             color: isSelected
-                                                ? SignupColors.darkPurple
-                                                : SignupColors.textColor,
+                                                ? AppColors
+                                                    .primaryDark // Updated
+                                                : AppColors
+                                                    .textPrimary, // Updated
                                             fontWeight: isSelected
                                                 ? FontWeight.bold
                                                 : FontWeight.normal,

@@ -1,7 +1,7 @@
 // lib/features/step_form/components/input_fields/username_field_component.dart
 
 import 'package:flutter/material.dart';
-import '../../../constants/signup_colors.dart';
+import '../../../../../../core/constants/appColor.dart'; // Updated import
 import '../enhanced_input_field.dart';
 
 class UsernameFieldComponent extends StatelessWidget {
@@ -45,13 +45,13 @@ class UsernameFieldComponent extends StatelessWidget {
               margin: const EdgeInsets.all(12),
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: SignupColors.mediumPurple,
+                color: AppColors.primaryLight, // Updated
               ),
             )
           : usernameError != null
               ? Icon(
                   Icons.error_outline,
-                  color: SignupColors.accentColor,
+                  color: AppColors.accent, // Updated
                   size: 20,
                 )
               : null,

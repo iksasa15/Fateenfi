@@ -1,7 +1,7 @@
 // lib/features/step_form/components/enhanced_input_field.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 
 class EnhancedInputField extends StatelessWidget {
   final String title;
@@ -92,7 +92,7 @@ class EnhancedInputField extends StatelessWidget {
                       }
                     },
                     style: TextStyle(
-                      color: SignupColors.textColor,
+                      color: AppColors.textPrimary, // Updated
                       fontSize: fontSize,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
@@ -101,21 +101,21 @@ class EnhancedInputField extends StatelessWidget {
                       labelText: title,
                       labelStyle: TextStyle(
                         color: focusNode.hasFocus
-                            ? SignupColors.mediumPurple
-                            : SignupColors.textColor.withOpacity(0.7),
+                            ? AppColors.primaryLight // Updated
+                            : AppColors.textPrimary.withOpacity(0.7), // Updated
                         fontSize: labelSize,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                       hintStyle: TextStyle(
-                        color: SignupColors.hintColor,
+                        color: AppColors.textHint, // Updated
                         fontSize: labelSize,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                       prefixIcon: Icon(
                         icon,
                         color: focusNode.hasFocus || controller.text.isNotEmpty
-                            ? SignupColors.mediumPurple
-                            : SignupColors.hintColor,
+                            ? AppColors.primaryLight // Updated
+                            : AppColors.textHint, // Updated
                         size: iconSize,
                       ),
                       suffixIcon: suffixIcon,
@@ -131,21 +131,21 @@ class EnhancedInputField extends StatelessWidget {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: SignupColors.mediumPurple,
+                          color: AppColors.primaryLight, // Updated
                           width: 1.5,
                         ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: SignupColors.accentColor,
+                          color: AppColors.accent, // Updated
                           width: 1,
                         ),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: SignupColors.accentColor,
+                          color: AppColors.accent, // Updated
                           width: 1.5,
                         ),
                       ),
@@ -173,7 +173,7 @@ class EnhancedInputField extends StatelessWidget {
                       child: Text(
                         error!,
                         style: TextStyle(
-                          color: SignupColors.accentColor,
+                          color: AppColors.accent, // Updated
                           fontSize: 12,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
@@ -192,14 +192,14 @@ class EnhancedInputField extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.error_outline,
-                            color: SignupColors.accentColor,
+                            color: AppColors.accent, // Updated
                             size: 16,
                           ),
                           SizedBox(width: 6),
                           Text(
                             error!.split("تسجيل الدخول؟")[0].trim(),
                             style: TextStyle(
-                              color: SignupColors.accentColor,
+                              color: AppColors.accent, // Updated
                               fontSize: 12,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
@@ -210,7 +210,7 @@ class EnhancedInputField extends StatelessWidget {
                             child: Text(
                               "تسجيل الدخول",
                               style: TextStyle(
-                                color: SignupColors.mediumPurple,
+                                color: AppColors.primaryLight, // Updated
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                                 fontSize: 12,
@@ -237,7 +237,7 @@ class EnhancedInputField extends StatelessWidget {
               child: Text(
                 helperText!,
                 style: TextStyle(
-                  color: SignupColors.hintColor,
+                  color: AppColors.textHint, // Updated
                   fontSize: helperTextSize,
                   fontFamily: 'SYMBIOAR+LT',
                 ),

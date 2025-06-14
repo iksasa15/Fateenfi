@@ -79,7 +79,7 @@ class AppDimensions {
 
   // طرق أحجام العناصر
   static double getButtonHeight(BuildContext context,
-      {ButtonSize size = ButtonSize.regular}) {
+      {ButtonSize size = ButtonSize.regular, required bool small}) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     switch (size) {

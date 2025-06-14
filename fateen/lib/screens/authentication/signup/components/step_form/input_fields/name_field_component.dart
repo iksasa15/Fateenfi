@@ -1,7 +1,7 @@
 // lib/features/step_form/components/input_fields/name_field_component.dart
 
 import 'package:flutter/material.dart';
-import '../../../constants/signup_colors.dart';
+import '../../../../../../core/constants/appColor.dart'; // Updated import
 import '../enhanced_input_field.dart';
 
 class NameFieldComponent extends StatelessWidget {

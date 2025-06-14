@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 import '../../../../../core/constants/app_dimensions.dart';
 
@@ -103,14 +103,15 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
               decoration: BoxDecoration(
-                color: SignupColors.lightPurple.withOpacity(0.3),
-                borderRadius:
-                    BorderRadius.circular(AppDimensions.mediumRadius),
+                color: AppColors.primaryPale
+                    .withOpacity(0.3), // Updated from SignupColors.lightPurple
+                borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               ),
               child: Text(
                 SignupStrings.orLoginWith,
                 style: TextStyle(
-                  color: SignupColors.mediumPurple,
+                  color: AppColors
+                      .primaryLight, // Updated from SignupColors.mediumPurple
                   fontSize: fontSize,
                   fontFamily: 'SYMBIOAR+LT',
                   fontWeight: FontWeight.w500,
@@ -163,7 +164,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'google',
             icon: Icons.g_mobiledata_rounded,
-            color: Colors.red.shade400,
+            color: AppColors.google, // Updated to use AppColors.google
             onTap: () {/* تنفيذ تسجيل باستخدام جوجل */},
             size: buttonSize,
             iconSize: iconSize,
@@ -176,7 +177,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'facebook',
             icon: Icons.facebook_rounded,
-            color: Colors.blue.shade600,
+            color: AppColors.facebook, // Updated to use AppColors.facebook
             onTap: () {/* تنفيذ تسجيل باستخدام فيسبوك */},
             size: buttonSize,
             iconSize: iconSize,
@@ -189,7 +190,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'apple',
             icon: Icons.apple_rounded,
-            color: Colors.black87,
+            color: AppColors.apple, // Updated to use AppColors.apple
             onTap: () {/* تنفيذ تسجيل باستخدام آبل */},
             size: buttonSize,
             iconSize: iconSize,

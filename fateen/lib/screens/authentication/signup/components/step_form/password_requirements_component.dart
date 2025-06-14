@@ -1,7 +1,7 @@
 // lib/features/step_form/components/password_requirements_component.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 
 class PasswordRequirementsComponent extends StatelessWidget {
   final String password;

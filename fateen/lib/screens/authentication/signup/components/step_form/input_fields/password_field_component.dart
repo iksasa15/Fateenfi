@@ -1,7 +1,7 @@
 // lib/features/step_form/components/input_fields/password_field_component.dart
 
 import 'package:flutter/material.dart';
-import '../../../constants/signup_colors.dart';
+import '../../../../../../core/constants/appColor.dart'; // Updated import
 import '../enhanced_input_field.dart';
 import '../password_requirements_component.dart';
 
@@ -52,8 +52,8 @@ class _PasswordFieldComponentState extends State<PasswordFieldComponent> {
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
               color: widget.passwordVisible
-                  ? SignupColors.mediumPurple
-                  : SignupColors.hintColor,
+                  ? AppColors.primaryLight // Updated
+                  : AppColors.textHint, // Updated
             ),
             onPressed: widget.togglePasswordVisibility,
           ),

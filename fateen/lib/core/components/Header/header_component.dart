@@ -16,8 +16,8 @@ class HeaderComponent extends StatefulWidget {
     required this.subtitle,
     this.showWavingHand = true,
     this.gradientColors = const [
-      AppColors.darkPurple,
-      AppColors.mediumPurple,
+      AppColors.primaryDark, // Updated from darkPurple
+      AppColors.primaryLight, // Updated from mediumPurple
     ],
     this.iconColor,
     this.subtitleColor,
@@ -54,9 +54,10 @@ class _HeaderComponentState extends State<HeaderComponent>
   @override
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.width < 360;
-    final actualIconColor =
-        widget.iconColor ?? AppColors.accentColor.withOpacity(0.7);
-    final actualSubtitleColor = widget.subtitleColor ?? AppColors.hintColor;
+    final actualIconColor = widget.iconColor ??
+        AppColors.accent.withOpacity(0.7); // Updated from accentColor
+    final actualSubtitleColor =
+        widget.subtitleColor ?? AppColors.textHint; // Updated from hintColor
 
     return Container(
       padding: EdgeInsets.fromLTRB(

@@ -1,7 +1,7 @@
 // lib/features/step_form/components/step_title_component.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../signup_controller/controllers/signup_controller.dart';
 
 class StepTitleComponent extends StatelessWidget {
@@ -34,7 +34,7 @@ class StepTitleComponent extends StatelessWidget {
               Text(
                 controller.getCurrentStepTitle(),
                 style: TextStyle(
-                  color: SignupColors.darkPurple,
+                  color: AppColors.primaryDark, // Updated
                   fontSize: screenWidth * 0.045,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SYMBIOAR+LT',
@@ -51,9 +51,9 @@ class StepTitleComponent extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      SignupColors.mediumPurple.withOpacity(0.2),
-                      SignupColors.mediumPurple,
-                      SignupColors.mediumPurple.withOpacity(0.2),
+                      AppColors.primaryLight.withOpacity(0.2), // Updated
+                      AppColors.primaryLight, // Updated
+                      AppColors.primaryLight.withOpacity(0.2), // Updated
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

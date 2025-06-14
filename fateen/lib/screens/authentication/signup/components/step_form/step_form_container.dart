@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../../signup_controller/controllers/signup_controller.dart';
 import '../university_major/signup_major_field.dart';
 import '../university_major/signup_university_field.dart';
@@ -265,7 +265,7 @@ class _StepFormContainerState extends State<StepFormContainer>
           style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
         ),
         duration: Duration(milliseconds: 1500),
-        backgroundColor: SignupColors.mediumPurple,
+        backgroundColor: AppColors.mediumPurple,
       ),
     );
   }

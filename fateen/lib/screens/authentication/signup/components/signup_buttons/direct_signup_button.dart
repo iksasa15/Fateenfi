@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 
 class DirectSignupButton extends StatelessWidget {
@@ -20,7 +20,7 @@ class DirectSignupButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: Material(
-        color: SignupColors.mediumPurple,
+        color: AppColors.primaryLight, // Updated from SignupColors.mediumPurple
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -31,8 +31,9 @@ class DirectSignupButton extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  SignupColors.mediumPurple,
-                  SignupColors.darkPurple,
+                  AppColors
+                      .primaryLight, // Updated from SignupColors.mediumPurple
+                  AppColors.primaryDark, // Updated from SignupColors.darkPurple
                 ],
               ),
               borderRadius: BorderRadius.circular(16),

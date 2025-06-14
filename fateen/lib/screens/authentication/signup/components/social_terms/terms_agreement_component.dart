@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 import '../../../../../core/constants/app_dimensions.dart';
 
@@ -61,7 +61,8 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
               Text(
                 SignupStrings.termsAgreementText,
                 style: TextStyle(
-                  color: SignupColors.hintColor,
+                  color:
+                      AppColors.textHint, // Updated from SignupColors.hintColor
                   fontSize: fontSize,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -88,7 +89,8 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
                           horizontal: 4, vertical: 2),
                       decoration: BoxDecoration(
                         color: _isHovered
-                            ? SignupColors.lightPurple.withOpacity(0.3)
+                            ? AppColors.primaryPale.withOpacity(
+                                0.3) // Updated from SignupColors.lightPurple
                             : Colors.transparent,
                         borderRadius:
                             BorderRadius.circular(AppDimensions.smallRadius),
@@ -96,14 +98,16 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
                       child: Text(
                         SignupStrings.termsText,
                         style: TextStyle(
-                          color: SignupColors.darkPurple,
+                          color: AppColors
+                              .primaryDark, // Updated from SignupColors.darkPurple
                           fontWeight: FontWeight.bold,
                           fontSize: fontSize,
                           fontFamily: 'SYMBIOAR+LT',
                           decoration: _isHovered
                               ? TextDecoration.underline
                               : TextDecoration.none,
-                          decorationColor: SignupColors.mediumPurple,
+                          decorationColor: AppColors
+                              .primaryLight, // Updated from SignupColors.mediumPurple
                         ),
                       ),
                     ),

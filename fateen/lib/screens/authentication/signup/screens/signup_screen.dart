@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../signup_controller/controllers/signup_controller.dart';
-import '../components/input_fields/signup_header_component.dart';
+import '../../../../core/components/Header/header_component.dart'; // Changed import
 import '../components/input_fields/error_message_component.dart';
 import '../components/step_form/step_form_container.dart';
 import '../../shared/components/auth_toggle_bar.dart';
-import '../constants/signup_colors.dart';
+import '../../../../core/constants/appColor.dart'; // Changed from signup_colors.dart to appColor.dart
+import '../constants/signup_strings.dart'; // Make sure this exists
 import '../../verification/screens/verification_screen.dart';
 import '../../shared/helpers/custom_route_transitions.dart';
 import '../../../authentication/login/screens/login_screen.dart';
@@ -252,7 +253,8 @@ class _SignUpScreenState extends State<SignUpScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SignupColors.backgroundColor,
+      backgroundColor: AppColors
+          .background, // Changed from SignupColors.backgroundColor to AppColors.background
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
@@ -281,7 +283,22 @@ class _SignUpScreenState extends State<SignUpScreen>
                               height: _controller.currentStep == SignupStep.name
                                   ? null
                                   : 0,
-                              child: const SignupHeaderComponent(),
+                              // استخدام الهيدر المشترك بدلاً من الخاص
+                              child: HeaderComponent(
+                                title:
+                                    "إنشاء حساب", // استخدم SignupStrings.signupTitle بدلاً من هذا إذا كان متوفرًا
+                                subtitle:
+                                    "قم بإكمال البيانات التالية لإنشاء حسابك", // استخدم SignupStrings.formInfoText بدلاً من هذا
+                                showWavingHand: false,
+                                iconColor: AppColors.accent.withOpacity(
+                                    0.7), // Changed from SignupColors.accentColor to AppColors.accent
+                                gradientColors: [
+                                  AppColors
+                                      .primaryDark, // Changed from SignupColors.darkPurple to AppColors.primaryDark
+                                  AppColors
+                                      .primaryLight, // Changed from SignupColors.mediumPurple to AppColors.primaryLight
+                                ],
+                              ),
                             ),
                           ),
 

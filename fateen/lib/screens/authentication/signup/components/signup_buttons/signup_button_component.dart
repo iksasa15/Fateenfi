@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 import '../../../../../core/constants/app_dimensions.dart';
 
@@ -36,11 +36,12 @@ class SignupButtonComponent extends StatelessWidget {
             height:
                 AppDimensions.getButtonHeight(context, small: isSmallScreen),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(
-                  AppDimensions.getLargeRadius(context)),
+              borderRadius:
+                  BorderRadius.circular(AppDimensions.getLargeRadius(context)),
               boxShadow: [
                 BoxShadow(
-                  color: SignupColors.darkPurple.withOpacity(0.3),
+                  color: AppColors.primaryDark
+                      .withOpacity(0.3), // Updated from SignupColors.darkPurple
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                   spreadRadius: -2,
@@ -61,8 +62,10 @@ class SignupButtonComponent extends StatelessWidget {
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
                       colors: [
-                        SignupColors.mediumPurple,
-                        SignupColors.darkPurple,
+                        AppColors
+                            .primaryLight, // Updated from SignupColors.mediumPurple
+                        AppColors
+                            .primaryDark, // Updated from SignupColors.darkPurple
                       ],
                     ),
                     borderRadius: BorderRadius.circular(
@@ -94,10 +97,9 @@ class SignupButtonComponent extends StatelessWidget {
                                 Text(
                                   SignupStrings.signupButtonText,
                                   style: TextStyle(
-                                    fontSize:
-                                        AppDimensions.getButtonFontSize(
-                                            context,
-                                            small: isSmallScreen),
+                                    fontSize: AppDimensions.getButtonFontSize(
+                                        context,
+                                        small: isSmallScreen),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     fontFamily: 'SYMBIOAR+LT',
@@ -110,8 +112,7 @@ class SignupButtonComponent extends StatelessWidget {
                                 Icon(
                                   Icons.arrow_forward_ios,
                                   color: Colors.white,
-                                  size: AppDimensions.getButtonFontSize(
-                                          context,
+                                  size: AppDimensions.getButtonFontSize(context,
                                           small: isSmallScreen) *
                                       0.8,
                                 ),

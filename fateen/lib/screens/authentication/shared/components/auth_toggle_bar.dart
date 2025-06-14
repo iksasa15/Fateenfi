@@ -98,11 +98,13 @@ class _AuthToggleBarState extends State<AuthToggleBar>
   // دالة لحساب لون النص بناءً على قيمة الانيميشن
   Color _getTextColor(bool isLogin) {
     if (isLogin) {
-      return Color.lerp(Colors.white, AppColors.textColor, _animation.value) ??
+      return Color.lerp(
+              Colors.white, AppColors.textPrimary, _animation.value) ??
           Colors.white;
     } else {
-      return Color.lerp(AppColors.textColor, Colors.white, _animation.value) ??
-          AppColors.textColor;
+      return Color.lerp(
+              AppColors.textPrimary, Colors.white, _animation.value) ??
+          AppColors.textPrimary;
     }
   }
 
@@ -112,8 +114,8 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value < 0.5
           ? const LinearGradient(
               colors: [
-                AppColors.mediumPurple,
-                AppColors.darkPurple,
+                AppColors.primaryLight,
+                AppColors.primaryDark,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -123,8 +125,8 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value >= 0.5
           ? const LinearGradient(
               colors: [
-                AppColors.mediumPurple,
-                AppColors.darkPurple,
+                AppColors.primaryLight,
+                AppColors.primaryDark,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -139,7 +141,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value < 0.5
           ? [
               BoxShadow(
-                color: AppColors.darkPurple.withOpacity(0.3),
+                color: AppColors.primaryDark.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -149,7 +151,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value >= 0.5
           ? [
               BoxShadow(
-                color: AppColors.darkPurple.withOpacity(0.3),
+                color: AppColors.primaryDark.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

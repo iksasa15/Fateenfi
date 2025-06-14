@@ -272,7 +272,8 @@ class LoginFirebaseService {
           style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: AppColors.darkPurple,
+        backgroundColor:
+            AppColors.primaryDark, // Updated from darkPurple to primaryDark
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

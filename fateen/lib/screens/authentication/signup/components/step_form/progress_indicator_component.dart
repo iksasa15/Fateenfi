@@ -1,7 +1,7 @@
 // lib/features/step_form/components/progress_indicator_component.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../signup_controller/controllers/signup_controller.dart';
 
 class StepProgressIndicator extends StatelessWidget {
@@ -33,7 +33,7 @@ class StepProgressIndicator extends StatelessWidget {
               Text(
                 'الخطوة $currentStepNumber من 7',
                 style: TextStyle(
-                  color: SignupColors.hintColor,
+                  color: AppColors.textHint, // Updated
                   fontSize: screenWidth * 0.035,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -49,7 +49,7 @@ class StepProgressIndicator extends StatelessWidget {
                 height: 8,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: SignupColors.lightPurple.withOpacity(0.3),
+                  color: AppColors.primaryPale.withOpacity(0.3), // Updated
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -62,8 +62,8 @@ class StepProgressIndicator extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      SignupColors.mediumPurple,
-                      SignupColors.darkPurple,
+                      AppColors.primaryLight, // Updated
+                      AppColors.primaryDark, // Updated
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -71,7 +71,7 @@ class StepProgressIndicator extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: SignupColors.mediumPurple.withOpacity(0.3),
+                      color: AppColors.primaryLight.withOpacity(0.3), // Updated
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

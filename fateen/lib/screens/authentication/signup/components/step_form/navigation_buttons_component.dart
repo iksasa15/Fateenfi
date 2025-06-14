@@ -1,7 +1,7 @@
 // lib/features/step_form/components/navigation_buttons_component.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../signup_controller/controllers/signup_controller.dart';
 
 class NavigationButtonsComponent extends StatelessWidget {
@@ -63,13 +63,13 @@ class NavigationButtonsComponent extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: SignupColors.hintColor.withOpacity(0.3),
+                      color: AppColors.textHint.withOpacity(0.3), // Updated
                       width: 1,
                     ),
                   ),
-                  foregroundColor: SignupColors.hintColor,
+                  foregroundColor: AppColors.textHint, // Updated
                   disabledForegroundColor:
-                      SignupColors.hintColor.withOpacity(0.4),
+                      AppColors.textHint.withOpacity(0.4), // Updated
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -77,13 +77,13 @@ class NavigationButtonsComponent extends StatelessWidget {
                     Icon(
                       Icons.arrow_back_ios,
                       size: screenWidth * 0.035,
-                      color: SignupColors.hintColor,
+                      color: AppColors.textHint, // Updated
                     ),
                     SizedBox(width: screenWidth * 0.01),
                     Text(
                       'رجوع',
                       style: TextStyle(
-                        color: SignupColors.hintColor,
+                        color: AppColors.textHint, // Updated
                         fontFamily: 'SYMBIOAR+LT',
                         fontWeight: FontWeight.w500,
                         fontSize: screenWidth * 0.035,
@@ -111,15 +111,17 @@ class NavigationButtonsComponent extends StatelessWidget {
             ? (isLastStep ? onSubmitPressed : onNextPressed)
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isLastStep ? SignupColors.darkPurple : SignupColors.mediumPurple,
+          backgroundColor: isLastStep
+              ? AppColors.primaryDark
+              : AppColors.primaryLight, // Updated
           foregroundColor: Colors.white,
-          disabledBackgroundColor:
-              (isLastStep ? SignupColors.darkPurple : SignupColors.mediumPurple)
-                  .withOpacity(0.5),
+          disabledBackgroundColor: (isLastStep
+                  ? AppColors.primaryDark
+                  : AppColors.primaryLight) // Updated
+              .withOpacity(0.5),
           disabledForegroundColor: Colors.white.withOpacity(0.7),
           elevation: isButtonEnabled ? 4 : 0,
-          shadowColor: SignupColors.mediumPurple.withOpacity(0.5),
+          shadowColor: AppColors.primaryLight.withOpacity(0.5), // Updated
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

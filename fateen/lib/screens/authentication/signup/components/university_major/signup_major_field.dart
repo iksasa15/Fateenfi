@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/signup_strings.dart';
 import '../../../../../core/constants/app_dimensions.dart';
 
@@ -60,7 +60,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: SignupColors.shadowColor.withOpacity(0.05),
+                  color: AppColors.shadowColor.withOpacity(0.05), // Updated
                   blurRadius: 10,
                   spreadRadius: 0.5,
                   offset: const Offset(0, 2),
@@ -86,7 +86,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
       focusNode: widget.focusNode,
       textAlign: TextAlign.right,
       style: TextStyle(
-        color: SignupColors.textColor,
+        color: AppColors.textPrimary, // Updated
         fontSize: fontSize,
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
@@ -96,20 +96,21 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         labelText: "التخصص",
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         labelStyle: TextStyle(
-          color: SignupColors.textColor.withOpacity(0.7),
+          color: AppColors.textPrimary.withOpacity(0.7), // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
-          color: SignupColors.hintColor,
+          color: AppColors.textHint, // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           Icons.school_outlined,
-          color:
-              _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
+          color: _isFocused
+              ? AppColors.primaryLight
+              : AppColors.textHint, // Updated
           size: iconSize,
         ),
         filled: true,
@@ -124,26 +125,26 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.mediumPurple,
+            color: AppColors.primaryLight, // Updated
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1.5,
           ),
         ),
         errorStyle: TextStyle(
-          color: SignupColors.accentColor,
+          color: AppColors.accent, // Updated
           fontSize: isSmallScreen ? 10 : 12,
           fontFamily: 'SYMBIOAR+LT',
         ),
@@ -165,7 +166,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
       readOnly: true, // جعله للقراءة فقط بدلاً من تعطيله تمامًا
       textAlign: TextAlign.right,
       style: TextStyle(
-        color: SignupColors.textColor,
+        color: AppColors.textPrimary, // Updated
         fontSize: fontSize,
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
@@ -178,27 +179,29 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
             : FloatingLabelBehavior.always,
         labelStyle: TextStyle(
           color: _isFocused
-              ? SignupColors.mediumPurple
-              : SignupColors.textColor.withOpacity(0.7),
+              ? AppColors.primaryLight // Updated
+              : AppColors.textPrimary.withOpacity(0.7), // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
-          color: SignupColors.hintColor,
+          color: AppColors.textHint, // Updated
           fontSize: labelSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           Icons.school_outlined,
-          color:
-              _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
+          color: _isFocused
+              ? AppColors.primaryLight
+              : AppColors.textHint, // Updated
           size: iconSize,
         ),
         suffixIcon: Icon(
           Icons.arrow_drop_down,
-          color:
-              _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
+          color: _isFocused
+              ? AppColors.primaryLight
+              : AppColors.textHint, // Updated
           size: iconSize + 4,
         ),
         filled: true,
@@ -213,26 +216,26 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.mediumPurple,
+            color: AppColors.primaryLight, // Updated
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: SignupColors.accentColor,
+            color: AppColors.accent, // Updated
             width: 1.5,
           ),
         ),
         errorStyle: TextStyle(
-          color: SignupColors.accentColor,
+          color: AppColors.accent, // Updated
           fontSize: isSmallScreen ? 10 : 12,
           fontFamily: 'SYMBIOAR+LT',
         ),

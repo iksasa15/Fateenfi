@@ -1,7 +1,7 @@
 // lib/features/step_form/components/final_step_view_component.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/signup_colors.dart';
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../signup_controller/controllers/signup_controller.dart';
 import '../social_terms/terms_agreement_component.dart';
 
@@ -52,12 +52,12 @@ class FinalStepViewComponent extends StatelessWidget {
       width: screenWidth * 0.22,
       height: screenWidth * 0.22,
       decoration: BoxDecoration(
-        color: SignupColors.lightPurple.withOpacity(0.3),
+        color: AppColors.primaryPale.withOpacity(0.3), // Updated
         shape: BoxShape.circle,
       ),
       child: Icon(
         Icons.check_circle_outline,
-        color: SignupColors.darkPurple,
+        color: AppColors.primaryDark, // Updated
         size: screenWidth * 0.15,
       ),
     );
@@ -76,7 +76,7 @@ class FinalStepViewComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: screenWidth * 0.052,
               fontWeight: FontWeight.bold,
-              color: SignupColors.darkPurple,
+              color: AppColors.primaryDark, // Updated
               fontFamily: 'SYMBIOAR+LT',
               height: 1.3,
             ),
@@ -87,7 +87,7 @@ class FinalStepViewComponent extends StatelessWidget {
             'تأكد من صحة بياناتك قبل المتابعة',
             style: TextStyle(
               fontSize: screenWidth * 0.038,
-              color: SignupColors.hintColor,
+              color: AppColors.textHint, // Updated
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -106,7 +106,7 @@ class FinalStepViewComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: SignupColors.mediumPurple.withOpacity(0.15),
+            color: AppColors.primaryLight.withOpacity(0.15), // Updated
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -123,8 +123,8 @@ class FinalStepViewComponent extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  SignupColors.mediumPurple,
-                  SignupColors.darkPurple,
+                  AppColors.primaryLight, // Updated
+                  AppColors.primaryDark, // Updated
                 ],
                 begin: Alignment.centerRight,
                 end: Alignment.centerLeft,
@@ -202,10 +202,10 @@ class FinalStepViewComponent extends StatelessWidget {
         vertical: screenHeight * 0.02,
       ),
       decoration: BoxDecoration(
-        color: SignupColors.lightPurple.withOpacity(0.15),
+        color: AppColors.primaryPale.withOpacity(0.15), // Updated
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: SignupColors.mediumPurple.withOpacity(0.3),
+          color: AppColors.primaryLight.withOpacity(0.3), // Updated
           width: 1,
         ),
       ),
@@ -233,12 +233,12 @@ class FinalStepViewComponent extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: SignupColors.lightPurple.withOpacity(0.2),
+              color: AppColors.primaryPale.withOpacity(0.2), // Updated
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
-              color: SignupColors.darkPurple,
+              color: AppColors.primaryDark, // Updated
               size: 20,
             ),
           ),
@@ -249,7 +249,7 @@ class FinalStepViewComponent extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: SignupColors.hintColor,
+                  color: AppColors.textHint, // Updated
                   fontSize: screenWidth * 0.032,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -259,7 +259,7 @@ class FinalStepViewComponent extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  color: SignupColors.textColor,
+                  color: AppColors.textPrimary, // Updated
                   fontSize: screenWidth * 0.038,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'SYMBIOAR+LT',
@@ -276,7 +276,7 @@ class FinalStepViewComponent extends StatelessWidget {
   // دالة مساعدة لإنشاء خط فاصل
   Widget _buildDivider() {
     return Divider(
-      color: SignupColors.lightPurple.withOpacity(0.3),
+      color: AppColors.primaryPale.withOpacity(0.3), // Updated
       thickness: 1,
       height: 20,
     );

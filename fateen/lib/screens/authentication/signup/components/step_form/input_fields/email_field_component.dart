@@ -1,7 +1,8 @@
 // lib/features/step_form/components/input_fields/email_field_component.dart
 
+import 'package:fateen/core/constants/appColor.dart';
 import 'package:flutter/material.dart';
-import '../../../constants/signup_colors.dart';
+import '../../../../../../core/constants/appColor.dart'; // Updated import
 import '../enhanced_input_field.dart';
 
 class EmailFieldComponent extends StatelessWidget {
@@ -46,13 +47,13 @@ class EmailFieldComponent extends StatelessWidget {
               margin: const EdgeInsets.all(12),
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: SignupColors.mediumPurple,
+                color: AppColors.primaryLight, // Updated
               ),
             )
           : emailError != null
               ? Icon(
                   Icons.error_outline,
-                  color: SignupColors.accentColor,
+                  color: AppColors.accent, // Updated
                   size: 20,
                 )
               : null,

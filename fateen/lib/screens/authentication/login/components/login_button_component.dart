@@ -38,7 +38,7 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
               BorderRadius.circular(LoginDimensions.getLargeRadius(context)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.darkPurple.withOpacity(0.3),
+              color: AppColors.primaryDark.withOpacity(0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
               spreadRadius: -2,
@@ -68,11 +68,11 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
                   end: Alignment.bottomLeft,
                   colors: [
                     widget.isLoading
-                        ? AppColors.mediumPurple.withOpacity(0.8)
-                        : AppColors.mediumPurple,
+                        ? AppColors.primaryLight.withOpacity(0.8)
+                        : AppColors.primaryLight,
                     widget.isLoading
-                        ? AppColors.darkPurple.withOpacity(0.8)
-                        : AppColors.darkPurple,
+                        ? AppColors.primaryDark.withOpacity(0.8)
+                        : AppColors.primaryDark,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(

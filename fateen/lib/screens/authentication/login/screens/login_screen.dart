@@ -1,11 +1,11 @@
 import 'package:fateen/core/constants/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../components/login_header_component.dart';
+import '../../../../core/components/Header/header_component.dart'; // Updated import
 import '../components/login_form_component.dart';
 import '../components/login_footer_component.dart';
 import '../controllers/login_controller.dart';
-import '../constants/login_colors.dart';
+import '../constants/login_strings.dart'; // Added import for strings
 import '../../shared/components/auth_toggle_bar.dart';
 import '../../signup/screens/signup_screen.dart';
 import '../../shared/helpers/custom_route_transitions.dart';
@@ -134,7 +134,8 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ],
             ),
-            backgroundColor: AppColors.accentColor,
+            backgroundColor: AppColors
+                .accent, // Updated to use accent from the new color scheme
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -165,7 +166,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LoginColors.backgroundColor,
+      backgroundColor: AppColors
+          .background, // Updated to use background from the new color scheme
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -180,8 +182,18 @@ class _LoginScreenState extends State<LoginScreen>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // رأس الصفحة
-                      const LoginHeaderComponent(),
+                      // رأس الصفحة - استخدام الهيدر المشترك
+                      HeaderComponent(
+                        title: LoginStrings.loginTitle,
+                        subtitle: LoginStrings.formInfoText,
+                        showWavingHand: true,
+                        gradientColors: [
+                          AppColors
+                              .primaryDark, // Updated to use primaryDark from the new color scheme
+                          AppColors
+                              .primaryLight, // Updated to use primaryLight from the new color scheme
+                        ],
+                      ),
 
                       // زر التبديل بين التسجيل وإنشاء الحساب - نضعه هنا ليتطابق مع شاشة التسجيل
                       Directionality(
