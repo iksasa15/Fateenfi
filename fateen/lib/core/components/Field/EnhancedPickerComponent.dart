@@ -89,14 +89,14 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
               child: Container(
                 height: totalHeight,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colorSurface,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: context.colorShadowColor,
                       blurRadius: 10,
                       spreadRadius: 0,
                       offset: const Offset(0, -1),
@@ -112,7 +112,9 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                       width: screenWidth * 0.1,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: context.isDarkMode
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -122,14 +124,14 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                       height: headerHeight,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colorSurface,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24),
                           topRight: Radius.circular(24),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: context.colorShadow,
                             blurRadius: 4,
                             spreadRadius: 0,
                             offset: const Offset(0, 1),
@@ -149,7 +151,7 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.textHint,
+                              foregroundColor: context.colorTextHint,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
                             ),
@@ -168,7 +170,7 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                             style: TextStyle(
                               fontSize: isTablet ? 18 : 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primaryDark,
+                              color: context.colorPrimaryDark,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -187,7 +189,7 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryLight,
+                              foregroundColor: context.colorPrimaryLight,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12),
                             ),
@@ -207,7 +209,7 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                     // استخدام Expanded لضمان عدم تجاوز المساحة المتاحة
                     Expanded(
                       child: Container(
-                        color: Colors.white,
+                        color: context.colorSurface,
                         child: ListView.builder(
                           shrinkWrap: true,
                           physics: const BouncingScrollPhysics(),
@@ -237,12 +239,14 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppColors.primaryLight
+                                        ? context.colorPrimaryLight
                                             .withOpacity(0.1)
                                         : Colors.transparent,
                                     border: Border(
                                       bottom: BorderSide(
-                                        color: Colors.grey.shade200,
+                                        color: context.isDarkMode
+                                            ? context.colorBorder
+                                            : Colors.grey.shade200,
                                         width: 0.5,
                                       ),
                                     ),
@@ -254,12 +258,12 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                                       isSelected
                                           ? Icon(
                                               Icons.check_circle,
-                                              color: AppColors.primaryLight,
+                                              color: context.colorPrimaryLight,
                                               size: isTablet ? 24 : 20,
                                             )
                                           : Icon(
                                               Icons.circle_outlined,
-                                              color: AppColors.textHint,
+                                              color: context.colorTextHint,
                                               size: isTablet ? 24 : 20,
                                             ),
 
@@ -271,8 +275,8 @@ class _EnhancedPickerComponentState extends State<EnhancedPickerComponent>
                                           style: TextStyle(
                                             fontSize: isTablet ? 16 : 14,
                                             color: isSelected
-                                                ? AppColors.primaryDark
-                                                : AppColors.textPrimary,
+                                                ? context.colorPrimaryDark
+                                                : context.colorTextPrimary,
                                             fontWeight: isSelected
                                                 ? FontWeight.bold
                                                 : FontWeight.normal,

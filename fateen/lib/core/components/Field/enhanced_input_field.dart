@@ -103,8 +103,8 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
         },
         style: TextStyle(
           color: widget.enabled
-              ? AppColors.textPrimary
-              : AppColors.textPrimary.withOpacity(0.6),
+              ? context.colorTextPrimary
+              : context.colorTextPrimary.withOpacity(0.6),
           fontSize: fontSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
@@ -113,41 +113,47 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
           labelText: widget.title,
           labelStyle: TextStyle(
             color: !widget.enabled
-                ? AppColors.textPrimary.withOpacity(0.4)
+                ? context.colorTextPrimary.withOpacity(0.4)
                 : widget.isError
-                    ? AppColors.accent
+                    ? context.colorAccent
                     : (widget.focusNode.hasFocus
-                        ? AppColors.primaryLight
-                        : AppColors.textPrimary.withOpacity(0.7)),
+                        ? context.colorPrimaryLight
+                        : context.colorTextPrimary.withOpacity(0.7)),
             fontSize: labelSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
           hintStyle: TextStyle(
-            color: AppColors.textHint.withOpacity(widget.enabled ? 1.0 : 0.5),
+            color:
+                context.colorTextHint.withOpacity(widget.enabled ? 1.0 : 0.5),
             fontSize: labelSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
           prefixIcon: Icon(
             widget.icon,
             color: !widget.enabled
-                ? AppColors.textHint.withOpacity(0.5)
+                ? context.colorTextHint.withOpacity(0.5)
                 : widget.isError
-                    ? AppColors.accent
+                    ? context.colorAccent
                     : (widget.focusNode.hasFocus ||
                             widget.controller.text.isNotEmpty
-                        ? AppColors.primaryLight
-                        : AppColors.textHint),
+                        ? context.colorPrimaryLight
+                        : context.colorTextHint),
             size: iconSize,
           ),
           suffixIcon: widget.suffixIcon,
           filled: true,
-          fillColor:
-              widget.enabled ? Colors.white : Colors.white.withOpacity(0.9),
+          fillColor: widget.enabled
+              ? context.colorSurface
+              : context.colorSurface.withOpacity(0.9),
           enabledBorder: OutlineInputBorder(
             borderRadius:
                 BorderRadius.circular(AppDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: widget.isError ? AppColors.accent : Colors.grey.shade200,
+              color: widget.isError
+                  ? context.colorAccent
+                  : context.isDarkMode
+                      ? context.colorBorder
+                      : Colors.grey.shade200,
               width: widget.isError ? 1.5 : 1,
             ),
           ),
@@ -155,7 +161,9 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
             borderRadius:
                 BorderRadius.circular(AppDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: widget.isError ? AppColors.accent : AppColors.primaryLight,
+              color: widget.isError
+                  ? context.colorAccent
+                  : context.colorPrimaryLight,
               width: 1.5,
             ),
           ),
@@ -163,7 +171,9 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
             borderRadius:
                 BorderRadius.circular(AppDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: Colors.grey.shade200,
+              color: context.isDarkMode
+                  ? context.colorBorder
+                  : Colors.grey.shade200,
               width: 1,
             ),
           ),
@@ -171,7 +181,7 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
             borderRadius:
                 BorderRadius.circular(AppDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: AppColors.accent,
+              color: context.colorAccent,
               width: 1,
             ),
           ),
@@ -179,12 +189,12 @@ class _EnhancedInputFieldState extends State<EnhancedInputField> {
             borderRadius:
                 BorderRadius.circular(AppDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: AppColors.accent,
+              color: context.colorAccent,
               width: 1.5,
             ),
           ),
           errorStyle: TextStyle(
-            color: AppColors.accent,
+            color: context.colorAccent,
             fontSize: isSmallScreen ? 10 : 12,
             fontFamily: 'SYMBIOAR+LT',
           ),

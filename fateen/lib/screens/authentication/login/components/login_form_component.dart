@@ -199,7 +199,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
         children: [
           Icon(
             Icons.error_outline,
-            color: AppColors.accent,
+            color: context.colorAccent,
             size: 18,
           ),
           SizedBox(width: 8),
@@ -207,7 +207,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             child: Text(
               message,
               style: TextStyle(
-                color: AppColors.accent,
+                color: context.colorAccent,
                 fontSize: 13,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -260,7 +260,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                   Text(
                     LoginStrings.forgotPasswordText,
                     style: TextStyle(
-                      color: AppColors.primaryDark,
+                      color: context.colorPrimaryDark,
                       fontSize: LoginDimensions.getBodyFontSize(context,
                           small: isSmallScreen),
                       fontWeight: FontWeight.w500,
@@ -273,7 +273,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                           2),
                   Icon(
                     Icons.lock_reset_rounded,
-                    color: AppColors.primaryDark,
+                    color: context.colorPrimaryDark,
                     size: LoginDimensions.getBodyFontSize(context,
                             small: isSmallScreen) +
                         2,
@@ -320,10 +320,10 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                   : Icons.visibility_off_outlined,
               key: ValueKey<bool>(widget.controller.passwordVisible),
               color: widget.controller.isLoggingIn
-                  ? AppColors.textHint.withOpacity(0.5)
+                  ? context.colorTextHint.withOpacity(0.5)
                   : (widget.controller.passwordVisible
-                      ? AppColors.primaryLight
-                      : AppColors.textHint),
+                      ? context.colorPrimaryLight
+                      : context.colorTextHint),
               size: iconSize,
             ),
           ),

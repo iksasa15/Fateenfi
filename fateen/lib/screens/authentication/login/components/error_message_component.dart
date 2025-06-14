@@ -91,16 +91,16 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
                 padding: EdgeInsets.all(LoginDimensions.getSpacing(context,
                     size: SpacingSize.small)),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.08),
+                  color: context.colorAccent.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(
                       LoginDimensions.getMediumRadius(context)),
                   border: Border.all(
-                    color: AppColors.accent.withOpacity(0.2),
+                    color: context.colorAccent.withOpacity(0.2),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accent.withOpacity(0.05),
+                      color: context.colorAccent.withOpacity(0.05),
                       blurRadius: 8,
                       spreadRadius: 0,
                       offset: const Offset(0, 2),
@@ -116,12 +116,12 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
                               size: SpacingSize.small) /
                           2),
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.1),
+                        color: context.colorAccent.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.error_outline_rounded,
-                        color: AppColors.accent,
+                        color: context.colorAccent,
                         size: isSmallScreen
                             ? LoginDimensions.getIconSize(context, small: true)
                             : LoginDimensions.getIconSize(context),
@@ -134,7 +134,7 @@ class _ErrorMessageComponentState extends State<ErrorMessageComponent>
                       child: Text(
                         widget.errorMessage,
                         style: TextStyle(
-                          color: AppColors.accent,
+                          color: context.colorAccent,
                           fontSize: LoginDimensions.getBodyFontSize(context,
                               small: isSmallScreen),
                           fontFamily: 'SYMBIOAR+LT',

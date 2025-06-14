@@ -60,7 +60,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowColor.withOpacity(0.05),
+              color: context.colorShadowColor.withOpacity(0.05),
               blurRadius: 10,
               spreadRadius: 0.5,
               offset: const Offset(0, 2),
@@ -81,7 +81,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
       focusNode: _focusNode,
       textAlign: TextAlign.right,
       style: TextStyle(
-        color: AppColors.textPrimary,
+        color: context.colorTextPrimary,
         fontSize: AppDimensions.getBodyFontSize(context, small: isSmallScreen),
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
@@ -91,30 +91,31 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
         labelText: widget.title,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         labelStyle: TextStyle(
-          color: AppColors.textPrimary.withOpacity(0.7),
+          color: context.colorTextPrimary.withOpacity(0.7),
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
-          color: AppColors.textHint,
+          color: context.colorTextHint,
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           widget.icon,
-          color: _isFocused ? AppColors.primaryLight : AppColors.textHint,
+          color: _isFocused ? context.colorPrimaryLight : context.colorTextHint,
           size: AppDimensions.getIconSize(context, small: isSmallScreen),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: context.colorSurface,
         enabledBorder: OutlineInputBorder(
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: Colors.grey.shade200,
+            color:
+                context.isDarkMode ? context.colorBorder : Colors.grey.shade200,
             width: 1,
           ),
         ),
@@ -122,7 +123,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.primaryLight,
+            color: context.colorPrimaryLight,
             width: 1.5,
           ),
         ),
@@ -130,7 +131,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.accent,
+            color: context.colorAccent,
             width: 1,
           ),
         ),
@@ -138,12 +139,12 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.accent,
+            color: context.colorAccent,
             width: 1.5,
           ),
         ),
         errorStyle: TextStyle(
-          color: AppColors.accent,
+          color: context.colorAccent,
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen) - 1,
           fontFamily: 'SYMBIOAR+LT',
@@ -168,7 +169,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
       focusNode: _focusNode,
       textAlign: TextAlign.right,
       style: TextStyle(
-        color: AppColors.textPrimary,
+        color: context.colorTextPrimary,
         fontSize: AppDimensions.getBodyFontSize(context, small: isSmallScreen),
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
@@ -181,36 +182,37 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
             : FloatingLabelBehavior.always,
         labelStyle: TextStyle(
           color: _isFocused
-              ? AppColors.primaryLight
-              : AppColors.textPrimary.withOpacity(0.7),
+              ? context.colorPrimaryLight
+              : context.colorTextPrimary.withOpacity(0.7),
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
-          color: AppColors.textHint,
+          color: context.colorTextHint,
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           widget.icon,
-          color: _isFocused ? AppColors.primaryLight : AppColors.textHint,
+          color: _isFocused ? context.colorPrimaryLight : context.colorTextHint,
           size: AppDimensions.getIconSize(context, small: isSmallScreen),
         ),
         suffixIcon: Icon(
           Icons.arrow_drop_down,
-          color: _isFocused ? AppColors.primaryLight : AppColors.textHint,
+          color: _isFocused ? context.colorPrimaryLight : context.colorTextHint,
           size: AppDimensions.getIconSize(context, small: isSmallScreen) + 4,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: context.colorSurface,
         enabledBorder: OutlineInputBorder(
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: Colors.grey.shade200,
+            color:
+                context.isDarkMode ? context.colorBorder : Colors.grey.shade200,
             width: 1,
           ),
         ),
@@ -218,7 +220,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.primaryLight,
+            color: context.colorPrimaryLight,
             width: 1.5,
           ),
         ),
@@ -226,7 +228,7 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.accent,
+            color: context.colorAccent,
             width: 1,
           ),
         ),
@@ -234,12 +236,12 @@ class _EnhancedSelectionFieldState extends State<EnhancedSelectionField> {
           borderRadius:
               BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
-            color: AppColors.accent,
+            color: context.colorAccent,
             width: 1.5,
           ),
         ),
         errorStyle: TextStyle(
-          color: AppColors.accent,
+          color: context.colorAccent,
           fontSize:
               AppDimensions.getLabelFontSize(context, small: isSmallScreen) - 1,
           fontFamily: 'SYMBIOAR+LT',

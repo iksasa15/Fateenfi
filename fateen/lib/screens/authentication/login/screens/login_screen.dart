@@ -134,8 +134,7 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ],
             ),
-            backgroundColor: AppColors
-                .accent, // Updated to use accent from the new color scheme
+            backgroundColor: context.colorAccent, // استخدام Extension
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -166,8 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors
-          .background, // Updated to use background from the new color scheme
+      backgroundColor: context.colorBackground, // استخدام Extension
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -188,10 +186,8 @@ class _LoginScreenState extends State<LoginScreen>
                         subtitle: LoginStrings.formInfoText,
                         showWavingHand: true,
                         gradientColors: [
-                          AppColors
-                              .primaryDark, // Updated to use primaryDark from the new color scheme
-                          AppColors
-                              .primaryLight, // Updated to use primaryLight from the new color scheme
+                          context.colorPrimaryDark, // استخدام Extension
+                          context.colorPrimaryLight, // استخدام Extension
                         ],
                       ),
 

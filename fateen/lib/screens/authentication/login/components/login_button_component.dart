@@ -38,7 +38,7 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
               BorderRadius.circular(LoginDimensions.getLargeRadius(context)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryDark.withOpacity(0.3),
+              color: context.colorPrimaryDark.withOpacity(0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
               spreadRadius: -2,
@@ -63,18 +63,31 @@ class _LoginButtonComponentState extends State<LoginButtonComponent> {
             highlightColor: Colors.white.withOpacity(0.05),
             child: Ink(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    widget.isLoading
-                        ? AppColors.primaryLight.withOpacity(0.8)
-                        : AppColors.primaryLight,
-                    widget.isLoading
-                        ? AppColors.primaryDark.withOpacity(0.8)
-                        : AppColors.primaryDark,
-                  ],
-                ),
+                gradient: context.isDarkMode
+                    ? LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          widget.isLoading
+                              ? context.colorPrimaryLight.withOpacity(0.8)
+                              : context.colorPrimaryLight,
+                          widget.isLoading
+                              ? context.colorPrimaryDark.withOpacity(0.8)
+                              : context.colorPrimaryDark,
+                        ],
+                      )
+                    : LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          widget.isLoading
+                              ? context.colorPrimaryLight.withOpacity(0.8)
+                              : context.colorPrimaryLight,
+                          widget.isLoading
+                              ? context.colorPrimaryDark.withOpacity(0.8)
+                              : context.colorPrimaryDark,
+                        ],
+                      ),
                 borderRadius: BorderRadius.circular(
                     LoginDimensions.getLargeRadius(context)),
               ),

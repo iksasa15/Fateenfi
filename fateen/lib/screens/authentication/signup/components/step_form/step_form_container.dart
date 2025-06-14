@@ -4,23 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../core/constants/appColor.dart';
 import '../../signup_controller/controllers/signup_controller.dart';
-import '../university_major/signup_major_field.dart';
-import '../university_major/signup_university_field.dart';
 import '../social_terms/terms_agreement_component.dart';
-import '../university_major/major_picker_component.dart';
-import '../university_major/university_picker_component.dart';
 import 'progress_indicator_component.dart';
 import 'step_title_component.dart';
 import 'final_step_view_component.dart';
 import 'navigation_buttons_component.dart';
-import '../../../../../core/components/Field/enhanced_input_field.dart'; // استيراد المكون الموحد
+import '../../../../../core/components/Field/EnhancedPickerComponent.dart';
+import '../../../../../core/components/Field/enhanced_selection_field.dart';
+import '../../../../../core/components/Field/EnhancedPickerComponent.dart';
+import '../../../../../core/components/Field/enhanced_input_field.dart';
+import '../../constants/signup_strings.dart';
 
 class StepFormContainer extends StatefulWidget {
   final SignupController controller;
   final VoidCallback onNextPressed;
   final VoidCallback onPrevPressed;
   final VoidCallback onSubmitPressed;
-  final VoidCallback? onLoginPressed;
+  final VoidCallback?
+      onLoginPressed; // إضافة جديدة: دالة للانتقال إلى شاشة تسجيل الدخول
 
   const StepFormContainer({
     Key? key,
@@ -28,7 +29,7 @@ class StepFormContainer extends StatefulWidget {
     required this.onNextPressed,
     required this.onPrevPressed,
     required this.onSubmitPressed,
-    this.onLoginPressed,
+    this.onLoginPressed, // إضافة جديدة (اختيارية)
   }) : super(key: key);
 
   @override
@@ -663,6 +664,90 @@ class _StepFormContainerState extends State<StepFormContainer>
     return Colors.green;
   }
 
+  // 1. حقل الجامعة باستخدام المكون الموحد
+  Widget _buildUniversityField() {
+    return EnhancedSelectionField(
+      title: SignupStrings.universityNameLabel,
+      hintText: SignupStrings.universityNameHint,
+      controller: widget.controller.universityNameController,
+      icon: Icons.account_balance_outlined,
+      onTap: () => _showUniversityPicker(context),
+      errorText: (_hasAttemptedUniversityValidation &&
+              !widget.controller.validateUniversity())
+          ? 'الرجاء اختيار الجامعة'
+          : null,
+      isEditable: widget.controller.isOtherUniversity,
+      focusNode: widget.controller.universityFocusNode,
+    );
+  }
+
+  // 2. حقل التخصص باستخدام المكون الموحد
+  Widget _buildMajorField() {
+    return EnhancedSelectionField(
+      title: "التخصص",
+      hintText: SignupStrings.majorHint,
+      controller: widget.controller.majorController,
+      icon: Icons.school_outlined,
+      onTap: () => _showMajorPicker(context),
+      errorText:
+          (_hasAttemptedMajorValidation && !widget.controller.validateMajor())
+              ? 'الرجاء اختيار التخصص'
+              : null,
+      isEditable: widget.controller.isOtherMajor,
+      focusNode: widget.controller.majorFocusNode,
+    );
+  }
+
+  // 3. منتقي الجامعة باستخدام المكون الموحد
+  void _showUniversityPicker(BuildContext context) {
+    HapticFeedback.mediumImpact();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EnhancedPickerComponent(
+        itemsList: widget.controller.getUniversitiesList,
+        selectedItem: widget.controller.selectedUniversity,
+        onItemSelected: (university) {
+          widget.controller.selectUniversity(university);
+        },
+        onCancel: () {
+          Navigator.pop(context);
+        },
+        onDone: () {
+          Navigator.pop(context);
+        },
+        title: SignupStrings.universityPickerTitle,
+      ),
+    );
+  }
+
+  // 4. منتقي التخصص باستخدام المكون الموحد
+  void _showMajorPicker(BuildContext context) {
+    HapticFeedback.mediumImpact();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EnhancedPickerComponent(
+        itemsList: widget.controller.getMajorsList,
+        selectedItem: widget.controller.selectedMajor,
+        onItemSelected: (major) {
+          widget.controller.selectMajor(major);
+        },
+        onCancel: () {
+          Navigator.pop(context);
+        },
+        onDone: () {
+          Navigator.pop(context);
+        },
+        title: 'اختر التخصص',
+      ),
+    );
+  }
+
   // دالة مخصصة للتحقق من اسم المستخدم مع إضافة خيار تسجيل الدخول
   String? _customUsernameValidator(String? value) {
     final originalError = widget.controller.validateUsername(value);
@@ -694,33 +779,6 @@ class _StepFormContainerState extends State<StepFormContainer>
     if (widget.controller.validateCurrentStep()) {
       await _navigateToNextStep();
     }
-  }
-
-  // نستخدم الدوال الأصلية لحقول الجامعة والتخصص لأنها تستخدم منتقيات خاصة
-  Widget _buildUniversityField() {
-    return SignupUniversityField(
-      controller: widget.controller.universityNameController,
-      focusNode: widget.controller.universityFocusNode,
-      isOtherUniversity: widget.controller.isOtherUniversity,
-      onTap: () => _showUniversityPicker(context),
-      errorText: (_hasAttemptedUniversityValidation &&
-              !widget.controller.validateUniversity())
-          ? 'الرجاء اختيار الجامعة'
-          : null,
-    );
-  }
-
-  Widget _buildMajorField() {
-    return SignupMajorField(
-      controller: widget.controller.majorController,
-      focusNode: widget.controller.majorFocusNode,
-      isOtherMajor: widget.controller.isOtherMajor,
-      onTap: () => _showMajorPicker(context),
-      errorText:
-          (_hasAttemptedMajorValidation && !widget.controller.validateMajor())
-              ? 'الرجاء اختيار التخصص'
-              : null,
-    );
   }
 
   // عرض الشروط والأحكام
@@ -757,54 +815,6 @@ class _StepFormContainerState extends State<StepFormContainer>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // عرض منتقي التخصص
-  void _showMajorPicker(BuildContext context) {
-    HapticFeedback.mediumImpact();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => MajorPickerComponent(
-        majorsList: widget.controller.getMajorsList,
-        selectedMajor: widget.controller.selectedMajor,
-        onMajorSelected: (major) {
-          widget.controller.selectMajor(major);
-        },
-        onCancel: () {
-          Navigator.pop(context);
-        },
-        onDone: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
-  // عرض منتقي الجامعة
-  void _showUniversityPicker(BuildContext context) {
-    HapticFeedback.mediumImpact();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => UniversityPickerComponent(
-        universitiesList: widget.controller.getUniversitiesList,
-        selectedUniversity: widget.controller.selectedUniversity,
-        onUniversitySelected: (university) {
-          widget.controller.selectUniversity(university);
-        },
-        onCancel: () {
-          Navigator.pop(context);
-        },
-        onDone: () {
-          Navigator.pop(context);
-        },
       ),
     );
   }

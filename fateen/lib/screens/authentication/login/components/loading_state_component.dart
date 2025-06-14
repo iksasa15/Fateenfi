@@ -50,9 +50,9 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
           shaderCallback: (bounds) {
             return LinearGradient(
               colors: [
-                AppColors.shimmerBase,
-                AppColors.shimmerHighlight,
-                AppColors.shimmerBase,
+                context.colorShimmerBase,
+                context.colorShimmerHighlight,
+                context.colorShimmerBase,
               ],
               stops: const [0.1, 0.5, 0.9],
               begin: Alignment(_animation.value - 1, 0),
@@ -98,7 +98,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                           bottom:
                               screenHeight * 0.015), // 1.5% من ارتفاع الشاشة
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colorSurface,
                         borderRadius: BorderRadius.circular(
                             screenWidth * 0.044), // 4.4% من عرض الشاشة
                       ),
@@ -115,7 +115,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     margin: EdgeInsets.only(
                         right: screenWidth * 0.022), // 2.2% من عرض الشاشة
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colorSurface,
                       borderRadius: BorderRadius.circular(
                           screenWidth * 0.033), // 3.3% من عرض الشاشة
                     ),
@@ -124,7 +124,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     width: screenWidth * 0.333, // 33.3% من عرض الشاشة
                     height: screenHeight * 0.025, // 2.5% من ارتفاع الشاشة
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.8),
+                      color: context.colorSurface.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(
                           screenWidth * 0.028), // 2.8% من عرض الشاشة
                     ),
@@ -165,7 +165,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     bottom: screenHeight * 0.04, // 4% من ارتفاع الشاشة
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colorSurface,
                     borderRadius: BorderRadius.circular(
                         screenWidth * 0.033), // 3.3% من عرض الشاشة
                   ),
@@ -184,12 +184,14 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     margin: EdgeInsets.only(
                         bottom: screenHeight * 0.04), // 4% من ارتفاع الشاشة
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colorSurface,
                       borderRadius: BorderRadius.circular(
                           screenWidth * 0.044), // 4.4% من عرض الشاشة
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade100,
+                          color: context.isDarkMode
+                              ? context.colorShadowColor
+                              : Colors.grey.shade100,
                           blurRadius: 10 * _pulseAnimation.value,
                           spreadRadius: 1,
                         ),
@@ -208,7 +210,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     Expanded(
                       child: Container(
                         height: 1.5,
-                        color: Colors.white,
+                        color: context.colorSurface,
                       ),
                     ),
                     Container(
@@ -218,7 +220,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                           horizontal:
                               screenWidth * 0.044), // 4.4% من عرض الشاشة
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colorSurface,
                         borderRadius: BorderRadius.circular(
                             screenWidth * 0.042), // 4.2% من عرض الشاشة
                       ),
@@ -226,7 +228,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                     Expanded(
                       child: Container(
                         height: 1.5,
-                        color: Colors.white,
+                        color: context.colorSurface,
                       ),
                     ),
                   ],
@@ -260,12 +262,14 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
     return Container(
       height: screenHeight * 0.075, // 7.5% من ارتفاع الشاشة
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius:
             BorderRadius.circular(screenWidth * 0.044), // 4.4% من عرض الشاشة
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade50,
+            color: context.isDarkMode
+                ? context.colorShadowColor
+                : Colors.grey.shade50,
             blurRadius: 8,
             spreadRadius: 1,
           ),
@@ -279,7 +283,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
             padding: EdgeInsets.all(screenWidth * 0.033), // 3.3% من عرض الشاشة
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSurface,
                 borderRadius: BorderRadius.circular(
                     screenWidth * 0.033), // 3.3% من عرض الشاشة
               ),
@@ -297,7 +301,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                   margin: EdgeInsets.only(
                       bottom: screenHeight * 0.0075), // 0.75% من ارتفاع الشاشة
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colorSurface,
                     borderRadius: BorderRadius.circular(
                         screenWidth * 0.017), // 1.7% من عرض الشاشة
                   ),
@@ -306,7 +310,7 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
                   width: screenWidth * 0.333, // 33.3% من عرض الشاشة
                   height: screenHeight * 0.02, // 2% من ارتفاع الشاشة
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: context.colorSurface.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(
                         screenWidth * 0.022), // 2.2% من عرض الشاشة
                   ),
@@ -337,12 +341,14 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
           width: buttonSize,
           height: buttonSize,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.colorSurface,
             borderRadius: BorderRadius.circular(
                 screenWidth * 0.044), // 4.4% من عرض الشاشة
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade100,
+                color: context.isDarkMode
+                    ? context.colorShadowColor
+                    : Colors.grey.shade100,
                 blurRadius: 5 * _pulseAnimation.value,
                 spreadRadius: 1,
               ),
