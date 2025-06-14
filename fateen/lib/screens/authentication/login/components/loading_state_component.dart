@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../shared/constants/auth_colors.dart';
+import '../../../../core/constants/appColor.dart';
 
 class LoadingStateComponent extends StatefulWidget {
   const LoadingStateComponent({Key? key}) : super(key: key);

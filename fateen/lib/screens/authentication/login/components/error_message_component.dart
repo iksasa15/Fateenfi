@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../shared/constants/auth_colors.dart';
+import '../../../../core/constants/appColor.dart';
 import '../constants/login_dimensions.dart';
 
 class ErrorMessageComponent extends StatefulWidget {

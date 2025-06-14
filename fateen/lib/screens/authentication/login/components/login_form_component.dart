@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../shared/constants/auth_colors.dart';
+import '../../../../core/constants/appColor.dart';
 import '../constants/login_strings.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_dimensions.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/appColor.dart';
 import '../constants/auth_strings.dart';
 
 enum AuthToggleMode {

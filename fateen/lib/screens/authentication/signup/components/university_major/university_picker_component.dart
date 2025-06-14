@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../constants/signup_dimensions.dart';
+import '../../../../../core/constants/appDimensions.dart';
 
 class UniversityPickerComponent extends StatefulWidget {
   final List<String> universitiesList;

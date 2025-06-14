@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/signup_colors.dart';
 import '../constants/signup_strings.dart';
-import '../constants/signup_dimensions.dart';
+import '../../../../core/constants/appDimensions.dart';
 import '../signup_controller/controllers/signup_controller.dart';
 
 class SignupFormComponent extends StatelessWidget {

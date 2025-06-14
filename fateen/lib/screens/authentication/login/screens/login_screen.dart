@@ -1,4 +1,4 @@
-import 'package:fateen/screens/authentication/shared/constants/auth_colors.dart';
+import 'package:fateen/core/constants/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/login_header_component.dart';

@@ -1,16 +1,33 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/appColor.dart';
-import '../constants/login_strings.dart';
-import '../../../../core/constants/appDimensions.dart'; // استخدام نفس الأبعاد من signup
+import '../../constants/appColor.dart';
+import '../../constants/appDimensions.dart';
 
-class LoginHeaderComponent extends StatefulWidget {
-  const LoginHeaderComponent({Key? key}) : super(key: key);
+class HeaderComponent extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final bool showWavingHand;
+  final List<Color> gradientColors;
+  final Color? iconColor;
+  final Color? subtitleColor;
+
+  const HeaderComponent({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    this.showWavingHand = true,
+    this.gradientColors = const [
+      AuthColors.darkPurple,
+      AuthColors.mediumPurple,
+    ],
+    this.iconColor,
+    this.subtitleColor,
+  }) : super(key: key);
 
   @override
-  State<LoginHeaderComponent> createState() => _LoginHeaderComponentState();
+  State<HeaderComponent> createState() => _HeaderComponentState();
 }
 
-class _LoginHeaderComponentState extends State<LoginHeaderComponent>
+class _HeaderComponentState extends State<HeaderComponent>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _waveAnimation;
@@ -36,10 +53,11 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على حجم الشاشة للتصميم المتجاوب
     final isSmallScreen = MediaQuery.of(context).size.width < 360;
+    final actualIconColor =
+        widget.iconColor ?? AuthColors.accentColor.withOpacity(0.7);
+    final actualSubtitleColor = widget.subtitleColor ?? AuthColors.hintColor;
 
-    // استخدام نفس هيكل الهوامش تمامًا كما في signup_header_component
     return Container(
       padding: EdgeInsets.fromLTRB(
           SignupDimensions.getSpacing(context, size: SpacingSize.large),
@@ -50,18 +68,20 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // عنوان مع تأثير تدرج لوني خفيف
+          // عنوان مع تأثير تدرج لوني
           ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
               colors: [
-                AuthColors.darkPurple,
-                AuthColors.mediumPurple.withOpacity(0.9),
+                widget.gradientColors[0],
+                widget.gradientColors.length > 1
+                    ? widget.gradientColors[1].withOpacity(0.9)
+                    : widget.gradientColors[0].withOpacity(0.7),
               ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
             ).createShader(bounds),
             child: Text(
-              LoginStrings.loginTitle,
+              widget.title,
               style: TextStyle(
                 fontSize: SignupDimensions.getTitleFontSize(context,
                     small: isSmallScreen),
@@ -77,33 +97,35 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
                   size: SpacingSize.small)),
           Row(
             children: [
-              // أيقونة ترحيبية متحركة
-              AnimatedBuilder(
-                animation: _waveAnimation,
-                builder: (context, child) {
-                  return Transform.rotate(
-                    angle: _waveAnimation.value * 0.2,
-                    child: Icon(
-                      Icons.waving_hand_rounded,
-                      color: AuthColors.accentColor.withOpacity(0.7),
-                      size: SignupDimensions.getSubtitleFontSize(context,
-                              small: isSmallScreen) +
-                          2,
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                  width: SignupDimensions.getSpacing(context,
-                          size: SpacingSize.small) /
-                      2),
+              // أيقونة ترحيبية متحركة - تظهر فقط إذا كانت showWavingHand = true
+              if (widget.showWavingHand)
+                AnimatedBuilder(
+                  animation: _waveAnimation,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _waveAnimation.value * 0.2,
+                      child: Icon(
+                        Icons.waving_hand_rounded,
+                        color: actualIconColor,
+                        size: SignupDimensions.getSubtitleFontSize(context,
+                                small: isSmallScreen) +
+                            2,
+                      ),
+                    );
+                  },
+                ),
+              if (widget.showWavingHand)
+                SizedBox(
+                    width: SignupDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        2),
               Expanded(
                 child: Text(
-                  LoginStrings.formInfoText,
+                  widget.subtitle,
                   style: TextStyle(
                     fontSize: SignupDimensions.getSubtitleFontSize(context,
                         small: isSmallScreen),
-                    color: AuthColors.hintColor,
+                    color: actualSubtitleColor,
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,
                   ),
