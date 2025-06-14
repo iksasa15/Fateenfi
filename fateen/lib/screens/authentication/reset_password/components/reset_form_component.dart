@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/appColor.dart'; // Updated import
+import '../../../../core/constants/appColor.dart';
 import '../constants/reset_password_strings.dart';
 import '../controllers/reset_password_controller.dart';
+import '../../../../core/components/Field/enhanced_input_field.dart'; // استيراد المكون الموحد
 
-class ResetFormComponent extends StatelessWidget {
+class ResetFormComponent extends StatefulWidget {
   final ResetPasswordController controller;
   final String? Function(String?) validator;
 
@@ -14,84 +15,48 @@ class ResetFormComponent extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ResetFormComponent> createState() => _ResetFormComponentState();
+}
+
+class _ResetFormComponentState extends State<ResetFormComponent> {
+  // إضافة FocusNode للحقل
+  final FocusNode _emailFocusNode = FocusNode();
+
+  // إضافة GlobalKey للحقل
+  final GlobalKey<FormFieldState> _emailFieldKey = GlobalKey<FormFieldState>();
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    final isTablet = screenWidth > 600;
-
-    // تحديد أحجام الخط
-    final fontSize = isTablet ? 16.0 : (isSmallScreen ? 14.0 : 15.0);
-    final labelSize = isTablet ? 14.0 : (isSmallScreen ? 12.0 : 13.0);
-    final iconSize = isTablet ? 24.0 : 22.0;
-
-    return TextFormField(
-      controller: controller.emailController,
+    return EnhancedInputField(
+      title: ResetPasswordStrings.emailLabel,
+      hintText: ResetPasswordStrings.emailHint,
+      controller: widget.controller.emailController,
+      icon: Icons.email_outlined,
+      validator: widget.validator,
+      focusNode: _emailFocusNode,
+      formFieldKey: _emailFieldKey,
       keyboardType: TextInputType.emailAddress,
-      textAlign: TextAlign.right,
-      style: TextStyle(
-        color: AppColors.textPrimary, // Updated
-        fontSize: fontSize,
-        fontFamily: 'SYMBIOAR+LT',
-      ),
-      decoration: InputDecoration(
-        hintText: ResetPasswordStrings.emailHint,
-        labelText: ResetPasswordStrings.emailLabel,
-        labelStyle: TextStyle(
-          color: AppColors.textPrimary.withOpacity(0.7), // Updated
-          fontSize: labelSize,
-          fontFamily: 'SYMBIOAR+LT',
-        ),
-        hintStyle: TextStyle(
-          color: AppColors.textHint, // Updated
-          fontSize: labelSize,
-          fontFamily: 'SYMBIOAR+LT',
-        ),
-        prefixIcon: Icon(
-          Icons.email_outlined,
-          color: controller.emailController.text.isEmpty
-              ? AppColors.textHint // Updated
-              : AppColors.primaryLight, // Updated
-          size: iconSize,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.primaryLight, // Updated
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.accent, // Updated
-            width: 1,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.accent, // Updated
-            width: 1.5,
-          ),
-        ),
-        errorStyle: TextStyle(
-          color: AppColors.accent, // Updated
-          fontSize: isSmallScreen ? 10 : 12,
-          fontFamily: 'SYMBIOAR+LT',
-        ),
-        contentPadding: EdgeInsets.symmetric(
-            vertical: isTablet ? 20.0 : 16.0, horizontal: 20),
-      ),
-      validator: validator,
+      textInputAction: TextInputAction.done,
+      enabled: !widget.controller.isLoading,
+      isError: widget.controller.serverError != null,
+      onFieldSubmitted: (_) {
+        // إخفاء لوحة المفاتيح عند الانتهاء
+        FocusScope.of(context).unfocus();
+      },
+      onChanged: (value) {
+        // مسح رسائل الخطأ عند الكتابة
+        if (widget.controller.serverError != null) {
+          setState(() {
+            widget.controller.clearError();
+          });
+        }
+      },
     );
   }
 }

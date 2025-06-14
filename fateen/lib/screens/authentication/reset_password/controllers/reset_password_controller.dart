@@ -91,4 +91,6 @@ class ResetPasswordController extends ChangeNotifier {
       setLoading(false);
     }
   }
+
+  void clearError() {}
 }

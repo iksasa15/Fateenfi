@@ -11,20 +11,16 @@ import '../university_major/major_picker_component.dart';
 import '../university_major/university_picker_component.dart';
 import 'progress_indicator_component.dart';
 import 'step_title_component.dart';
-import 'input_fields/name_field_component.dart';
-import 'input_fields/username_field_component.dart';
-import 'input_fields/email_field_component.dart';
-import 'input_fields/password_field_component.dart';
 import 'final_step_view_component.dart';
 import 'navigation_buttons_component.dart';
+import '../../../../../core/components/Field/enhanced_input_field.dart'; // استيراد المكون الموحد
 
 class StepFormContainer extends StatefulWidget {
   final SignupController controller;
   final VoidCallback onNextPressed;
   final VoidCallback onPrevPressed;
   final VoidCallback onSubmitPressed;
-  final VoidCallback?
-      onLoginPressed; // إضافة جديدة: دالة للانتقال إلى شاشة تسجيل الدخول
+  final VoidCallback? onLoginPressed;
 
   const StepFormContainer({
     Key? key,
@@ -32,7 +28,7 @@ class StepFormContainer extends StatefulWidget {
     required this.onNextPressed,
     required this.onPrevPressed,
     required this.onSubmitPressed,
-    this.onLoginPressed, // إضافة جديدة (اختيارية)
+    this.onLoginPressed,
   }) : super(key: key);
 
   @override
@@ -51,6 +47,14 @@ class _StepFormContainerState extends State<StepFormContainer>
   final FocusNode _usernameFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+
+  // إضافة GlobalKeys للحقول
+  final GlobalKey<FormFieldState> _nameFieldKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _usernameFieldKey =
+      GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _emailFieldKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _passwordFieldKey =
+      GlobalKey<FormFieldState>();
 
   // متغيرات لتتبع محاولات التحقق
   bool _hasAttemptedUniversityValidation = false;
@@ -408,49 +412,16 @@ class _StepFormContainerState extends State<StepFormContainer>
 
     switch (step) {
       case SignupStep.name:
-        content = NameFieldComponent(
-          controller: widget.controller.nameController,
-          focusNode: _nameFocusNode,
-          validator: widget.controller.validateName,
-          onSubmitted: (_) => _attemptNextStep(),
-        );
+        content = _buildNameField();
         break;
       case SignupStep.username:
-        content = UsernameFieldComponent(
-          controller: widget.controller.usernameController,
-          focusNode: _usernameFocusNode,
-          validator: _customUsernameValidator,
-          onSubmitted: (_) => _attemptNextStep(),
-          isCheckingUsername: widget.controller.isCheckingUsername,
-          usernameError: widget.controller.usernameError,
-          onChanged: _handleUsernameChange,
-          onLoginPressed: widget.onLoginPressed,
-        );
+        content = _buildUsernameField();
         break;
       case SignupStep.email:
-        content = EmailFieldComponent(
-          controller: widget.controller.emailController,
-          focusNode: _emailFocusNode,
-          validator: _customEmailValidator,
-          onSubmitted: (_) => _attemptNextStep(),
-          isCheckingEmail: widget.controller.isCheckingEmail,
-          emailError: widget.controller.emailError,
-          onChanged: _handleEmailChange,
-          onLoginPressed: widget.onLoginPressed,
-        );
+        content = _buildEmailField();
         break;
       case SignupStep.password:
-        content = PasswordFieldComponent(
-          controller: widget.controller.passwordController,
-          focusNode: _passwordFocusNode,
-          validator: widget.controller.validatePassword,
-          passwordVisible: widget.controller.passwordVisible,
-          togglePasswordVisibility: widget.controller.togglePasswordVisibility,
-          onSubmitted: (_) => _attemptNextStep(),
-          calculatePasswordStrength:
-              widget.controller.calculatePasswordStrength,
-          getPasswordStrengthText: widget.controller.getPasswordStrengthText,
-        );
+        content = _buildPasswordField();
         break;
       case SignupStep.university:
         content = _buildUniversityField();
@@ -473,6 +444,223 @@ class _StepFormContainerState extends State<StepFormContainer>
       ),
       child: content,
     );
+  }
+
+  // حقل الاسم باستخدام المكون الموحد
+  Widget _buildNameField() {
+    return EnhancedInputField(
+      title: 'الاسم الكامل',
+      hintText: 'أدخل اسمك الكامل',
+      controller: widget.controller.nameController,
+      icon: Icons.person_outline,
+      validator: widget.controller.validateName,
+      focusNode: _nameFocusNode,
+      formFieldKey: _nameFieldKey,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (_) => _attemptNextStep(),
+      onChanged: (_) {},
+    );
+  }
+
+  // حقل اسم المستخدم باستخدام المكون الموحد
+  Widget _buildUsernameField() {
+    final bool hasUsernameError = widget.controller.usernameError != null;
+    final bool isLoginSuggestion = hasUsernameError &&
+        widget.controller.usernameError!.contains("مستخدم بالفعل");
+
+    return Column(
+      children: [
+        EnhancedInputField(
+          title: 'اسم المستخدم',
+          hintText: 'أدخل اسم المستخدم',
+          controller: widget.controller.usernameController,
+          icon: Icons.account_circle_outlined,
+          validator: _customUsernameValidator,
+          focusNode: _usernameFocusNode,
+          formFieldKey: _usernameFieldKey,
+          textInputAction: TextInputAction.next,
+          isError: hasUsernameError,
+          suffixIcon: widget.controller.isCheckingUsername
+              ? Container(
+                  margin: const EdgeInsets.all(14),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.primaryLight),
+                  ),
+                )
+              : null,
+          onFieldSubmitted: (_) => _attemptNextStep(),
+          onChanged: _handleUsernameChange,
+        ),
+
+        // زر الانتقال إلى تسجيل الدخول إذا كان اسم المستخدم مستخدم بالفعل
+        if (isLoginSuggestion && widget.onLoginPressed != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TextButton.icon(
+              onPressed: widget.onLoginPressed,
+              icon: Icon(Icons.login, color: AppColors.primaryLight),
+              label: Text(
+                'انتقل إلى تسجيل الدخول',
+                style: TextStyle(
+                  color: AppColors.primaryLight,
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // حقل البريد الإلكتروني باستخدام المكون الموحد
+  Widget _buildEmailField() {
+    final bool hasEmailError = widget.controller.emailError != null;
+    final bool isLoginSuggestion = hasEmailError &&
+        widget.controller.emailError!.contains("مستخدم بالفعل");
+
+    return Column(
+      children: [
+        EnhancedInputField(
+          title: 'البريد الإلكتروني',
+          hintText: 'أدخل بريدك الإلكتروني',
+          controller: widget.controller.emailController,
+          icon: Icons.email_outlined,
+          validator: _customEmailValidator,
+          focusNode: _emailFocusNode,
+          formFieldKey: _emailFieldKey,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          isError: hasEmailError,
+          suffixIcon: widget.controller.isCheckingEmail
+              ? Container(
+                  margin: const EdgeInsets.all(14),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.primaryLight),
+                  ),
+                )
+              : null,
+          onFieldSubmitted: (_) => _attemptNextStep(),
+          onChanged: _handleEmailChange,
+        ),
+
+        // زر الانتقال إلى تسجيل الدخول إذا كان البريد الإلكتروني مستخدم بالفعل
+        if (isLoginSuggestion && widget.onLoginPressed != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TextButton.icon(
+              onPressed: widget.onLoginPressed,
+              icon: Icon(Icons.login, color: AppColors.primaryLight),
+              label: Text(
+                'انتقل إلى تسجيل الدخول',
+                style: TextStyle(
+                  color: AppColors.primaryLight,
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // حقل كلمة المرور باستخدام المكون الموحد
+  Widget _buildPasswordField() {
+    final passwordStrength = widget.controller.calculatePasswordStrength(
+      widget.controller.passwordController.text,
+    );
+
+    return Column(
+      children: [
+        EnhancedInputField(
+          title: 'كلمة المرور',
+          hintText: 'أدخل كلمة المرور',
+          controller: widget.controller.passwordController,
+          icon: Icons.lock_outline,
+          validator: widget.controller.validatePassword,
+          focusNode: _passwordFocusNode,
+          formFieldKey: _passwordFieldKey,
+          obscureText: !widget.controller.passwordVisible,
+          textInputAction: TextInputAction.done,
+          suffixIcon: _buildPasswordToggleButton(),
+          onFieldSubmitted: (_) => _attemptNextStep(),
+          onChanged: (value) {
+            // تحديث واجهة المستخدم عند تغيير كلمة المرور لعرض قوة كلمة المرور
+            setState(() {});
+          },
+        ),
+
+        // مؤشر قوة كلمة المرور
+        if (widget.controller.passwordController.text.isNotEmpty)
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // شريط قوة كلمة المرور
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: passwordStrength / 100,
+                    minHeight: 6,
+                    backgroundColor: Colors.grey.shade200,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getStrengthColor(passwordStrength),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // نص قوة كلمة المرور
+                Text(
+                  widget.controller.getPasswordStrengthText(passwordStrength as String),
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: _getStrengthColor(passwordStrength),
+                    fontSize: 12,
+                    fontFamily: 'SYMBIOAR+LT',
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  // زر إظهار/إخفاء كلمة المرور
+  Widget _buildPasswordToggleButton() {
+    return IconButton(
+      icon: Icon(
+        widget.controller.passwordVisible
+            ? Icons.visibility_outlined
+            : Icons.visibility_off_outlined,
+        color: AppColors.primaryLight,
+      ),
+      onPressed: () {
+        HapticFeedback.selectionClick();
+        setState(() {
+          widget.controller.togglePasswordVisibility();
+        });
+      },
+    );
+  }
+
+  // لون قوة كلمة المرور
+  Color _getStrengthColor(double strength) {
+    if (strength < 30) return Colors.red;
+    if (strength < 60) return Colors.orange;
+    if (strength < 80) return Colors.yellow.shade700;
+    return Colors.green;
   }
 
   // دالة مخصصة للتحقق من اسم المستخدم مع إضافة خيار تسجيل الدخول
@@ -508,6 +696,7 @@ class _StepFormContainerState extends State<StepFormContainer>
     }
   }
 
+  // نستخدم الدوال الأصلية لحقول الجامعة والتخصص لأنها تستخدم منتقيات خاصة
   Widget _buildUniversityField() {
     return SignupUniversityField(
       controller: widget.controller.universityNameController,

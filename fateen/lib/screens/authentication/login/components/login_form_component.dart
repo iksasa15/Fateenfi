@@ -5,6 +5,7 @@ import '../constants/login_strings.dart';
 import '../controllers/login_controller.dart';
 import '../constants/login_dimensions.dart';
 import '../components/login_button_component.dart';
+import '../../../../core/components/Field/enhanced_input_field.dart'; // استيراد المكون الجديد
 import '../../reset_password/screens/reset_password_screen.dart';
 
 class LoginFormComponent extends StatefulWidget {
@@ -96,9 +97,8 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
         builder: (context, _) {
           return Column(
             children: [
-              // حقل البريد الإلكتروني أو اسم المستخدم
-              _buildEnhancedInputField(
-                context: context,
+              // حقل البريد الإلكتروني أو اسم المستخدم باستخدام المكون الجديد
+              EnhancedInputField(
                 title: LoginStrings.emailOrUsernameLabel,
                 hintText: LoginStrings.emailOrUsernameHint,
                 controller: widget.controller.emailController,
@@ -110,6 +110,16 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                 focusNode: _emailFocusNode,
                 formFieldKey: _emailFieldKey,
                 isError: _authErrorType == 'email',
+                onTap: () {
+                  // مسح رسائل الخطأ عند التركيز على الحقل
+                  widget.controller.clearError();
+                },
+                onChanged: (value) {
+                  // مسح رسالة الخطأ عند الكتابة
+                  if (widget.controller.errorMessage.isNotEmpty) {
+                    widget.controller.clearError();
+                  }
+                },
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_passwordFocusNode);
                 },
@@ -119,9 +129,8 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
               if (_authErrorType == 'email')
                 _buildErrorMessage(widget.controller.errorMessage),
 
-              // حقل كلمة المرور
-              _buildEnhancedInputField(
-                context: context,
+              // حقل كلمة المرور باستخدام المكون الجديد
+              EnhancedInputField(
                 title: LoginStrings.passwordLabel,
                 hintText: LoginStrings.passwordHint,
                 controller: widget.controller.passwordController,
@@ -134,6 +143,16 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                 focusNode: _passwordFocusNode,
                 formFieldKey: _passwordFieldKey,
                 isError: _authErrorType == 'password',
+                onTap: () {
+                  // مسح رسائل الخطأ عند التركيز على الحقل
+                  widget.controller.clearError();
+                },
+                onChanged: (value) {
+                  // مسح رسالة الخطأ عند الكتابة
+                  if (widget.controller.errorMessage.isNotEmpty) {
+                    widget.controller.clearError();
+                  }
+                },
                 onFieldSubmitted: (_) {
                   // عند الضغط على زر "تم" على لوحة المفاتيح
                   if (widget.controller.isFormValid &&
@@ -309,171 +328,6 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // حقل إدخال محسن مع إزالة فورية للخطأ عند الكتابة
-  Widget _buildEnhancedInputField({
-    required BuildContext context,
-    required String title,
-    required String hintText,
-    required TextEditingController controller,
-    required IconData icon,
-    required String? Function(String?) validator,
-    required FocusNode focusNode,
-    required GlobalKey<FormFieldState> formFieldKey,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    Widget? suffixIcon,
-    TextInputAction? textInputAction,
-    void Function(String)? onFieldSubmitted,
-    bool enabled = true,
-    bool isError = false,
-  }) {
-    final isSmallScreen = MediaQuery.of(context).size.width < 360;
-
-    // استخدام دوال الأبعاد الجديدة
-    final fontSize =
-        LoginDimensions.getBodyFontSize(context, small: isSmallScreen);
-    final labelSize =
-        LoginDimensions.getLabelFontSize(context, small: isSmallScreen);
-    final iconSize = LoginDimensions.getIconSize(context, small: isSmallScreen);
-
-    // استخدام النسب المئوية لضبط الهوامش بناءً على عرض الشاشة
-    final horizontalPadding =
-        LoginDimensions.getSpacing(context, size: SpacingSize.large);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          vertical:
-              LoginDimensions.getSpacing(context, size: SpacingSize.small) + 2,
-          horizontal: horizontalPadding),
-      child: TextFormField(
-        key: formFieldKey,
-        controller: controller,
-        focusNode: focusNode,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        textAlign: TextAlign.right,
-        textInputAction: textInputAction,
-        onFieldSubmitted: onFieldSubmitted,
-        enabled: enabled,
-        onTap: () {
-          if (enabled) {
-            // تطبيق تأثير حسي عند الضغط
-            HapticFeedback.selectionClick();
-            // مسح رسائل الخطأ عند التركيز على الحقل
-            widget.controller.clearError();
-          }
-        },
-        onChanged: (value) {
-          // عند تغيير النص، قم بإعادة التحقق من الحقل وإزالة رسالة الخطأ إذا كان النص صحيحاً
-          if (formFieldKey.currentState != null &&
-              formFieldKey.currentState!.hasError) {
-            // إعادة التحقق فقط إذا كان هناك خطأ
-            if (validator(value) == null) {
-              formFieldKey.currentState!.validate();
-            }
-          }
-
-          // مسح رسالة الخطأ عند الكتابة
-          if (widget.controller.errorMessage.isNotEmpty) {
-            widget.controller.clearError();
-          }
-        },
-        style: TextStyle(
-          color: enabled
-              ? AppColors.textPrimary
-              : AppColors.textPrimary.withOpacity(0.6),
-          fontSize: fontSize,
-          fontFamily: 'SYMBIOAR+LT',
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          labelText: title,
-          labelStyle: TextStyle(
-            color: !enabled
-                ? AppColors.textPrimary.withOpacity(0.4)
-                : isError
-                    ? AppColors.accent
-                    : (focusNode.hasFocus
-                        ? AppColors.primaryLight
-                        : AppColors.textPrimary.withOpacity(0.7)),
-            fontSize: labelSize,
-            fontFamily: 'SYMBIOAR+LT',
-          ),
-          hintStyle: TextStyle(
-            color: AppColors.textHint.withOpacity(enabled ? 1.0 : 0.5),
-            fontSize: labelSize,
-            fontFamily: 'SYMBIOAR+LT',
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: !enabled
-                ? AppColors.textHint.withOpacity(0.5)
-                : isError
-                    ? AppColors.accent
-                    : (focusNode.hasFocus || controller.text.isNotEmpty
-                        ? AppColors.primaryLight
-                        : AppColors.textHint),
-            size: iconSize,
-          ),
-          suffixIcon: suffixIcon,
-          filled: true,
-          fillColor: enabled ? Colors.white : Colors.white.withOpacity(0.9),
-          enabledBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
-            borderSide: BorderSide(
-              color: isError ? AppColors.accent : Colors.grey.shade200,
-              width: isError ? 1.5 : 1,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
-            borderSide: BorderSide(
-              color: isError ? AppColors.accent : AppColors.primaryLight,
-              width: 1.5,
-            ),
-          ),
-          disabledBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
-            borderSide: BorderSide(
-              color: Colors.grey.shade200,
-              width: 1,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
-            borderSide: BorderSide(
-              color: AppColors.accent,
-              width: 1,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
-            borderSide: BorderSide(
-              color: AppColors.accent,
-              width: 1.5,
-            ),
-          ),
-          errorStyle: TextStyle(
-            color: AppColors.accent,
-            fontSize: isSmallScreen ? 10 : 12,
-            fontFamily: 'SYMBIOAR+LT',
-          ),
-          contentPadding: EdgeInsets.symmetric(
-            vertical: LoginDimensions.getInputFieldPadding(context,
-                small: isSmallScreen),
-            horizontal: 20,
-          ),
-        ),
-        validator: validator,
       ),
     );
   }
