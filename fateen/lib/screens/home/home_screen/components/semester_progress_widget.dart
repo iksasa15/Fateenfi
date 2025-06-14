@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/semester_progress_controller.dart';
-import '../constants/semester_progress_constants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class SemesterProgressWidget extends StatelessWidget {
   final SemesterProgressController controller;
@@ -12,44 +13,31 @@ class SemesterProgressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على أبعاد الشاشة للتصميم المتجاوب
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    // حساب الأحجام النسبية
-    final double horizontalPadding = screenSize.width * 0.04;
-    final double smallSpacing = screenSize.height * 0.01;
-    final double fontSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
+    // استخدام الأبعاد المتجاوبة من AppDimensions
+    final double horizontalPadding = AppDimensions.getSpacing(context);
+    final double smallSpacing =
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
+    final double fontSize = AppDimensions.getBodyFontSize(context);
 
     // التحقق من حالة التحميل
     if (controller.isLoading) {
-      return _buildLoadingState(horizontalPadding);
+      return _buildLoadingState(context, horizontalPadding);
     }
 
     // عرض رسالة الخطأ إذا وجدت
     if (controller.errorMessage != null) {
-      return _buildErrorState(controller.errorMessage!, horizontalPadding);
+      return _buildErrorState(
+          context, controller.errorMessage!, horizontalPadding);
     }
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            SemesterProgressConstants.gradientStartColor,
-            SemesterProgressConstants.gradientEndColor,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius:
-            BorderRadius.circular(SemesterProgressConstants.cardBorderRadius),
+        gradient: context.gradientPrimary,
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: SemesterProgressConstants.cardShadowColor,
+            color: context.colorShadow,
             blurRadius: 12,
             offset: const Offset(0, 6),
             spreadRadius: 1,
@@ -57,8 +45,7 @@ class SemesterProgressWidget extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius:
-            BorderRadius.circular(SemesterProgressConstants.cardBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: Stack(
           children: [
             // النمط الزخرفي في الخلفية
@@ -98,37 +85,44 @@ class SemesterProgressWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.calendar_today_rounded,
-                            color: SemesterProgressConstants.textColor,
-                            size: 18,
+                            color: Colors.white,
+                            size: AppDimensions.getIconSize(context,
+                                size: IconSize.small, small: true),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
-                            SemesterProgressConstants.title,
+                            "تقدم الفصل الدراسي",
                             style: TextStyle(
-                              fontFamily: SemesterProgressConstants.fontFamily,
+                              fontFamily: 'SYMBIOAR+LT',
                               fontSize: fontSize,
                               fontWeight: FontWeight.bold,
-                              color: SemesterProgressConstants.textColor,
+                              color: Colors.white,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small),
+                          vertical: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2,
+                        ),
                         decoration: BoxDecoration(
-                          color: SemesterProgressConstants.badgeBackgroundColor,
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                         ),
                         child: Text(
                           controller.getFormattedPercentage(),
                           style: TextStyle(
-                            fontFamily: SemesterProgressConstants.fontFamily,
+                            fontFamily: 'SYMBIOAR+LT',
                             fontSize: fontSize - 2,
                             fontWeight: FontWeight.bold,
-                            color: SemesterProgressConstants.textColor,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -143,35 +137,39 @@ class SemesterProgressWidget extends StatelessWidget {
                     children: [
                       // بطاقة للأيام المتبقية
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small),
+                          vertical: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2,
+                        ),
+                        margin: EdgeInsets.only(bottom: smallSpacing),
                         decoration: BoxDecoration(
-                          color: SemesterProgressConstants.badgeBackgroundColor,
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                         ),
                         child: Text(
                           controller.getFormattedDaysRemaining(),
                           style: TextStyle(
-                            fontFamily: SemesterProgressConstants.fontFamily,
+                            fontFamily: 'SYMBIOAR+LT',
                             fontSize: fontSize - 2,
                             fontWeight: FontWeight.bold,
-                            color: SemesterProgressConstants.textColor,
+                            color: Colors.white,
                           ),
                         ),
                       ),
 
                       // شريط التقدم
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            SemesterProgressConstants.progressBarBorderRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         child: LinearProgressIndicator(
                           value: controller.progressPercentage,
-                          backgroundColor: SemesterProgressConstants
-                              .progressBarBackgroundColor,
-                          color: SemesterProgressConstants.progressBarColor,
-                          minHeight:
-                              SemesterProgressConstants.progressBarHeight,
+                          backgroundColor: Colors.white.withOpacity(0.3),
+                          color: Colors.white,
+                          minHeight: 6.0,
                         ),
                       ),
                     ],
@@ -188,12 +186,11 @@ class SemesterProgressWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            SemesterProgressConstants.semesterStartLabel,
+                            "بداية الفصل",
                             style: TextStyle(
-                              fontFamily: SemesterProgressConstants.fontFamily,
+                              fontFamily: 'SYMBIOAR+LT',
                               fontSize: fontSize - 3,
-                              color: SemesterProgressConstants.textColor
-                                  .withOpacity(0.8),
+                              color: Colors.white.withOpacity(0.8),
                             ),
                           ),
                           const SizedBox(height: 3),
@@ -202,11 +199,10 @@ class SemesterProgressWidget extends StatelessWidget {
                               Text(
                                 controller.getFormattedStartDate(),
                                 style: TextStyle(
-                                  fontFamily:
-                                      SemesterProgressConstants.fontFamily,
+                                  fontFamily: 'SYMBIOAR+LT',
                                   fontSize: fontSize - 2,
                                   fontWeight: FontWeight.bold,
-                                  color: SemesterProgressConstants.textColor,
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(width: 4),
@@ -215,20 +211,17 @@ class SemesterProgressWidget extends StatelessWidget {
                                 onTap: () =>
                                     _showStartDatePickerDialog(context),
                                 borderRadius: BorderRadius.circular(
-                                    SemesterProgressConstants
-                                        .editButtonBorderRadius),
+                                    AppDimensions.smallRadius),
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: SemesterProgressConstants
-                                        .editButtonColor,
+                                    color: Colors.white.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(
-                                        SemesterProgressConstants
-                                            .editButtonBorderRadius),
+                                        AppDimensions.smallRadius),
                                   ),
                                   child: const Icon(
                                     Icons.edit,
-                                    color: SemesterProgressConstants.textColor,
+                                    color: Colors.white,
                                     size: 14,
                                   ),
                                 ),
@@ -243,12 +236,11 @@ class SemesterProgressWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            SemesterProgressConstants.semesterEndLabel,
+                            "نهاية الفصل",
                             style: TextStyle(
-                              fontFamily: SemesterProgressConstants.fontFamily,
+                              fontFamily: 'SYMBIOAR+LT',
                               fontSize: fontSize - 3,
-                              color: SemesterProgressConstants.textColor
-                                  .withOpacity(0.8),
+                              color: Colors.white.withOpacity(0.8),
                             ),
                           ),
                           const SizedBox(height: 3),
@@ -257,11 +249,10 @@ class SemesterProgressWidget extends StatelessWidget {
                               Text(
                                 controller.getFormattedEndDate(),
                                 style: TextStyle(
-                                  fontFamily:
-                                      SemesterProgressConstants.fontFamily,
+                                  fontFamily: 'SYMBIOAR+LT',
                                   fontSize: fontSize - 2,
                                   fontWeight: FontWeight.bold,
-                                  color: SemesterProgressConstants.textColor,
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(width: 4),
@@ -269,20 +260,17 @@ class SemesterProgressWidget extends StatelessWidget {
                               InkWell(
                                 onTap: () => _showEndDatePickerDialog(context),
                                 borderRadius: BorderRadius.circular(
-                                    SemesterProgressConstants
-                                        .editButtonBorderRadius),
+                                    AppDimensions.smallRadius),
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: SemesterProgressConstants
-                                        .editButtonColor,
+                                    color: Colors.white.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(
-                                        SemesterProgressConstants
-                                            .editButtonBorderRadius),
+                                        AppDimensions.smallRadius),
                                   ),
                                   child: const Icon(
                                     Icons.edit,
-                                    color: SemesterProgressConstants.textColor,
+                                    color: Colors.white,
                                     size: 14,
                                   ),
                                 ),
@@ -304,14 +292,15 @@ class SemesterProgressWidget extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  color:
-                      SemesterProgressConstants.successColor.withOpacity(0.8),
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
+                  color: context.colorSuccess.withOpacity(0.8),
                   child: Text(
                     controller.successMessage!,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontFamily: SemesterProgressConstants.fontFamily,
+                      fontFamily: 'SYMBIOAR+LT',
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -359,25 +348,25 @@ class SemesterProgressWidget extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: SemesterProgressConstants.gradientStartColor,
+              primary: context.colorPrimary,
               onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onSurface: context.colorTextPrimary,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: SemesterProgressConstants.gradientStartColor,
+                foregroundColor: context.colorPrimary,
               ),
             ),
             textTheme: const TextTheme(
               // ضبط الخط للعناصر العربية
               titleMedium: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
               bodyMedium: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
               labelSmall: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
             ),
           ),
@@ -417,25 +406,25 @@ class SemesterProgressWidget extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: SemesterProgressConstants.gradientStartColor,
+              primary: context.colorPrimary,
               onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onSurface: context.colorTextPrimary,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: SemesterProgressConstants.gradientStartColor,
+                foregroundColor: context.colorPrimary,
               ),
             ),
             textTheme: const TextTheme(
               // ضبط الخط للعناصر العربية
               titleMedium: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
               bodyMedium: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
               labelSmall: TextStyle(
-                fontFamily: SemesterProgressConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
               ),
             ),
           ),
@@ -454,27 +443,26 @@ class SemesterProgressWidget extends StatelessWidget {
   }
 
   // حالة التحميل
-  Widget _buildLoadingState(double horizontalPadding) {
+  Widget _buildLoadingState(BuildContext context, double horizontalPadding) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            SemesterProgressConstants.gradientStartColor.withOpacity(0.7),
-            SemesterProgressConstants.gradientEndColor.withOpacity(0.7),
+            context.colorPrimary.withOpacity(0.7),
+            context.colorPrimaryDark.withOpacity(0.7),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius:
-            BorderRadius.circular(SemesterProgressConstants.cardBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
       ),
       child: const Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),
           child: CircularProgressIndicator(
-            color: SemesterProgressConstants.textColor,
+            color: Colors.white,
           ),
         ),
       ),
@@ -482,15 +470,15 @@ class SemesterProgressWidget extends StatelessWidget {
   }
 
   // حالة الخطأ
-  Widget _buildErrorState(String errorMessage, double horizontalPadding) {
+  Widget _buildErrorState(
+      BuildContext context, String errorMessage, double horizontalPadding) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius:
-            BorderRadius.circular(SemesterProgressConstants.cardBorderRadius),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorError.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,16 +486,18 @@ class SemesterProgressWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.error_outline, color: Colors.red),
-                  SizedBox(width: 8),
+                  Icon(Icons.error_outline, color: context.colorError),
+                  SizedBox(
+                      width: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
                   Text(
                     'حدث خطأ',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontFamily: SemesterProgressConstants.fontFamily,
+                      color: context.colorError,
+                      fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
                 ],
@@ -515,20 +505,24 @@ class SemesterProgressWidget extends StatelessWidget {
               // زر لمحاولة إعادة التحميل
               TextButton(
                 onPressed: () => controller.refresh(),
-                child: const Text(
+                child: Text(
                   'إعادة المحاولة',
                   style: TextStyle(
-                    fontFamily: SemesterProgressConstants.fontFamily,
+                    fontFamily: 'SYMBIOAR+LT',
+                    color: context.colorPrimary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Text(
             errorMessage,
-            style: const TextStyle(
-              fontFamily: SemesterProgressConstants.fontFamily,
+            style: TextStyle(
+              fontFamily: 'SYMBIOAR+LT',
+              color: context.colorTextPrimary,
             ),
           ),
         ],

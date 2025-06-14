@@ -58,6 +58,8 @@ class AppDimensions {
   // مدة الحركات
   static const Duration animationDuration = Duration(milliseconds: 300);
 
+  static var cardHeightMedium;
+
   // طرق الأبعاد المتجاوبة
 
   // طرق الزوايا
@@ -190,6 +192,8 @@ class AppDimensions {
     final screenWidth = MediaQuery.of(context).size.width;
     return small ? screenWidth * 0.035 : screenWidth * 0.037;
   }
+
+  static getWidth(BuildContext context, {required double percentage}) {}
 }
 
 // تعدادات لتسهيل اختيار الأحجام

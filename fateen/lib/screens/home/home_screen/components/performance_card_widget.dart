@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/performance_indicators_constants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class PerformanceCardWidget extends StatelessWidget {
   final String title;
@@ -22,20 +24,20 @@ class PerformanceCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(PerformanceIndicatorsConstants.cardPadding),
+      padding: EdgeInsets.all(PerformanceIndicatorsConstants.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface, // استخدام لون السطح من AppColors
         borderRadius: BorderRadius.circular(
-            PerformanceIndicatorsConstants.cardBorderRadius),
+            AppDimensions.mediumRadius), // استخدام الزوايا من AppDimensions
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: context.colorShadow, // استخدام لون الظل من AppColors
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder, // استخدام لون الحدود من AppColors
           width: 1,
         ),
       ),
@@ -50,35 +52,36 @@ class PerformanceCardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: PerformanceIndicatorsConstants.fontFamily,
                   fontSize: fontSize - 2,
-                  color: Colors.grey[600],
+                  color: context.colorTextSecondary, // استخدام لون النص الثانوي
                 ),
               ),
               Icon(
                 icon,
                 color: color,
-                size: 18,
+                size: AppDimensions
+                    .smallIconSize, // استخدام حجم الأيقونة من AppDimensions
               ),
             ],
           ),
-          SizedBox(height: 8),
+          SizedBox(height: AppDimensions.smallSpacing / 2),
           Text(
             value,
             style: TextStyle(
               fontFamily: PerformanceIndicatorsConstants.fontFamily,
               fontSize: fontSize + 4,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: context.colorTextPrimary, // استخدام لون النص الأساسي
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: AppDimensions.smallSpacing / 2),
           Container(
-            padding: const EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
                 horizontal: PerformanceIndicatorsConstants.indicatorPadding,
                 vertical: 2),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                  PerformanceIndicatorsConstants.indicatorBorderRadius),
+              borderRadius: BorderRadius.circular(AppDimensions
+                  .smallRadius), // استخدام الزوايا من AppDimensions
             ),
             child: Text(
               description,

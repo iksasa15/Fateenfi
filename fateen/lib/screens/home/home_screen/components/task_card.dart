@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fateen/models/task.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -19,17 +21,11 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
     // تحديد لون البطاقة بناءً على اللون المخصص أو نوع المهمة
     final cardColor = color ??
         (isOverdue
-            ? const Color(0xFFE53935) // لون المهام المتأخرة - أحمر
-            : const Color(0xFF6366F1)); // لون المهام العادية - أرجواني متوسط
+            ? context.colorError // لون المهام المتأخرة
+            : context.colorPrimaryLight); // لون المهام العادية
 
     // حساب الوقت المتبقي أو المتأخر
     final now = DateTime.now();
@@ -50,25 +46,25 @@ class TaskCard extends StatelessWidget {
       }
     }
 
-    // حساب أحجام العناصر بناءً على حجم الشاشة - تحسين الأحجام
-    final double cardHeight =
-        screenSize.height * 0.09; // زيادة ارتفاع البطاقة قليلاً
+    // حساب أحجام العناصر
+    final double cardHeight = AppDimensions.getButtonHeight(context,
+            size: ButtonSize.regular, small: false) *
+        1.1;
 
-    // تحسين أحجام النصوص والأيقونات
+    // أحجام النصوص والأيقونات
     final double iconSize =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-    final double textSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final double smallTextSize =
-        isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 13.0);
-    final double timeCircleSize = screenSize.width * 0.10; // 10% من عرض الشاشة
+        AppDimensions.getIconSize(context, size: IconSize.small, small: true);
+    final double textSize = AppDimensions.getBodyFontSize(context);
+    final double smallTextSize = AppDimensions.getLabelFontSize(context);
+    final double timeCircleSize =
+        AppDimensions.getIconSize(context, size: IconSize.medium, small: false);
 
     Widget cardContent = Container(
       width: double.infinity,
       height: cardHeight,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         boxShadow: [
           BoxShadow(
             color: cardColor.withOpacity(0.15),
@@ -79,7 +75,7 @@ class TaskCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         child: Stack(
           children: [
             // دائرة زخرفية في الخلفية
@@ -87,8 +83,12 @@ class TaskCard extends StatelessWidget {
               left: -25,
               top: -15,
               child: Container(
-                width: screenSize.width * 0.15,
-                height: screenSize.width * 0.15,
+                width: AppDimensions.getIconSize(context,
+                        size: IconSize.large, small: false) *
+                    0.6,
+                height: AppDimensions.getIconSize(context,
+                        size: IconSize.large, small: false) *
+                    0.6,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.07),
@@ -99,8 +99,10 @@ class TaskCard extends StatelessWidget {
             // المحتوى الرئيسي
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: screenSize.width * 0.03,
-                vertical: screenSize.height * 0.015, // زيادة المسافة العمودية
+                horizontal:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,13 +121,16 @@ class TaskCard extends StatelessWidget {
                             fontSize: textSize,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'SYMBIOAR+LT',
-                            height: 1.2, // تحسين المسافة بين السطور
+                            height: 1.2,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
 
-                        SizedBox(height: screenSize.height * 0.006),
+                        SizedBox(
+                            height: AppDimensions.getSpacing(context,
+                                    size: SpacingSize.small) /
+                                2),
 
                         // معلومات إضافية (موعد التسليم أو متأخرة منذ)
                         Row(
@@ -137,7 +142,10 @@ class TaskCard extends StatelessWidget {
                               color: Colors.white,
                               size: iconSize,
                             ),
-                            SizedBox(width: screenSize.width * 0.01),
+                            SizedBox(
+                                width: AppDimensions.getSpacing(context,
+                                        size: SpacingSize.small) /
+                                    2),
                             Text(
                               isOverdue ? 'متأخرة منذ:' : 'موعد التسليم:',
                               style: TextStyle(
@@ -148,7 +156,10 @@ class TaskCard extends StatelessWidget {
                                 height: 1.2,
                               ),
                             ),
-                            SizedBox(width: screenSize.width * 0.01),
+                            SizedBox(
+                                width: AppDimensions.getSpacing(context,
+                                        size: SpacingSize.small) /
+                                    2),
                             Text(
                               task.dueDateFormatted,
                               style: TextStyle(
@@ -209,11 +220,13 @@ class TaskCard extends StatelessWidget {
                 top: 0,
                 right: 0,
                 child: Container(
-                  width: screenSize.width * 0.03,
-                  height:
-                      screenSize.height * 0.008, // زيادة ارتفاع الشريط قليلاً
+                  width: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
+                  height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2,
                   decoration: BoxDecoration(
-                    color: Colors.amber,
+                    color: context.colorWarning,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(5),
                       topRight: Radius.circular(12),

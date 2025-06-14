@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/profile_card_controller.dart';
-import '../constants/profile_card_constants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class ProfileCardWidget extends StatelessWidget {
   final ProfileCardController controller;
@@ -14,26 +15,25 @@ class ProfileCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على أبعاد الشاشة للتصميم المتجاوب
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    // حساب الأحجام النسبية
-    final double horizontalPadding = screenSize.width * 0.04;
-    final double smallSpacing = screenSize.height * 0.01;
-    final double fontSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
+    // استخدام طرق الأبعاد المتجاوبة من AppDimensions
+    final double horizontalPadding = AppDimensions.getSpacing(context);
+    final double smallSpacing =
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
+    final double fontSize = AppDimensions.getBodyFontSize(context, small: true);
+    final double iconSize =
+        AppDimensions.getIconSize(context, size: IconSize.small, small: true);
+    final double smallIconSize = AppDimensions.getIconSize(context,
+        size: IconSize.extraSmall, small: true);
 
     // التحقق من حالة التحميل
     if (controller.isLoading) {
-      return _buildLoadingState(horizontalPadding);
+      return _buildLoadingState(context, horizontalPadding);
     }
 
     // عرض رسالة الخطأ إذا وجدت
     if (controller.errorMessage != null) {
-      return _buildErrorState(controller.errorMessage!, horizontalPadding);
+      return _buildErrorState(
+          context, controller.errorMessage!, horizontalPadding);
     }
 
     // الحصول على التحية والتاريخ من وحدة التحكم
@@ -43,19 +43,11 @@ class ProfileCardWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            ProfileCardConstants.gradientStartColor,
-            ProfileCardConstants.gradientEndColor
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius:
-            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
+        gradient: context.gradientPrimary,
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: ProfileCardConstants.cardShadowColor,
+            color: context.colorShadow,
             blurRadius: 12,
             offset: const Offset(0, 6),
             spreadRadius: 1,
@@ -63,8 +55,7 @@ class ProfileCardWidget extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius:
-            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: Stack(
           children: [
             // النمط الزخرفي في الخلفية
@@ -107,36 +98,39 @@ class ProfileCardWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          // أيقونة صغيرة بجانب الاسم بدلاً من الدائرة الكبيرة
+                          // أيقونة صغيرة بجانب الاسم
                           Icon(
                             Icons.person,
-                            color: ProfileCardConstants.textColor,
-                            size: 18,
+                            color: Colors.white,
+                            size: iconSize,
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(
+                              width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small)),
                           Text(
                             '$greeting ${controller.userName}',
                             style: TextStyle(
-                              fontFamily: ProfileCardConstants.fontFamily,
+                              fontFamily: 'SYMBIOAR+LT',
                               fontSize: fontSize + 1,
                               fontWeight: FontWeight.bold,
-                              color: ProfileCardConstants.textColor,
+                              color: Colors.white,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: smallSpacing / 2),
                       Padding(
-                        padding: const EdgeInsets.only(right: 26),
+                        padding: EdgeInsets.only(
+                            right: AppDimensions.getSpacing(context,
+                                size: SpacingSize.large)),
                         child: Text(
                           controller.userMajor,
                           style: TextStyle(
-                            fontFamily: ProfileCardConstants.fontFamily,
+                            fontFamily: 'SYMBIOAR+LT',
                             fontSize: fontSize - 2,
-                            color:
-                                ProfileCardConstants.textColor.withOpacity(0.9),
+                            color: Colors.white.withOpacity(0.9),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -147,27 +141,36 @@ class ProfileCardWidget extends StatelessWidget {
 
                   // الجانب الأيسر: التاريخ
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small),
+                      vertical: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2,
+                    ),
                     decoration: BoxDecoration(
-                      color: ProfileCardConstants.badgeBackgroundColor,
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.calendar_today,
-                          color: ProfileCardConstants.textColor,
-                          size: 14,
+                          color: Colors.white,
+                          size: smallIconSize,
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(
+                            width: AppDimensions.getSpacing(context,
+                                    size: SpacingSize.small) /
+                                2),
                         Text(
                           formattedDate,
                           style: TextStyle(
-                            fontFamily: ProfileCardConstants.fontFamily,
+                            fontFamily: 'SYMBIOAR+LT',
                             fontSize: fontSize - 3,
-                            color: ProfileCardConstants.textColor,
+                            color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -184,27 +187,26 @@ class ProfileCardWidget extends StatelessWidget {
   }
 
   // حالة التحميل
-  Widget _buildLoadingState(double horizontalPadding) {
+  Widget _buildLoadingState(BuildContext context, double horizontalPadding) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            ProfileCardConstants.gradientStartColor.withOpacity(0.7),
-            ProfileCardConstants.gradientEndColor.withOpacity(0.7),
+            context.colorPrimary.withOpacity(0.7),
+            context.colorPrimaryDark.withOpacity(0.7),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius:
-            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
       ),
       child: const Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),
           child: CircularProgressIndicator(
-            color: ProfileCardConstants.textColor,
+            color: Colors.white,
           ),
         ),
       ),
@@ -212,15 +214,15 @@ class ProfileCardWidget extends StatelessWidget {
   }
 
   // حالة الخطأ
-  Widget _buildErrorState(String errorMessage, double horizontalPadding) {
+  Widget _buildErrorState(
+      BuildContext context, String errorMessage, double horizontalPadding) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       padding: EdgeInsets.all(horizontalPadding * 0.8),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius:
-            BorderRadius.circular(ProfileCardConstants.cardBorderRadius),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorError.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,16 +230,18 @@ class ProfileCardWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.error_outline, color: Colors.red),
-                  SizedBox(width: 8),
+                  Icon(Icons.error_outline, color: context.colorError),
+                  SizedBox(
+                      width: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
                   Text(
                     'حدث خطأ',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontFamily: ProfileCardConstants.fontFamily,
+                      color: context.colorError,
+                      fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
                 ],
@@ -245,20 +249,24 @@ class ProfileCardWidget extends StatelessWidget {
               // زر لمحاولة إعادة التحميل
               TextButton(
                 onPressed: () => controller.refresh(),
-                child: const Text(
+                child: Text(
                   'إعادة المحاولة',
                   style: TextStyle(
-                    fontFamily: ProfileCardConstants.fontFamily,
+                    fontFamily: 'SYMBIOAR+LT',
+                    color: context.colorPrimary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Text(
             errorMessage,
-            style: const TextStyle(
-              fontFamily: ProfileCardConstants.fontFamily,
+            style: TextStyle(
+              fontFamily: 'SYMBIOAR+LT',
+              color: context.colorTextPrimary,
             ),
           ),
         ],

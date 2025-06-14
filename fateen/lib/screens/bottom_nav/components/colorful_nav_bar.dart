@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/bottom_nav_constants.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 /// شريط التنقل السفلي العصري
 class ColorfulNavBar extends StatelessWidget {
@@ -20,14 +22,14 @@ class ColorfulNavBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(0),
           topRight: Radius.circular(0),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: context.colorShadow,
             spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, -2),
@@ -35,7 +37,7 @@ class ColorfulNavBar extends StatelessWidget {
         ],
       ),
       child: SizedBox(
-        height: 42,
+        height: AppDimensions.extraSmallButtonHeight,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,13 +56,15 @@ class ColorfulNavBar extends StatelessWidget {
     final bool isSelected = index == selectedIndex;
 
     // لون العنصر الحالي
-    final Color itemColor = BottomNavConstants.sectionColors[index];
+    final Color itemColor = BottomNavConstants.getSectionColor(context, index);
 
     // لون النص والأيقونة
-    final Color textIconColor = isSelected ? itemColor : Colors.grey.shade500;
+    final Color textIconColor = isSelected ? itemColor : context.colorTextHint;
 
     // حجم الأيقونة معدل ليناسب المساحة المتاحة
-    final double iconSize = isSelected ? 24.0 : 22.0;
+    final double iconSize = isSelected
+        ? AppDimensions.getIconSize(context, size: IconSize.small, small: false)
+        : AppDimensions.getIconSize(context, size: IconSize.small, small: true);
 
     return GestureDetector(
       onTap: () => onItemTapped(index),
@@ -68,7 +72,9 @@ class ColorfulNavBar extends StatelessWidget {
       child: Container(
         width: MediaQuery.of(context).size.width /
             BottomNavConstants.navigationLabels.length,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: EdgeInsets.symmetric(
+            horizontal:
+                AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
         child: LayoutBuilder(
           builder: (context, constraints) {
             // استخدام LayoutBuilder للتأكد من أن العناصر تناسب الارتفاع المتاح
@@ -94,7 +100,8 @@ class ColorfulNavBar extends StatelessWidget {
                       BottomNavConstants.navigationLabels[index],
                       style: TextStyle(
                         color: textIconColor,
-                        fontSize: 10,
+                        fontSize: AppDimensions.getLabelFontSize(context,
+                            small: true),
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w500,
                         fontFamily: 'SYMBIOAR+LT',

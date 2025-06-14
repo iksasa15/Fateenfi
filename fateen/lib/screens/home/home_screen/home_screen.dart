@@ -28,10 +28,8 @@ import '../home_screen/constants/next_lecture_constants.dart';
 // استيراد ملفات ميزة شريط التنقل السفلي
 import '../../bottom_nav/index.dart';
 
-// استيراد ملفات ميزة الإحصائيات - سنحتفظ بالاستيراد لكن لن نستخدمه
+// استيراد ملفات ميزة الإحصائيات
 import '../home_screen/controllers/stats_controller.dart';
-
-// حذف استيراد ملفات ميزة المهام التي تحتاج اهتمام (تم حذفه)
 
 // استيراد ملفات الصفحات الرئيسية
 import 'package:fateen/screens/courses/course_screen/course_screen.dart';
@@ -41,6 +39,10 @@ import '../settings_screen/settings_screen.dart';
 
 // استيراد MyScheduleScreen
 import '../../courses/Schedule_screen/Schedule_screen.dart';
+
+// استيراد ملفات النظام الموحد
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 // إنشاء مكون NextLectureCard معدل لإزالة الأنيميشن
 class StaticNextLectureCard extends StatelessWidget {
@@ -59,16 +61,16 @@ class StaticNextLectureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // نسخة مبسطة من NextLectureCard بدون أنيميشن
     String timeText = _formatTime(diffSeconds);
-    Color timeColor = _getTimeColor(diffSeconds);
-    Color bgColor = _getBgColor(diffSeconds);
+    Color timeColor = _getTimeColor(context, diffSeconds);
+    Color bgColor = _getBgColor(context, diffSeconds);
 
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: context.colorShadow,
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -76,7 +78,7 @@ class StaticNextLectureCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -88,31 +90,39 @@ class StaticNextLectureCard extends StatelessWidget {
                 children: [
                   Text(
                     courseName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 16,
+                      fontSize:
+                          AppDimensions.getBodyFontSize(context),
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: context.colorTextPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(
+                      height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
-                        size: 14,
-                        color: Colors.grey,
+                        size: AppDimensions.getIconSize(context,
+                            size: IconSize.small, small: true),
+                        color: context.colorTextHint,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
                       Text(
                         classroom,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'SYMBIOAR+LT',
-                          fontSize: 13,
-                          color: Colors.grey,
+                          fontSize: AppDimensions.getLabelFontSize(context),
+                          color: context.colorTextSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -124,16 +134,23 @@ class StaticNextLectureCard extends StatelessWidget {
             ),
             // مؤشر الوقت المتبقي
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                        2,
+              ),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: context.colorSurface,
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               ),
               child: Text(
                 timeText,
                 style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: 14,
+                  fontSize:
+                      AppDimensions.getLabelFontSize(context),
                   fontWeight: FontWeight.bold,
                   color: timeColor,
                 ),
@@ -165,27 +182,27 @@ class StaticNextLectureCard extends StatelessWidget {
     return "خلال $diffHours ساعة و $remainingMinutes دقيقة";
   }
 
-  Color _getTimeColor(int diffSeconds) {
+  Color _getTimeColor(BuildContext context, int diffSeconds) {
     if (diffSeconds < 900) {
       // أقل من 15 دقيقة
-      return Colors.red;
+      return context.colorError;
     } else if (diffSeconds < 1800) {
       // أقل من 30 دقيقة
-      return Colors.orange;
+      return context.colorWarning;
     } else {
-      return Colors.green;
+      return context.colorSuccess;
     }
   }
 
-  Color _getBgColor(int diffSeconds) {
+  Color _getBgColor(BuildContext context, int diffSeconds) {
     if (diffSeconds < 900) {
       // أقل من 15 دقيقة
-      return Colors.red.withOpacity(0.1);
+      return context.colorError.withOpacity(0.1);
     } else if (diffSeconds < 1800) {
       // أقل من 30 دقيقة
-      return Colors.orange.withOpacity(0.1);
+      return context.colorWarning.withOpacity(0.1);
     } else {
-      return Colors.green.withOpacity(0.1);
+      return context.colorSuccess.withOpacity(0.1);
     }
   }
 }
@@ -202,19 +219,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  // ألوان ثابتة لتوحيد المظهر
-  static const Color kDarkPurple = Color(0xFF4338CA);
-  static const Color kMediumPurple = Color(0xFF6366F1);
-  static const Color kLightPurple = Color(0xFFEEF2FF);
-  static const Color kBackgroundColor = Color(0xFFFDFDFF);
-  static const Color kAccentColor = Color(0xFF7E22CE);
-  static const Color kGreenColor = Color(0xFF10B981);
-  static const Color kOrangeColor = Color(0xFFF59E0B);
-
   final HeaderController _headerController = HeaderController();
   late NextLectureController _nextLectureController;
   late StatsController _statsController;
-  // حذف متحكم المهام التي تحتاج اهتمام
 
   // إضافة متحكمات الميزات المستخرجة
   late ProfileCardController _profileCardController;
@@ -330,7 +337,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _statsController = StatsController();
         await _statsController.initialize();
       }),
-      // حذف تهيئة متحكم المهام التي تحتاج اهتمام
     ]);
 
     // تهيئة وحدة تحكم شريط التنقل
@@ -381,33 +387,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildHomeContent() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // الحصول على أبعاد الشاشة
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
-
-        // حساب المسافات والأحجام النسبية
-        final double horizontalPadding =
-            screenSize.width * 0.04; // 4% من عرض الشاشة
-        final double verticalPadding =
-            screenSize.height * 0.02; // 2% من ارتفاع الشاشة
-        final double sectionSpacing =
-            screenSize.height * 0.022; // زيادة المسافة بين الأقسام
-        final double smallSpacing =
-            screenSize.height * 0.01; // 1% من ارتفاع الشاشة
-
-        // أحجام الخطوط
-        final double normalFontSize =
-            isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
-        final double smallFontSize =
-            isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-
         return MultiProvider(
           providers: [
             ChangeNotifierProvider.value(value: _nextLectureController),
             ChangeNotifierProvider.value(value: _statsController),
-            // حذف متحكم المهام التي تحتاج اهتمام من providers
             ChangeNotifierProvider.value(value: _profileCardController),
             ChangeNotifierProvider.value(value: _semesterProgressController),
             ChangeNotifierProvider.value(
@@ -416,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ],
           child: RefreshIndicator(
             onRefresh: _refreshData,
-            color: kDarkPurple,
+            color: context.colorPrimaryDark,
             strokeWidth: 2.5,
             child: Stack(
               children: [
@@ -426,7 +409,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: verticalPadding),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.medium)),
 
                       // استخدام بطاقة الملف الشخصي المستخرجة
                       Consumer<ProfileCardController>(
@@ -448,7 +433,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                       ),
 
-                      SizedBox(height: sectionSpacing),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.medium)),
 
                       // استخدام ميزة تقدم التقويم الدراسي المستخرجة
                       Consumer<SemesterProgressController>(
@@ -459,12 +446,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                       ),
 
-                      SizedBox(height: sectionSpacing),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.medium)),
 
                       // المحاضرة القادمة - تحت التقويم الدراسي مباشرة
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.getSpacing(context),
+                        ),
                         child: Consumer<NextLectureController>(
                           builder: (context, controller, child) {
                             // عرض عنوان قسم المحاضرة القادمة دائماً
@@ -474,19 +464,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 // عنوان قسم المحاضرة القادمة
                                 NextLectureComponents.buildSectionTitle(),
 
-                                SizedBox(height: smallSpacing),
+                                SizedBox(
+                                    height: AppDimensions.getSpacing(context,
+                                        size: SpacingSize.small)),
 
                                 // حالة التحميل
                                 if (controller.isLoading)
                                   Container(
-                                    height: 80,
+                                    height:
+                                        _AppDimensionsExtensions.getCardHeight(context),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(16),
+                                      color: context.colorSurfaceLight,
+                                      borderRadius: BorderRadius.circular(
+                                          AppDimensions.mediumRadius),
                                     ),
-                                    child: const Center(
+                                    child: Center(
                                       child: CircularProgressIndicator(
-                                        color: kMediumPurple,
+                                        color: context.colorPrimaryLight,
                                         strokeWidth: 2,
                                       ),
                                     ),
@@ -511,7 +505,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         ),
                       ),
 
-                      SizedBox(height: sectionSpacing),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.medium)),
 
                       // استخدام ميزة مؤشرات الأداء المستخرجة
                       Consumer<PerformanceIndicatorsController>(
@@ -522,12 +518,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                       ),
 
-                      SizedBox(height: sectionSpacing),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.medium)),
 
                       // استخدام ميزة فئات المهام المستخرجة
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.getSpacing(context),
+                        ),
                         child: Consumer<TaskCategoriesController>(
                           builder: (context, controller, _) {
                             return TaskCategoriesWidget(
@@ -541,13 +540,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
                       // مساحة إضافية في الأسفل للسماح بالسحب للأسفل بشكل أفضل
                       SizedBox(
-                          height: screenSize.height *
-                              0.12), // 12% من ارتفاع الشاشة لإعطاء مساحة للشريط السفلي
+                          height: _AppDimensionsExtensions.getCardHeight(context,
+                              size: CardSize.large)),
                     ],
                   ),
                 ),
 
-                // مؤشر التحديث - لا يحتوي على أنيميشن سنتركه كما هو
+                // مؤشر التحديث
                 if (_isRefreshing)
                   Positioned(
                     top: 0,
@@ -555,13 +554,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     right: 0,
                     child: Container(
                       width: double.infinity,
-                      height:
-                          screenSize.height * 0.055, // 5.5% من ارتفاع الشاشة
+                      height: AppDimensions.getButtonHeight(context,
+                          size: ButtonSize.small, small: true),
                       decoration: BoxDecoration(
-                        color: kDarkPurple.withOpacity(0.8),
+                        color: context.colorPrimaryDark.withOpacity(0.8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: context.colorShadow,
                             spreadRadius: 0,
                             blurRadius: 4,
                             offset: const Offset(0, 2),
@@ -573,20 +572,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: isSmallScreen ? 14 : 16,
-                              height: isSmallScreen ? 14 : 16,
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
+                              width: AppDimensions.getIconSize(context,
+                                  size: IconSize.small, small: true),
+                              height: AppDimensions.getIconSize(context,
+                                  size: IconSize.small, small: true),
+                              child: CircularProgressIndicator(
+                                color: context.colorSurface,
                                 strokeWidth: 2,
                               ),
                             ),
-                            SizedBox(width: screenSize.width * 0.02),
+                            SizedBox(
+                                width: AppDimensions.getSpacing(context,
+                                    size: SpacingSize.small)),
                             Text(
                               "جاري التحديث...",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.colorSurface,
                                 fontWeight: FontWeight.bold,
-                                fontSize: smallFontSize,
+                                fontSize:
+                                    AppDimensions.getLabelFontSize(context),
                                 fontFamily: 'SYMBIOAR+LT',
                                 height: 1.2,
                               ),
@@ -606,40 +610,32 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    // أحجام تتناسب مع حجم الشاشة
-    final double loadingTextSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final double indicatorSize =
-        isSmallScreen ? 28.0 : (isMediumScreen ? 32.0 : 36.0);
-
     if (_isInitialLoading) {
       return Scaffold(
-        backgroundColor: kBackgroundColor,
+        backgroundColor: context.colorBackground,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: indicatorSize,
-                height: indicatorSize,
-                child: const CircularProgressIndicator(
-                  color: kDarkPurple,
+                width: AppDimensions.getIconSize(context,
+                    size: IconSize.large, small: true),
+                height: AppDimensions.getIconSize(context,
+                    size: IconSize.large, small: true),
+                child: CircularProgressIndicator(
+                  color: context.colorPrimaryDark,
                   strokeWidth: 3,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.025),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                      size: SpacingSize.medium)),
               Text(
                 "جاري تحميل البيانات...",
                 style: TextStyle(
-                  color: Colors.grey[700],
+                  color: context.colorTextSecondary,
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: loadingTextSize,
+                  fontSize: AppDimensions.getBodyFontSize(context),
                   fontWeight: FontWeight.w500,
                   height: 1.2,
                 ),
@@ -663,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               return !controller.handleBackPress();
             },
             child: Scaffold(
-              backgroundColor: kBackgroundColor, // استخدام متغير اللون الثابت
+              backgroundColor: context.colorBackground,
               body: SafeArea(
                 // إضافة هامش سفلي إضافي للمحتوى ليتناسب مع شريط التنقل
                 bottom: false,
@@ -703,7 +699,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await Future.wait([
         _nextLectureController.refresh(),
         _statsController.refresh(),
-        // حذف تحديث متحكم المهام التي تحتاج اهتمام
         _headerController.initialize(),
         _profileCardController.refresh(),
         _semesterProgressController.refresh(),
@@ -734,11 +729,37 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     _nextLectureController.dispose();
     _statsController.dispose();
-    // حذف dispose لمتحكم المهام التي تحتاج اهتمام
     _profileCardController.dispose();
     _semesterProgressController.dispose();
     _performanceIndicatorsController.dispose();
     _taskCategoriesController.dispose();
     super.dispose();
   }
+}
+
+// إضافة هذه التوسعات لدعم AppDimensions
+extension _AppDimensionsExtensions on AppDimensions {
+  static double getCardHeight(BuildContext context,
+      {CardSize size = CardSize.regular}) {
+    final double baseHeight = AppDimensions.getButtonHeight(context,
+        size: ButtonSize.regular, small: false);
+
+    switch (size) {
+      case CardSize.small:
+        return baseHeight * 1.2;
+      case CardSize.regular:
+        return baseHeight * 1.5;
+      case CardSize.medium:
+        return baseHeight * 1.8;
+      case CardSize.large:
+        return baseHeight * 2.2;
+    }
+  }
+}
+
+enum CardSize {
+  small,
+  regular,
+  medium,
+  large,
 }

@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 /// ثوابت شريط التنقل السفلي
 class BottomNavConstants {
-  // ألوان الأقسام المختلفة
-  static const List<Color> sectionColors = [
-    Color(0xFF6C63FF), // بنفسجي للرئيسية
-    Color(0xFF4ECDC4), // فيروزي للجدول
-    Color(0xFF42A5F5), // أزرق للمقررات
-    Color(0xFFFFA726), // برتقالي للمهام
-    Color(0xFFFF5252), // أحمر للخدمات
-    Color(0xFF66BB6A), // أخضر للإعدادات
-  ];
-
   // عناوين الأقسام
   static const List<String> navigationLabels = [
     'الرئيسية',
@@ -32,61 +24,34 @@ class BottomNavConstants {
     Icons.settings_rounded,
   ];
 
-  // الحصول على تفاصيل التنسيق بناءً على حجم الشاشة
-  static double getActiveIconSize(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 360 ? 24.0 : 26.0;
-  }
+  // الألوان القديمة (للمرجع فقط)
+  static const List<Color> _legacySectionColors = [
+    Color(0xFF6C63FF), // بنفسجي للرئيسية
+    Color(0xFF4ECDC4), // فيروزي للجدول
+    Color(0xFF42A5F5), // أزرق للمقررات
+    Color(0xFFFFA726), // برتقالي للمهام
+    Color(0xFFFF5252), // أحمر للخدمات
+    Color(0xFF66BB6A), // أخضر للإعدادات
+  ];
 
-  static double getInactiveIconSize(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 360 ? 20.0 : 22.0;
-  }
-
-  static double getLabelFontSize(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 360 ? 11.0 : 13.0;
-  }
-
-  static double getIndicatorHeight(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 360 ? 2.5 : 3.0;
-  }
-
-  static double getIndicatorWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth < 360 ? 20.0 : 24.0;
-  }
-
-  static double getIndicatorRadius(BuildContext context) {
-    return 1.5;
-  }
-
-  static double getVerticalPadding(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return screenHeight * 0.0025; // 0.25% من ارتفاع الشاشة
-  }
-
-  static double getLabelTopPadding(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return screenHeight * 0.006; // 0.6% من ارتفاع الشاشة
-  }
-
-  static double getIndicatorTopMargin(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return screenHeight * 0.005; // 0.5% من ارتفاع الشاشة
-  }
-
-  // أرتفاع شريط التنقل (مع تعديله لأجهزة iPhone)
-  static double getBarHeight(BuildContext context) {
-    final isiPhone = Theme.of(context).platform == TargetPlatform.iOS;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // استخدام نسبة من ارتفاع الشاشة مع حد أدنى
-    final baseHeight = screenHeight * 0.08; // 8% من ارتفاع الشاشة
-    final minHeight = isiPhone ? 68.0 : 62.0;
-
-    return baseHeight > minHeight ? baseHeight : minHeight;
+  // دالة للحصول على لون القسم المناسب استنادا إلى نظام الألوان الجديد
+  static Color getSectionColor(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        return context.colorPrimaryLight; // الرئيسية
+      case 1:
+        return context.colorMediumPurple; // الجدول
+      case 2:
+        return context.colorInfo; // المقررات
+      case 3:
+        return context.colorWarning; // المهام
+      case 4:
+        return context.colorError; // الخدمات
+      case 5:
+        return context.colorSuccess; // الإعدادات
+      default:
+        return context.colorPrimary;
+    }
   }
 
   // معرفة ما إذا كان الجهاز به notch (مثل iPhone X وما بعده)

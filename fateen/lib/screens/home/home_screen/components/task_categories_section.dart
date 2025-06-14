@@ -7,6 +7,8 @@ import 'package:fateen/models/task.dart';
 import 'package:fateen/models/course.dart';
 import 'package:fateen/screens/tasks/services/tasks_firebase_service.dart';
 import 'task_card.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 /// قسم إحصائيات المهام في الصفحة الرئيسية
 /// (المهام المتأخرة، مهام اليوم، المهام القادمة)
@@ -25,12 +27,6 @@ class TaskCategoriesSection extends StatefulWidget {
 }
 
 class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
-  // ألوان متناسقة مع النظام
-  static const Color kDarkPurple = Color(0xFF4338CA);
-  static const Color kMediumPurple = Color(0xFF6366F1);
-  static const Color kRed = Color(0xFFE53935); // لون للمهام المتأخرة
-  static const Color kGreen = Color(0xFF4CAF50); // لون للمهام القادمة
-
   // إنشاء مثيل من خدمة Firebase للمهام
   final TasksFirebaseService _tasksService = TasksFirebaseService();
 
@@ -146,72 +142,63 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // عنوان القسم
-        _buildSectionTitle(' المهام', screenSize, isSmallScreen),
+        _buildSectionTitle(' المهام'),
 
         // حالة التحميل
         if (_isLoading)
           Center(
             child: Padding(
-              padding: EdgeInsets.all(screenSize.width * 0.04),
-              child: const CircularProgressIndicator(color: kMediumPurple),
+              padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
+              child:
+                  CircularProgressIndicator(color: context.colorPrimaryLight),
             ),
           )
 
         // حالة الخطأ
         else if (_errorMessage != null)
-          _buildErrorMessage(_errorMessage!, screenSize)
+          _buildErrorMessage(_errorMessage!)
 
         // عرض البطاقات والمهام
         else
           Column(
             children: [
               // بطاقة الإحصائيات
-              _buildTasksStatsCard(screenSize, isSmallScreen),
+              _buildTasksStatsCard(),
 
               // قائمة المهام
               if (_overdueTasks.isNotEmpty)
                 _buildTasksSection(
                   "المهام المتأخرة",
                   _overdueTasks,
-                  kRed,
+                  context.colorError,
                   Icons.warning_rounded,
-                  screenSize,
-                  isSmallScreen,
                 ),
 
               if (_todayTasks.isNotEmpty)
                 _buildTasksSection(
                   "مهام اليوم",
                   _todayTasks,
-                  kMediumPurple,
+                  context.colorPrimaryLight,
                   Icons.today_rounded,
-                  screenSize,
-                  isSmallScreen,
                 ),
 
               if (_upcomingTasks.isNotEmpty)
                 _buildTasksSection(
                   "المهام القادمة",
                   _upcomingTasks,
-                  kGreen,
+                  context.colorSuccess,
                   Icons.upcoming_rounded,
-                  screenSize,
-                  isSmallScreen,
                 ),
 
               // حالة عدم وجود مهام
               if (_overdueTasks.isEmpty &&
                   _todayTasks.isEmpty &&
                   _upcomingTasks.isEmpty)
-                _buildEmptyState(screenSize),
+                _buildEmptyState(),
             ],
           ),
       ],
@@ -219,16 +206,11 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء عنوان القسم
-  Widget _buildSectionTitle(String title, Size screenSize, bool isSmallScreen) {
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-    final double titleSize =
-        isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
-
+  Widget _buildSectionTitle(String title) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: screenSize.height * 0.01,
-        top: screenSize.height * 0.02,
+        bottom: AppDimensions.getSpacing(context, size: SpacingSize.small),
+        top: AppDimensions.getSpacing(context, size: SpacingSize.medium),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,21 +221,26 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: titleSize,
+                  fontSize: AppDimensions.getSubtitleFontSize(context),
                   fontWeight: FontWeight.bold,
-                  color: kDarkPurple,
+                  color: context.colorPrimaryDark,
                   letterSpacing: 0.3,
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.004),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      4),
               Container(
-                width: screenSize.width * 0.06,
-                height: 2.5, // زيادة سمك الخط
+                width:
+                    AppDimensions.getSpacing(context, size: SpacingSize.medium),
+                height: 2.5,
                 decoration: BoxDecoration(
-                  color: kMediumPurple,
-                  borderRadius: BorderRadius.circular(1),
+                  color: context.colorPrimaryLight,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius / 8),
                 ),
               ),
             ],
@@ -264,7 +251,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء بطاقة إحصائيات المهام
-  Widget _buildTasksStatsCard(Size screenSize, bool isSmallScreen) {
+  Widget _buildTasksStatsCard() {
     // حالة عدم وجود مهام
     if (_overdueTasks.isEmpty &&
         _todayTasks.isEmpty &&
@@ -276,30 +263,27 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
     final int totalTasks =
         _overdueTasks.length + _todayTasks.length + _upcomingTasks.length;
 
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    // حساب أحجام العناصر حسب حجم الشاشة
+    // حساب أحجام العناصر
     final double iconSize =
-        isSmallScreen ? 18.0 : (isMediumScreen ? 19.0 : 20.0);
-    final double fontSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 13.5 : 14.0);
+        AppDimensions.getIconSize(context, size: IconSize.small, small: false);
+    final double fontSize = AppDimensions.getBodyFontSize(context);
     final double statItemSize =
-        isSmallScreen ? 52.0 : (isMediumScreen ? 55.0 : 58.0);
+        AppDimensions.getIconSize(context, size: IconSize.large, small: true) *
+            0.8;
 
     return FadeTransition(
       opacity: widget.animation,
       child: Container(
         margin: EdgeInsets.symmetric(
-          vertical: screenSize.height * 0.01,
+          vertical: AppDimensions.getSpacing(context, size: SpacingSize.small),
         ),
-        padding: EdgeInsets.all(screenSize.width * 0.04),
+        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: context.colorShadow,
               blurRadius: 10,
               spreadRadius: 0,
               offset: const Offset(0, 2),
@@ -318,7 +302,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     title: 'المتأخرة',
                     count: _overdueTasks.length.toString(),
                     icon: Icons.warning_rounded,
-                    color: kRed,
+                    color: context.colorError,
                     size: statItemSize,
                     fontSize: fontSize,
                     iconSize: iconSize,
@@ -330,7 +314,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     title: 'اليوم',
                     count: _todayTasks.length.toString(),
                     icon: Icons.today_rounded,
-                    color: kMediumPurple,
+                    color: context.colorPrimaryLight,
                     size: statItemSize,
                     fontSize: fontSize,
                     iconSize: iconSize,
@@ -342,7 +326,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     title: 'القادمة',
                     count: _upcomingTasks.length.toString(),
                     icon: Icons.upcoming_rounded,
-                    color: kGreen,
+                    color: context.colorSuccess,
                     size: statItemSize,
                     fontSize: fontSize,
                     iconSize: iconSize,
@@ -353,12 +337,13 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
             // خط فاصل
             Padding(
               padding: EdgeInsets.symmetric(
-                vertical: screenSize.height * 0.015,
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
               ),
               child: Divider(
                 height: 1,
                 thickness: 1,
-                color: Colors.grey.shade100,
+                color: context.colorDivider,
               ),
             ),
 
@@ -368,10 +353,13 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                 // أيقونة الوقت
                 Icon(
                   Icons.schedule,
-                  color: kMediumPurple,
+                  color: context.colorPrimaryLight,
                   size: iconSize,
                 ),
-                SizedBox(width: screenSize.width * 0.02),
+                SizedBox(
+                    width: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
+
                 // رسالة تحفيزية
                 Expanded(
                   child: Text(
@@ -379,19 +367,23 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF555555),
+                      color: context.colorTextSecondary,
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.2,
                     ),
                   ),
                 ),
+
                 // زر عرض الكل
                 TextButton(
                   onPressed: widget.onTaskTap,
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenSize.width * 0.02,
-                      vertical: screenSize.height * 0.005,
+                      horizontal: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small),
+                      vertical: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2,
                     ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -401,17 +393,20 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                       Text(
                         'عرض الكل',
                         style: TextStyle(
-                          color: kMediumPurple,
+                          color: context.colorPrimaryLight,
                           fontSize: fontSize - 1,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                       ),
-                      SizedBox(width: screenSize.width * 0.005),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              4),
                       Icon(
                         Icons.arrow_forward_ios,
                         size: iconSize - 8,
-                        color: kMediumPurple,
+                        color: context.colorPrimaryLight,
                       ),
                     ],
                   ),
@@ -442,7 +437,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           height: size,
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
             border: Border.all(color: color.withOpacity(0.3), width: 1),
           ),
           child: Center(
@@ -470,7 +465,9 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           ),
         ),
 
-        const SizedBox(height: 8),
+        SizedBox(
+            height:
+                AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
 
         // عنوان الإحصائية
         Text(
@@ -478,7 +475,7 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           style: TextStyle(
             fontSize: fontSize - 1,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF555555),
+            color: context.colorTextSecondary,
             fontFamily: 'SYMBIOAR+LT',
             height: 1.2,
           ),
@@ -488,20 +485,15 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // بناء قسم المهام (عنوان + قائمة بالمهام)
-  Widget _buildTasksSection(String title, List<Task> tasks, Color color,
-      IconData icon, Size screenSize, bool isSmallScreen) {
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-    final double titleSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final double iconSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final double countSize =
-        isSmallScreen ? 10.0 : (isMediumScreen ? 11.0 : 12.0);
-
+  Widget _buildTasksSection(
+    String title,
+    List<Task> tasks,
+    Color color,
+    IconData icon,
+  ) {
     return Padding(
       padding: EdgeInsets.only(
-        top: screenSize.height * 0.02,
+        top: AppDimensions.getSpacing(context, size: SpacingSize.medium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,52 +501,71 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           // عنوان القسم
           Padding(
             padding: EdgeInsets.only(
-              bottom: screenSize.height * 0.01,
-              right: screenSize.width * 0.01,
-              left: screenSize.width * 0.01,
+              bottom:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small),
+              right:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                      2,
+              left: AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                  2,
             ),
             child: Row(
               children: [
                 Container(
-                  width: screenSize.width * 0.06,
-                  height: screenSize.width * 0.06,
+                  width: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: false),
+                  height: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: false),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius / 2),
                   ),
                   child: Center(
                     child: Icon(
                       icon,
                       color: color,
-                      size: iconSize,
+                      size: AppDimensions.getIconSize(context,
+                          size: IconSize.small, small: true),
                     ),
                   ),
                 ),
-                SizedBox(width: screenSize.width * 0.02),
+                SizedBox(
+                    width: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: titleSize,
+                    fontSize: AppDimensions.getBodyFontSize(context),
                     fontWeight: FontWeight.bold,
                     color: color,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
                 ),
-                SizedBox(width: screenSize.width * 0.015),
+                SizedBox(
+                    width: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        2),
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.015,
-                    vertical: screenSize.height * 0.0025,
+                    horizontal: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        2,
+                    vertical: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        4,
                   ),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                   ),
                   child: Text(
                     "${tasks.length}",
                     style: TextStyle(
-                      fontSize: countSize,
+                      fontSize:
+                          AppDimensions.getLabelFontSize(context, small: true),
                       fontWeight: FontWeight.bold,
                       color: color,
                       fontFamily: 'SYMBIOAR+LT',
@@ -577,7 +588,8 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
 
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: screenSize.height * 0.01,
+                  bottom: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
                 ),
                 child: TaskCard(
                   task: task,
@@ -594,24 +606,27 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           if (tasks.length > 3)
             Padding(
               padding: EdgeInsets.fromLTRB(
-                screenSize.width * 0.02,
+                AppDimensions.getSpacing(context, size: SpacingSize.small),
                 0,
-                screenSize.width * 0.02,
-                screenSize.height * 0.015,
+                AppDimensions.getSpacing(context, size: SpacingSize.small),
+                AppDimensions.getSpacing(context, size: SpacingSize.small),
               ),
               child: InkWell(
                 onTap: widget.onTaskTap,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
-                    vertical: screenSize.height * 0.01,
-                    horizontal: screenSize.width * 0.03,
+                    vertical: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small),
+                    horizontal: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small),
                   ),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                     border: Border.all(color: color.withOpacity(0.2), width: 1),
                   ),
                   child: Row(
@@ -620,18 +635,21 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
                       Text(
                         'عرض المزيد',
                         style: TextStyle(
-                          fontSize:
-                              isSmallScreen ? 12.0 : 13.0, // زيادة حجم النص
+                          fontSize: AppDimensions.getLabelFontSize(context),
                           color: color.withOpacity(0.9),
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SYMBIOAR+LT',
                           height: 1.2,
                         ),
                       ),
-                      SizedBox(width: screenSize.width * 0.01),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
                       Icon(
                         Icons.arrow_forward,
-                        size: isSmallScreen ? 11.0 : 13.0, // زيادة حجم الأيقونة
+                        size: AppDimensions.getIconSize(context,
+                            size: IconSize.small, small: true),
                         color: color.withOpacity(0.9),
                       ),
                     ],
@@ -645,40 +663,38 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // رسالة خطأ - مُصغّرة
-  Widget _buildErrorMessage(String message, Size screenSize) {
-    // تعديل الأحجام للشاشات المختلفة
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-    final double fontSize =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-    final double iconSize =
-        isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
-
+  Widget _buildErrorMessage(String message) {
     return Container(
       margin: EdgeInsets.symmetric(
-        vertical: screenSize.height * 0.015,
+        vertical: AppDimensions.getSpacing(context, size: SpacingSize.small),
       ),
-      padding: EdgeInsets.all(screenSize.width * 0.03),
+      padding: EdgeInsets.all(
+          AppDimensions.getSpacing(context, size: SpacingSize.small)),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorErrorLight,
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.red, size: iconSize),
-              SizedBox(width: screenSize.width * 0.015),
+              Icon(Icons.error_outline,
+                  color: context.colorError,
+                  size: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: false)),
+              SizedBox(
+                  width: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2),
               Expanded(
                 child: Text(
                   'حدث خطأ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: fontSize + 1,
-                    color: Colors.red[800],
+                    fontSize: AppDimensions.getBodyFontSize(context),
+                    color: context.colorError,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
@@ -686,33 +702,44 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
               ),
             ],
           ),
-          SizedBox(height: screenSize.height * 0.0075),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                      2),
           Text(
             message,
             style: TextStyle(
-              fontSize: fontSize,
+              fontSize: AppDimensions.getLabelFontSize(context),
               fontFamily: 'SYMBIOAR+LT',
+              color: context.colorTextPrimary,
               height: 1.2,
             ),
           ),
-          SizedBox(height: screenSize.height * 0.01),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: _loadTasks,
-              icon: Icon(Icons.refresh, size: iconSize - 2),
+              icon: Icon(Icons.refresh,
+                  size: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: true)),
               label: Text(
                 'إعادة المحاولة',
                 style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize,
+                  fontSize: AppDimensions.getLabelFontSize(context),
                 ),
               ),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.red[800],
+                foregroundColor: context.colorError,
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.02,
-                  vertical: screenSize.height * 0.005,
+                  horizontal: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
+                  vertical: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2,
                 ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -725,32 +752,19 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
   }
 
   // حالة فارغة - مُصغّرة
-  Widget _buildEmptyState(Size screenSize) {
-    // تعديل الأحجام للشاشات المختلفة
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-    final double iconSize =
-        isSmallScreen ? 55.0 : (isMediumScreen ? 60.0 : 65.0);
-    final double titleSize =
-        isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
-    final double descSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
-    final double buttonTextSize =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
-
+  Widget _buildEmptyState() {
     return Container(
       margin: EdgeInsets.symmetric(
-        vertical: screenSize.height * 0.02,
+        vertical: AppDimensions.getSpacing(context, size: SpacingSize.medium),
       ),
-      padding: EdgeInsets.all(screenSize.width * 0.04),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
+        border: Border.all(color: context.colorBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade50,
+            color: context.colorShadow,
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -762,63 +776,79 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: iconSize,
-              height: iconSize,
+              width: AppDimensions.getIconSize(context,
+                  size: IconSize.large, small: false),
+              height: AppDimensions.getIconSize(context,
+                  size: IconSize.large, small: false),
               decoration: BoxDecoration(
-                color: kMediumPurple.withOpacity(0.1),
+                color: context.colorPrimaryLight.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.task_alt,
-                color: kMediumPurple,
-                size: iconSize * 0.5,
+                color: context.colorPrimaryLight,
+                size: AppDimensions.getIconSize(context,
+                        size: IconSize.large, small: false) *
+                    0.5,
               ),
             ),
-            SizedBox(height: screenSize.height * 0.015),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             Text(
               'لا توجد مهام حاليًا',
               style: TextStyle(
-                fontSize: titleSize,
+                fontSize: AppDimensions.getSubtitleFontSize(context),
                 fontWeight: FontWeight.bold,
-                color: kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
                 height: 1.2,
               ),
             ),
-            SizedBox(height: screenSize.height * 0.0075),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                        2),
             Text(
               'عند إضافة مهام جديدة، ستظهر هنا',
               style: TextStyle(
-                fontSize: descSize,
-                color: Colors.grey[700],
+                fontSize: AppDimensions.getBodyFontSize(context),
+                color: context.colorTextSecondary,
                 fontFamily: 'SYMBIOAR+LT',
                 height: 1.2,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: screenSize.height * 0.015),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             // زر إضافة مهمة جديدة
             ElevatedButton.icon(
               onPressed: widget.onTaskTap,
-              icon:
-                  Icon(Icons.add_circle_outline, size: isSmallScreen ? 14 : 16),
+              icon: Icon(Icons.add_circle_outline,
+                  size: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: false)),
               label: Text(
                 'إضافة مهمة جديدة',
                 style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: buttonTextSize,
+                  fontSize: AppDimensions.getButtonFontSize(context),
                   height: 1.2,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: kMediumPurple,
+                backgroundColor: context.colorPrimaryLight,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.03,
-                  vertical: screenSize.height * 0.01,
+                  horizontal: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
+                  vertical: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
               ),
             ),
@@ -827,4 +857,8 @@ class _TaskCategoriesSectionState extends State<TaskCategoriesSection> {
       ),
     );
   }
+}
+
+extension on BuildContext {
+  get colorErrorLight => null;
 }

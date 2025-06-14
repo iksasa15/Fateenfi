@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/profileConstants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 /// مكونات الملف الشخصي
 class ProfileComponents {
@@ -12,46 +13,40 @@ class ProfileComponents {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // استخدام MediaQuery للحصول على أبعاد الشاشة
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
-
-        // تعديل الأحجام بناءً على حجم الشاشة
-        final double iconSize =
-            isSmallScreen ? 55.0 : (isMediumScreen ? 60.0 : 65.0);
-        final double nameSize =
-            isSmallScreen ? 22.0 : (isMediumScreen ? 24.0 : 26.0);
-        final double majorSize =
-            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
-        final double emailSize =
-            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+        // استخدام أبعاد التطبيق المتجاوبة
+        final double iconSize = AppDimensions.getIconSize(context,
+            size: IconSize.large, small: false);
+        final double nameSize = AppDimensions.getTitleFontSize(context);
+        final double majorSize = AppDimensions.getSubtitleFontSize(context);
+        final double emailSize = AppDimensions.getBodyFontSize(context);
 
         return Card(
-          elevation: 2,
+          elevation: AppDimensions.defaultElevation,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           ),
           child: Padding(
-            padding: EdgeInsets.all(screenSize.width * 0.04),
+            padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
             child: Column(
               children: [
                 // أيقونة المستخدم
                 Container(
-                  padding: EdgeInsets.all(screenSize.width * 0.03),
+                  padding: EdgeInsets.all(AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
                   decoration: BoxDecoration(
-                    color: ProfileConstants.kDarkPurple.withOpacity(0.1),
+                    color: context.colorPrimaryPale,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.person,
                     size: iconSize,
-                    color: ProfileConstants.kDarkPurple,
+                    color: context.colorPrimary,
                   ),
                 ),
 
-                SizedBox(height: screenSize.height * 0.02),
+                SizedBox(
+                    height: AppDimensions.getSpacing(context,
+                        size: SpacingSize.medium)),
 
                 // اسم المستخدم
                 Text(
@@ -59,30 +54,36 @@ class ProfileComponents {
                   style: TextStyle(
                     fontSize: nameSize,
                     fontWeight: FontWeight.bold,
-                    color: ProfileConstants.kDarkPurple,
+                    color: context.colorPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
                   textAlign: TextAlign.center,
                 ),
 
-                SizedBox(height: screenSize.height * 0.01),
+                SizedBox(
+                    height: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
 
                 // التخصص
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenSize.width * 0.03,
-                    vertical: screenSize.height * 0.0075,
+                    horizontal: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small),
+                    vertical: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        2,
                   ),
                   decoration: BoxDecoration(
-                    color: ProfileConstants.kLightPurple,
-                    borderRadius: BorderRadius.circular(15),
+                    color: context.colorPrimaryPale,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.mediumRadius),
                   ),
                   child: Text(
                     major,
                     style: TextStyle(
                       fontSize: majorSize,
-                      color: ProfileConstants.kMediumPurple,
+                      color: context.colorPrimary,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.2,
@@ -90,7 +91,9 @@ class ProfileComponents {
                   ),
                 ),
 
-                SizedBox(height: screenSize.height * 0.015),
+                SizedBox(
+                    height: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
 
                 // البريد الإلكتروني
                 if (email.isNotEmpty)
@@ -100,14 +103,17 @@ class ProfileComponents {
                       Icon(
                         Icons.email_outlined,
                         size: emailSize + 4,
-                        color: ProfileConstants.kHintColor,
+                        color: context.colorTextHint,
                       ),
-                      SizedBox(width: screenSize.width * 0.02),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
                       Text(
                         email,
                         style: TextStyle(
                           fontSize: emailSize,
-                          color: ProfileConstants.kHintColor,
+                          color: context.colorTextHint,
                           fontFamily: 'SYMBIOAR+LT',
                           height: 1.2,
                         ),
@@ -130,18 +136,14 @@ class ProfileComponents {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
-
-        final double titleSize =
-            isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
+        final double titleSize = AppDimensions.getSubtitleFontSize(context);
 
         return Container(
           margin: EdgeInsets.only(
-            top: isFirst ? 0 : screenSize.height * 0.025,
-            bottom: screenSize.height * 0.01,
+            top: isFirst
+                ? 0
+                : AppDimensions.getSpacing(context, size: SpacingSize.large),
+            bottom: AppDimensions.getSpacing(context, size: SpacingSize.small),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,16 +151,17 @@ class ProfileComponents {
               // عنوان القسم
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: screenSize.height * 0.015,
-                  right: screenSize.width * 0.04,
-                  left: screenSize.width * 0.04,
+                  bottom: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
+                  right: AppDimensions.getSpacing(context),
+                  left: AppDimensions.getSpacing(context),
                 ),
                 child: Text(
                   title,
                   style: TextStyle(
                     fontSize: titleSize,
                     fontWeight: FontWeight.bold,
-                    color: ProfileConstants.kDarkPurple,
+                    color: context.colorPrimaryDark,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
@@ -168,11 +171,12 @@ class ProfileComponents {
               // محتوى القسم
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: context.colorSurface,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: context.colorShadow,
                       spreadRadius: 0,
                       blurRadius: 2,
                       offset: const Offset(0, 1),
@@ -202,17 +206,15 @@ class ProfileComponents {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
+        final double titleSize = AppDimensions.getBodyFontSize(context);
+        final double subtitleSize = AppDimensions.getLabelFontSize(context);
+        final double iconSize = AppDimensions.getIconSize(context,
+            size: IconSize.small, small: false);
 
-        final double titleSize =
-            isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
-        final double subtitleSize =
-            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-        final double iconSize =
-            isSmallScreen ? 22.0 : (isMediumScreen ? 23.0 : 24.0);
+        final Color defaultIconColor =
+            isDanger ? context.colorError : context.colorPrimary;
+        final Color textColor =
+            isDanger ? context.colorError : context.colorTextPrimary;
 
         return InkWell(
           onTap: onTap,
@@ -220,30 +222,32 @@ class ProfileComponents {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.04,
-                  vertical: screenSize.height * 0.015,
+                  horizontal: AppDimensions.getSpacing(context),
+                  vertical: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
                 ),
                 child: Row(
                   children: [
                     // أيقونة العنصر
                     Container(
-                      padding: EdgeInsets.all(screenSize.width * 0.02),
+                      padding: EdgeInsets.all(AppDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2),
                       decoration: BoxDecoration(
-                        color: (iconColor ?? ProfileConstants.kDarkPurple)
-                            .withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: (iconColor ?? defaultIconColor).withOpacity(0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                       ),
                       child: Icon(
                         icon,
-                        color: iconColor ??
-                            (isDanger
-                                ? ProfileConstants.dangerColor
-                                : ProfileConstants.kDarkPurple),
+                        color: iconColor ?? defaultIconColor,
                         size: iconSize,
                       ),
                     ),
 
-                    SizedBox(width: screenSize.width * 0.04),
+                    SizedBox(
+                        width: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small)),
 
                     // النص والوصف
                     Expanded(
@@ -255,9 +259,7 @@ class ProfileComponents {
                             style: TextStyle(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w500,
-                              color: isDanger
-                                  ? ProfileConstants.dangerColor
-                                  : ProfileConstants.kTextColor,
+                              color: textColor,
                               fontFamily: 'SYMBIOAR+LT',
                               height: 1.2,
                             ),
@@ -265,13 +267,15 @@ class ProfileComponents {
                           if (subtitle != null)
                             Padding(
                               padding: EdgeInsets.only(
-                                top: screenSize.height * 0.005,
+                                top: AppDimensions.getSpacing(context,
+                                        size: SpacingSize.small) /
+                                    3,
                               ),
                               child: Text(
                                 subtitle,
                                 style: TextStyle(
                                   fontSize: subtitleSize,
-                                  color: ProfileConstants.kHintColor,
+                                  color: context.colorTextHint,
                                   fontFamily: 'SYMBIOAR+LT',
                                   height: 1.2,
                                 ),
@@ -284,8 +288,8 @@ class ProfileComponents {
                     // أيقونة السهم
                     Icon(
                       Icons.arrow_forward_ios,
-                      color: ProfileConstants.kHintColor,
-                      size: iconSize - 6,
+                      color: context.colorTextHint,
+                      size: iconSize - 4,
                     ),
                   ],
                 ),
@@ -296,9 +300,9 @@ class ProfileComponents {
                 Divider(
                   height: 1,
                   thickness: 1,
-                  indent: screenSize.width * 0.14,
+                  indent: AppDimensions.getWidth(context, percentage: 0.14),
                   endIndent: 0,
-                  color: Colors.grey[100],
+                  color: context.colorDivider,
                 ),
             ],
           ),
@@ -307,7 +311,7 @@ class ProfileComponents {
     );
   }
 
-  /// بناء حقل إدخال للنموذج (مطابق للتصميم القديم)
+  /// بناء حقل إدخال للنموذج
   static Widget buildTextField({
     required String label,
     required String hint,
@@ -323,23 +327,15 @@ class ProfileComponents {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
-
-        final double labelSize =
-            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
-        final double inputSize =
-            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
-        final double hintSize =
-            isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-        final double iconSize =
-            isSmallScreen ? 22.0 : (isMediumScreen ? 23.0 : 24.0);
+        final double labelSize = AppDimensions.getBodyFontSize(context);
+        final double inputSize = AppDimensions.getBodyFontSize(context);
+        final double hintSize = AppDimensions.getLabelFontSize(context);
+        final double iconSize = AppDimensions.getIconSize(context,
+            size: IconSize.small, small: false);
 
         return Container(
           margin: EdgeInsets.only(
-            bottom: screenSize.height * 0.025,
+            bottom: AppDimensions.getSpacing(context, size: SpacingSize.medium),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,15 +343,18 @@ class ProfileComponents {
               // تسمية الحقل
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: screenSize.height * 0.01,
-                  right: screenSize.width * 0.01,
+                  bottom: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small),
+                  right: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      2,
                 ),
                 child: Text(
                   label,
                   style: TextStyle(
                     fontSize: labelSize,
                     fontWeight: FontWeight.w500,
-                    color: ProfileConstants.kTextColor,
+                    color: context.colorTextPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
@@ -369,7 +368,7 @@ class ProfileComponents {
                 obscureText: obscureText,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  color: ProfileConstants.kTextColor,
+                  color: context.colorTextPrimary,
                   fontSize: inputSize,
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
@@ -377,7 +376,7 @@ class ProfileComponents {
                 decoration: InputDecoration(
                   hintText: hint,
                   hintStyle: TextStyle(
-                    color: ProfileConstants.kHintColor,
+                    color: context.colorTextHint,
                     fontSize: hintSize,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
@@ -385,50 +384,55 @@ class ProfileComponents {
                   prefixIcon: Icon(
                     icon,
                     color: controller.text.isEmpty
-                        ? ProfileConstants.kHintColor
-                        : ProfileConstants.kMediumPurple,
+                        ? context.colorTextHint
+                        : context.colorPrimary,
                     size: iconSize,
                   ),
                   suffixIcon: suffix,
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: context.colorSurface,
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
                     borderSide: BorderSide(
-                      color: Colors.grey.shade200,
+                      color: context.colorBorder,
                       width: 1,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ProfileConstants.kMediumPurple,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
+                    borderSide: BorderSide(
+                      color: context.colorPrimary,
                       width: 1.5,
                     ),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ProfileConstants.kAccentColorPink,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
+                    borderSide: BorderSide(
+                      color: context.colorError,
                       width: 1,
                     ),
                   ),
                   focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ProfileConstants.kAccentColorPink,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
+                    borderSide: BorderSide(
+                      color: context.colorError,
                       width: 1.5,
                     ),
                   ),
                   errorStyle: TextStyle(
-                    color: ProfileConstants.kAccentColorPink,
+                    color: context.colorError,
                     fontSize: hintSize - 2,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: screenSize.height * 0.02,
-                    horizontal: screenSize.width * 0.05,
+                    vertical: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small),
+                    horizontal: AppDimensions.getSpacing(context),
                   ),
                 ),
                 maxLines: obscureText ? 1 : maxLines,
@@ -443,7 +447,7 @@ class ProfileComponents {
     );
   }
 
-  /// بناء زر أساسي (مطابق للتصميم القديم)
+  /// بناء زر أساسي
   static Widget buildButton({
     required String text,
     required VoidCallback onPressed,
@@ -454,28 +458,21 @@ class ProfileComponents {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
+        final double buttonHeight = AppDimensions.getButtonHeight(
+          context,
+          size: ButtonSize.regular,
+          small: false,
+        );
 
-        final double buttonHeight = isSmallScreen
-            ? screenSize.height * 0.055
-            : (isMediumScreen
-                ? screenSize.height * 0.06
-                : screenSize.height * 0.065);
-
-        final double textSize =
-            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
-
+        final double textSize = AppDimensions.getButtonFontSize(context);
         final double iconSize = textSize + 6;
 
         final Color buttonColor = isDanger
-            ? ProfileConstants.dangerColor
-            : (isPrimary ? ProfileConstants.kDarkPurple : Colors.grey[300]!);
+            ? context.colorError
+            : (isPrimary ? context.colorPrimary : context.colorSurfaceLight);
 
         final Color textColor =
-            isPrimary || isDanger ? Colors.white : Colors.black87;
+            isPrimary || isDanger ? Colors.white : context.colorTextPrimary;
 
         return SizedBox(
           width: double.infinity,
@@ -487,10 +484,11 @@ class ProfileComponents {
               foregroundColor: textColor,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               ),
               padding: EdgeInsets.symmetric(
-                vertical: screenSize.height * 0.015,
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
               ),
             ),
             child: isLoading
@@ -509,7 +507,9 @@ class ProfileComponents {
                       if (icon != null)
                         Padding(
                           padding: EdgeInsets.only(
-                            left: screenSize.width * 0.02,
+                            left: AppDimensions.getSpacing(context,
+                                    size: SpacingSize.small) /
+                                2,
                           ),
                           child: Icon(icon, size: iconSize),
                         ),
@@ -535,21 +535,13 @@ class ProfileComponents {
     required BuildContext context,
     required String title,
     required String message,
-    String confirmText = ProfileConstants.confirmText,
-    String cancelText = ProfileConstants.cancelText,
+    String confirmText = "تأكيد",
+    String cancelText = "إلغاء",
     bool isDanger = false,
   }) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    final double titleSize =
-        isSmallScreen ? 17.0 : (isMediumScreen ? 18.0 : 19.0);
-    final double messageSize =
-        isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
-    final double buttonTextSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    final double titleSize = AppDimensions.getSubtitleFontSize(context);
+    final double messageSize = AppDimensions.getBodyFontSize(context);
+    final double buttonTextSize = AppDimensions.getLabelFontSize(context);
 
     return showDialog<bool>(
       context: context,
@@ -557,9 +549,7 @@ class ProfileComponents {
         title: Text(
           title,
           style: TextStyle(
-            color: isDanger
-                ? ProfileConstants.dangerColor
-                : ProfileConstants.kDarkPurple,
+            color: isDanger ? context.colorError : context.colorPrimary,
             fontWeight: FontWeight.bold,
             fontSize: titleSize,
             fontFamily: 'SYMBIOAR+LT',
@@ -573,6 +563,7 @@ class ProfileComponents {
             fontSize: messageSize,
             fontFamily: 'SYMBIOAR+LT',
             height: 1.2,
+            color: context.colorTextPrimary,
           ),
           textAlign: TextAlign.right,
         ),
@@ -583,7 +574,7 @@ class ProfileComponents {
             child: Text(
               cancelText,
               style: TextStyle(
-                color: Colors.grey[700],
+                color: context.colorTextSecondary,
                 fontSize: buttonTextSize,
                 fontFamily: 'SYMBIOAR+LT',
                 height: 1.2,
@@ -595,9 +586,8 @@ class ProfileComponents {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: isDanger
-                  ? ProfileConstants.dangerColor
-                  : ProfileConstants.kDarkPurple,
+              foregroundColor:
+                  isDanger ? context.colorError : context.colorPrimary,
             ),
             child: Text(
               confirmText,
@@ -616,42 +606,38 @@ class ProfileComponents {
 
   /// بناء عنصر خطأ من السيرفر
   static Widget buildServerError(BuildContext context, String errorMessage) {
-    // تعديل الأحجام حسب حجم الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-
-    final double fontSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
+    final double fontSize = AppDimensions.getLabelFontSize(context);
     final double iconSize =
-        isSmallScreen ? 19.0 : (isMediumScreen ? 20.0 : 22.0);
+        AppDimensions.getIconSize(context, size: IconSize.small, small: true);
     final double padding =
-        isSmallScreen ? 11.0 : (isMediumScreen ? 12.0 : 14.0);
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
 
     return Container(
       margin: EdgeInsets.only(
-        bottom: screenSize.height * 0.025,
+        bottom: AppDimensions.getSpacing(context, size: SpacingSize.medium),
       ),
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: ProfileConstants.kAccentColorPink.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: context.colorError.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: ProfileConstants.kAccentColorPink,
+            color: context.colorError,
             size: iconSize,
           ),
-          SizedBox(width: screenSize.width * 0.025),
+          SizedBox(
+              width:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                      2),
           Expanded(
             child: Text(
               errorMessage,
               style: TextStyle(
-                color: ProfileConstants.kAccentColorPink,
+                color: context.colorError,
                 fontSize: fontSize,
                 fontFamily: 'SYMBIOAR+LT',
                 height: 1.2,
@@ -668,15 +654,9 @@ class ProfileComponents {
   static Widget buildLoadingIndicator({String? message}) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-        final bool isSmallScreen = screenSize.width < 360;
-        final bool isMediumScreen =
-            screenSize.width >= 360 && screenSize.width < 400;
-
-        final double messageSize =
-            isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
-        final double indicatorSize =
-            isSmallScreen ? 25.0 : (isMediumScreen ? 28.0 : 30.0);
+        final double messageSize = AppDimensions.getBodyFontSize(context);
+        final double indicatorSize = AppDimensions.getIconSize(context,
+            size: IconSize.medium, small: false);
 
         return Center(
           child: Column(
@@ -685,18 +665,21 @@ class ProfileComponents {
               SizedBox(
                 width: indicatorSize,
                 height: indicatorSize,
-                child: const CircularProgressIndicator(
-                  color: ProfileConstants.kDarkPurple,
+                child: CircularProgressIndicator(
+                  color: context.colorPrimary,
                   strokeWidth: 3.0,
                 ),
               ),
-              if (message != null) SizedBox(height: screenSize.height * 0.02),
+              if (message != null)
+                SizedBox(
+                    height: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
               if (message != null)
                 Text(
                   message,
                   style: TextStyle(
                     fontSize: messageSize,
-                    color: Colors.grey.shade600,
+                    color: context.colorTextSecondary,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),

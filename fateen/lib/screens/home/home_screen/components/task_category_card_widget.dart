@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/task_categories_constants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class TaskCategoryCardWidget extends StatelessWidget {
   final String title;
@@ -21,24 +23,21 @@ class TaskCategoryCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius:
-          BorderRadius.circular(TaskCategoriesConstants.cardBorderRadius),
+      borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
       child: Container(
-        padding: EdgeInsets.all(TaskCategoriesConstants.cardPadding),
+        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(TaskCategoriesConstants.cardBorderRadius),
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black
-                  .withOpacity(TaskCategoriesConstants.shadowOpacity),
+              color: context.colorShadow,
               blurRadius: 10,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
           border: Border.all(
-            color: color.withOpacity(TaskCategoriesConstants.borderOpacity),
+            color: color.withOpacity(0.2),
             width: 1,
           ),
         ),
@@ -52,21 +51,28 @@ class TaskCategoryCardWidget extends StatelessWidget {
                 Icon(
                   icon,
                   color: color,
-                  size: TaskCategoriesConstants.cardIconSize,
+                  size:
+                      AppDimensions.getIconSize(context, size: IconSize.small, small: true),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small),
+                    vertical: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        2,
+                  ),
                   decoration: BoxDecoration(
-                    color: color
-                        .withOpacity(TaskCategoriesConstants.backgroundOpacity),
-                    borderRadius: BorderRadius.circular(
-                        TaskCategoriesConstants.badgeBorderRadius),
+                    color: color.withOpacity(0.1),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius / 2),
                   ),
                   child: Text(
                     '$count',
                     style: TextStyle(
                       fontFamily: TaskCategoriesConstants.fontFamily,
-                      fontSize: TaskCategoriesConstants.badgeFontSize,
+                      fontSize:
+                          AppDimensions.getLabelFontSize(context, small: true),
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -74,14 +80,16 @@ class TaskCategoryCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             Text(
               title,
               style: TextStyle(
                 fontFamily: TaskCategoriesConstants.fontFamily,
-                fontSize: TaskCategoriesConstants.cardTitleFontSize,
+                fontSize: AppDimensions.getBodyFontSize(context),
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: context.colorTextPrimary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../constants/performance_indicators_constants.dart';
 import '../controllers/performance_indicators_controller.dart';
 import 'performance_card_widget.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class PerformanceIndicatorsWidget extends StatelessWidget {
   final PerformanceIndicatorsController controller;
@@ -28,13 +30,17 @@ class PerformanceIndicatorsWidget extends StatelessWidget {
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
+            padding: EdgeInsets.only(
+              bottom:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small),
+            ),
             child: Text(
               PerformanceIndicatorsConstants.sectionTitle,
               style: TextStyle(
-                fontSize: 18.0,
+                fontSize: AppDimensions.smallTitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF111827),
+                color: context
+                    .colorTextPrimary, // استخدام الألوان من ملف AppColors
                 fontFamily: PerformanceIndicatorsConstants.fontFamily,
                 height: 1.2,
               ),
@@ -43,20 +49,22 @@ class PerformanceIndicatorsWidget extends StatelessWidget {
 
           // مؤشرات الأداء
           if (controller.isLoading)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
+                padding: EdgeInsets.all(AppDimensions.defaultSpacing),
+                child: CircularProgressIndicator(
+                  color: context.colorPrimary, // استخدام اللون الرئيسي للتطبيق
+                ),
               ),
             )
           else if (controller.errorMessage != null)
             Center(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                 child: Text(
                   controller.errorMessage!,
                   style: TextStyle(
-                    color: Colors.red,
+                    color: context.colorError, // استخدام لون الخطأ من AppColors
                     fontSize: fontSize,
                   ),
                 ),
@@ -66,12 +74,11 @@ class PerformanceIndicatorsWidget extends StatelessWidget {
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio:
-                    1.6, // تم تغييرها من 1.2 إلى 1.6 لجعل المربع أقصر
+                crossAxisSpacing: AppDimensions.smallSpacing,
+                mainAxisSpacing: AppDimensions.smallSpacing,
+                childAspectRatio: 1.6,
               ),
               itemCount: controller.indicators.length,
               itemBuilder: (context, index) {

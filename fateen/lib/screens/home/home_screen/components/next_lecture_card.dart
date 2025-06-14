@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/next_lecture_constants.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 /// بطاقة المحاضرة القادمة
 class NextLectureCard extends StatelessWidget {
@@ -23,10 +25,6 @@ class NextLectureCard extends StatelessWidget {
     final bool isSmallScreen = screenSize.width < 360;
     final bool isMediumScreen =
         screenSize.width >= 360 && screenSize.width < 400;
-
-    // الألوان المستخدمة في التطبيق
-    const Color kMediumPurple = Color(0xFF6366F1);
-    const Color kDarkPurple = Color(0xFF4338CA);
 
     // حساب الوقت المتبقي بشكل أكثر دقة
     int diffHours = diffSeconds ~/ 3600;
@@ -69,15 +67,13 @@ class NextLectureCard extends StatelessWidget {
         width: double.infinity,
         height: cardHeight,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [kMediumPurple, kDarkPurple],
-          ),
-          borderRadius: BorderRadius.circular(16),
+          gradient: context.gradientPrimary, // استخدام التدرج من AppColors
+          borderRadius: BorderRadius.circular(
+              AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
           boxShadow: [
             BoxShadow(
-              color: kMediumPurple.withOpacity(0.25),
+              color: context.colorPrimaryLight
+                  .withOpacity(0.25), // استخدام الألوان من AppColors
               blurRadius: 6,
               offset: const Offset(0, 2),
               spreadRadius: 0,
@@ -86,7 +82,8 @@ class NextLectureCard extends StatelessWidget {
         ),
         // استخدام ClipRRect لضمان عدم تجاوز أي عنصر داخلي
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(
+              AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
           child: Stack(
             children: [
               // زخارف الخلفية
@@ -106,7 +103,8 @@ class NextLectureCard extends StatelessWidget {
               // المحتوى الرئيسي
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenSize.width * 0.04,
+                  horizontal: AppDimensions.getSpacing(
+                      context), // استخدام التباعد من AppDimensions
                   vertical: screenSize.height * 0.015,
                 ),
                 child: Row(
@@ -219,13 +217,6 @@ class NextLectureComponents {
       builder: (context, constraints) {
         final Size screenSize = MediaQuery.of(context).size;
 
-        // تحديد ثوابت الألوان المتسقة مع باقي التطبيق
-        const Color titleColor =
-            Color(0xFF111827); // لون أسود داكن متسق مع العناوين الأخرى
-
-        // توحيد حجم الخط - بدون التفريق بين أحجام الشاشات
-        const double titleFontSize = 18.0; // حجم موحد مع العناوين الأخرى
-
         return Padding(
           padding: EdgeInsets.only(
             bottom: screenSize.height * 0.01,
@@ -233,12 +224,14 @@ class NextLectureComponents {
           child: Row(
             children: [
               // نص العنوان فقط بدون خط تحته
-              const Text(
+              Text(
                 NextLectureConstants.nextLectureTitle,
                 style: TextStyle(
-                  fontSize: titleFontSize, // حجم خط موحد
+                  fontSize: AppDimensions
+                      .smallTitleFontSize, // استخدام حجم الخط من AppDimensions
                   fontWeight: FontWeight.bold,
-                  color: titleColor, // لون موحد
+                  color:
+                      context.colorTextPrimary, // استخدام لون النص من AppColors
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
                 ),
@@ -273,16 +266,19 @@ class NextLectureComponents {
           ),
           padding: EdgeInsets.symmetric(
             vertical: screenSize.height * 0.02,
-            horizontal: screenSize.width * 0.04,
+            horizontal: AppDimensions.getSpacing(
+                context), // استخدام التباعد من AppDimensions
           ),
           height: screenSize.height * 0.12,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            color: context.colorSurface, // استخدام لون السطح من AppColors
+            borderRadius: BorderRadius.circular(
+                AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
+            border: Border.all(
+                color: context.colorBorder), // استخدام لون الحدود من AppColors
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade50,
+                color: context.colorShadow, // استخدام لون الظل من AppColors
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: const Offset(0, 1),
@@ -296,12 +292,14 @@ class NextLectureComponents {
                 width: iconSize,
                 height: iconSize,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  color: context.colorPrimaryLight
+                      .withOpacity(0.1), // استخدام الألوان من AppColors
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.event_note_rounded,
-                  color: const Color(0xFF6366F1),
+                  color: context
+                      .colorPrimary, // استخدام اللون الرئيسي من AppColors
                   size: iconSize * 0.5,
                 ),
               ),
@@ -319,7 +317,8 @@ class NextLectureComponents {
                       style: TextStyle(
                         fontSize: titleSize,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF4338CA),
+                        color: context
+                            .colorPrimaryDark, // استخدام اللون الرئيسي الداكن من AppColors
                         fontFamily: 'SYMBIOAR+LT',
                         height: 1.2,
                       ),
@@ -329,7 +328,8 @@ class NextLectureComponents {
                       'يمكنك إضافة محاضراتك من قسم الجدول الدراسي',
                       style: TextStyle(
                         fontSize: subtitleSize,
-                        color: Colors.grey[600],
+                        color: context
+                            .colorTextSecondary, // استخدام لون النص الثانوي من AppColors
                         fontFamily: 'SYMBIOAR+LT',
                         height: 1.2,
                       ),

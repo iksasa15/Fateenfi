@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../controllers/task_categories_controller.dart';
-import '../constants/task_categories_constants.dart';
-import '../constants/tasks_constants.dart';
 import '../controllers/tasks_controller.dart';
 import 'package:fateen/models/task.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 class TaskCategoriesWidget extends StatefulWidget {
   final TaskCategoriesController controller;
@@ -99,17 +99,12 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على أبعاد الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final bool isMediumScreen =
-        screenSize.width >= 360 && screenSize.width < 400;
-    final double fontSize =
-        isSmallScreen ? 13.0 : (isMediumScreen ? 14.0 : 15.0);
+    // استخدام أبعاد التطبيق المتجاوبة
+    final double fontSize = AppDimensions.getBodyFontSize(context);
 
     return RefreshIndicator(
       onRefresh: _refreshData,
-      color: const Color(0xFF4338CA),
+      color: context.colorPrimary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -117,32 +112,36 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
           children: [
             // عنوان القسم
             Text(
-              TaskCategoriesConstants.sectionTitle,
+              "فئات المهام",
               style: TextStyle(
-                fontFamily: TaskCategoriesConstants.fontFamily,
+                fontFamily: 'SYMBIOAR+LT',
                 fontSize: fontSize + 1,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: context.colorTextPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
 
             // بطاقة فئات المهام الموحدة
             _buildCategoriesCard(fontSize),
 
-            const SizedBox(height: 16),
+            SizedBox(
+                height: AppDimensions.getSpacing(context,
+                    size: SpacingSize.medium)),
 
             // عنوان قسم المهام العاجلة
             Row(
               children: [
                 Expanded(
                   child: Text(
-                    TasksConstants.tasksNeedAttentionTitle,
+                    "مهام تحتاج اهتمامك",
                     style: TextStyle(
-                      fontFamily: TaskCategoriesConstants.fontFamily,
+                      fontFamily: 'SYMBIOAR+LT',
                       fontSize: fontSize + 1,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: context.colorTextPrimary,
                     ),
                   ),
                 ),
@@ -158,12 +157,20 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                     // عرض نافذة منبثقة تظهر حالة المهام
                     _showTasksDebugInfo(context);
                   },
-                  child: Text('تحديث'),
+                  child: Text(
+                    'تحديث',
+                    style: TextStyle(
+                      color: context.colorPrimary,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
 
             // عرض المهام المتأخرة ومهام اليوم
             _buildTasksSection(),
@@ -189,19 +196,19 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.colorShadow,
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder,
           width: 1,
         ),
       ),
@@ -222,8 +229,10 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
               child: Column(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: AppDimensions.getIconSize(context,
+                        size: IconSize.medium, small: false),
+                    height: AppDimensions.getIconSize(context,
+                        size: IconSize.medium, small: false),
                     decoration: BoxDecoration(
                       color: category.color.withOpacity(0.1),
                       shape: BoxShape.circle,
@@ -231,26 +240,32 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                     child: Icon(
                       category.icon,
                       color: category.color,
-                      size: 20,
+                      size: AppDimensions.getIconSize(context,
+                          size: IconSize.small, small: false),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(
+                      height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
                   Text(
                     '${category.count}',
                     style: TextStyle(
-                      fontFamily: TaskCategoriesConstants.fontFamily,
+                      fontFamily: 'SYMBIOAR+LT',
                       fontSize: fontSize + 2,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: context.colorTextPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(
+                      height: AppDimensions.getSpacing(context,
+                              size: SpacingSize.small) /
+                          2),
                   Text(
                     category.title,
                     style: TextStyle(
-                      fontFamily: TaskCategoriesConstants.fontFamily,
+                      fontFamily: 'SYMBIOAR+LT',
                       fontSize: fontSize - 2,
-                      color: Colors.grey[600],
+                      color: context.colorTextSecondary,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -289,22 +304,22 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
     // بطاقة موحدة للمهام
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.colorShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder,
           width: 1,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -320,25 +335,30 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: TasksConstants.kOverdueTaskColor,
+                          color: context.colorError,
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
                       Text(
                         "مهمة متأخرة",
                         style: TextStyle(
-                          fontFamily: TaskCategoriesConstants.fontFamily,
-                          fontSize: 13,
+                          fontFamily: 'SYMBIOAR+LT',
+                          fontSize: AppDimensions.getLabelFontSize(context),
                           fontWeight: FontWeight.bold,
-                          color: TasksConstants.kOverdueTaskColor,
+                          color: context.colorError,
                         ),
                       ),
                       const Spacer(),
                       // زر إكمال المهمة
                       IconButton(
-                        icon: const Icon(Icons.check_circle_outline,
-                            color: Colors.green),
+                        icon: Icon(
+                          Icons.check_circle_outline,
+                          color: context.colorSuccess,
+                        ),
                         onPressed: () async {
                           try {
                             // إظهار مؤشر تحميل
@@ -354,10 +374,10 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
 
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('تم إكمال المهمة بنجاح'),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 2),
+                                SnackBar(
+                                  content: const Text('تم إكمال المهمة بنجاح'),
+                                  backgroundColor: context.colorSuccess,
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                             }
@@ -366,7 +386,7 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('فشل في إكمال المهمة: $e'),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: context.colorError,
                                 ),
                               );
                             }
@@ -375,19 +395,22 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(
+                      height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
 
                   // بطاقة المهمة
                   GestureDetector(
                     onTap: widget.onTaskTap,
                     child: Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(AppDimensions.getSpacing(context,
+                          size: SpacingSize.medium)),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        color: context.colorSurface,
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         border: Border.all(
-                          color:
-                              TasksConstants.kOverdueTaskColor.withOpacity(0.5),
+                          color: context.colorError.withOpacity(0.5),
                         ),
                       ),
                       child: Column(
@@ -395,31 +418,50 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                         children: [
                           Text(
                             _tasksController.overdueTask!.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize:
+                                  AppDimensions.getSubtitleFontSize(context),
+                              color: context.colorTextPrimary,
+                              fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small)),
                           Text(
                             _tasksController.overdueTask!.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: AppDimensions.getBodyFontSize(context),
+                              color: context.colorTextSecondary,
+                              fontFamily: 'SYMBIOAR+LT',
+                            ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small)),
                           Row(
                             children: [
                               Icon(
                                 Icons.calendar_today,
-                                size: 16,
-                                color: TasksConstants.kOverdueTaskColor,
+                                size: AppDimensions.getIconSize(context,
+                                    size: IconSize.small, small: true),
+                                color: context.colorError,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(
+                                  width: AppDimensions.getSpacing(context,
+                                          size: SpacingSize.small) /
+                                      2),
                               Text(
                                 _tasksController.overdueTask!.dueDateFormatted,
                                 style: TextStyle(
-                                  color: TasksConstants.kOverdueTaskColor,
+                                  color: context.colorError,
                                   fontWeight: FontWeight.bold,
+                                  fontSize:
+                                      AppDimensions.getLabelFontSize(context),
+                                  fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
                             ],
@@ -435,8 +477,10 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
             // فاصل بين المهام إذا وجدت كلاهما
             if (hasOverdueTask && hasTodayTask)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+                padding: EdgeInsets.symmetric(
+                    vertical: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
+                child: Divider(height: 1, color: context.colorDivider),
               ),
 
             // مهام اليوم
@@ -451,25 +495,30 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: TasksConstants.kTodayTaskColor,
+                          color: context.colorPrimary,
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(
+                          width: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
                       Text(
                         "مهمة اليوم",
                         style: TextStyle(
-                          fontFamily: TaskCategoriesConstants.fontFamily,
-                          fontSize: 13,
+                          fontFamily: 'SYMBIOAR+LT',
+                          fontSize: AppDimensions.getLabelFontSize(context),
                           fontWeight: FontWeight.bold,
-                          color: TasksConstants.kTodayTaskColor,
+                          color: context.colorPrimary,
                         ),
                       ),
                       const Spacer(),
                       // زر إكمال المهمة
                       IconButton(
-                        icon: const Icon(Icons.check_circle_outline,
-                            color: Colors.green),
+                        icon: Icon(
+                          Icons.check_circle_outline,
+                          color: context.colorSuccess,
+                        ),
                         onPressed: () async {
                           try {
                             // إظهار مؤشر تحميل
@@ -485,10 +534,10 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
 
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('تم إكمال المهمة بنجاح'),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 2),
+                                SnackBar(
+                                  content: const Text('تم إكمال المهمة بنجاح'),
+                                  backgroundColor: context.colorSuccess,
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                             }
@@ -497,7 +546,7 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('فشل في إكمال المهمة: $e'),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: context.colorError,
                                 ),
                               );
                             }
@@ -506,19 +555,22 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(
+                      height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
 
                   // بطاقة المهمة
                   GestureDetector(
                     onTap: widget.onTaskTap,
                     child: Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(AppDimensions.getSpacing(context,
+                          size: SpacingSize.medium)),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        color: context.colorSurface,
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         border: Border.all(
-                          color:
-                              TasksConstants.kTodayTaskColor.withOpacity(0.5),
+                          color: context.colorPrimary.withOpacity(0.5),
                         ),
                       ),
                       child: Column(
@@ -526,31 +578,50 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
                         children: [
                           Text(
                             _tasksController.todayTask!.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize:
+                                  AppDimensions.getSubtitleFontSize(context),
+                              color: context.colorTextPrimary,
+                              fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small)),
                           Text(
                             _tasksController.todayTask!.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: AppDimensions.getBodyFontSize(context),
+                              color: context.colorTextSecondary,
+                              fontFamily: 'SYMBIOAR+LT',
+                            ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small)),
                           Row(
                             children: [
                               Icon(
                                 Icons.calendar_today,
-                                size: 16,
-                                color: TasksConstants.kTodayTaskColor,
+                                size: AppDimensions.getIconSize(context,
+                                    size: IconSize.small, small: true),
+                                color: context.colorPrimary,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(
+                                  width: AppDimensions.getSpacing(context,
+                                          size: SpacingSize.small) /
+                                      2),
                               Text(
                                 _tasksController.todayTask!.dueDateFormatted,
                                 style: TextStyle(
-                                  color: TasksConstants.kTodayTaskColor,
+                                  color: context.colorPrimary,
                                   fontWeight: FontWeight.bold,
+                                  fontSize:
+                                      AppDimensions.getLabelFontSize(context),
+                                  fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
                             ],
@@ -573,16 +644,16 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder,
           width: 1,
         ),
       ),
-      child: const Center(
+      child: Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF4338CA),
+          color: context.colorPrimary,
         ),
       ),
     );
@@ -593,16 +664,16 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
     return Container(
       height: 150,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder,
           width: 1,
         ),
       ),
-      child: const Center(
+      child: Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF4338CA),
+          color: context.colorPrimary,
         ),
       ),
     );
@@ -611,46 +682,64 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
   // حالة الخطأ
   Widget _buildErrorState(String errorMessage) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius:
-            BorderRadius.circular(TaskCategoriesConstants.cardBorderRadius),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorErrorLight,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.red),
-              const SizedBox(width: 8),
+              Icon(
+                Icons.error_outline,
+                color: context.colorError,
+                size: AppDimensions.getIconSize(context,
+                    size: IconSize.small, small: false),
+              ),
+              SizedBox(
+                  width: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
               Expanded(
                 child: Text(
                   'حدث خطأ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    fontFamily: TaskCategoriesConstants.fontFamily,
+                    color: context.colorError,
+                    fontFamily: 'SYMBIOAR+LT',
+                    fontSize: AppDimensions.getSubtitleFontSize(context),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Text(
             errorMessage,
             style: TextStyle(
-              fontFamily: TaskCategoriesConstants.fontFamily,
+              fontFamily: 'SYMBIOAR+LT',
+              fontSize: AppDimensions.getBodyFontSize(context),
+              color: context.colorTextPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           TextButton(
             onPressed: () => widget.controller.refresh(),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: context.colorError,
             ),
-            child: const Text('إعادة المحاولة'),
+            child: const Text(
+              'إعادة المحاولة',
+              style: TextStyle(
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+            ),
           ),
         ],
       ),
@@ -660,48 +749,67 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
   // حالة خطأ المهام
   Widget _buildTasksErrorState(String errorMessage) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorErrorLight,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.red),
-              const SizedBox(width: 8),
+              Icon(
+                Icons.error_outline,
+                color: context.colorError,
+                size: AppDimensions.getIconSize(context,
+                    size: IconSize.small, small: false),
+              ),
+              SizedBox(
+                  width: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
               Expanded(
                 child: Text(
                   'حدث خطأ في تحميل المهام',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    fontFamily: TaskCategoriesConstants.fontFamily,
+                    color: context.colorError,
+                    fontFamily: 'SYMBIOAR+LT',
+                    fontSize: AppDimensions.getSubtitleFontSize(context),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Text(
             errorMessage,
             style: TextStyle(
-              fontFamily: TaskCategoriesConstants.fontFamily,
+              fontFamily: 'SYMBIOAR+LT',
+              fontSize: AppDimensions.getBodyFontSize(context),
+              color: context.colorTextPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           TextButton(
             onPressed: () async {
               await _tasksController.refresh();
               setState(() {});
             },
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: context.colorError,
             ),
-            child: const Text('إعادة المحاولة'),
+            child: const Text(
+              'إعادة المحاولة',
+              style: TextStyle(
+                fontFamily: 'SYMBIOAR+LT',
+              ),
+            ),
           ),
         ],
       ),
@@ -711,27 +819,31 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
   // حالة عدم وجود فئات
   Widget _buildEmptyState() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        color: context.colorSurfaceLight,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+        border: Border.all(color: context.colorBorder),
       ),
       child: Center(
         child: Column(
           children: [
             Icon(
               Icons.task_alt,
-              color: Colors.grey,
-              size: 32,
+              color: context.colorTextHint,
+              size: AppDimensions.getIconSize(context,
+                  size: IconSize.medium, small: false),
             ),
-            const SizedBox(height: 8),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             Text(
               'لا توجد فئات مهام',
               style: TextStyle(
-                fontFamily: TaskCategoriesConstants.fontFamily,
-                color: Colors.grey[600],
+                fontFamily: 'SYMBIOAR+LT',
+                color: context.colorTextSecondary,
                 fontWeight: FontWeight.bold,
+                fontSize: AppDimensions.getBodyFontSize(context),
               ),
             ),
           ],
@@ -743,19 +855,19 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
   // حالة عدم وجود مهام
   Widget _buildNoTasksState() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.colorShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.colorBorder,
           width: 1,
         ),
       ),
@@ -764,16 +876,20 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
           children: [
             Icon(
               Icons.check_circle_outline,
-              color: Colors.green,
-              size: 32,
+              color: context.colorSuccess,
+              size: AppDimensions.getIconSize(context,
+                  size: IconSize.medium, small: false),
             ),
-            const SizedBox(height: 8),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             Text(
               'لا توجد مهام تحتاج اهتمامك حالياً',
               style: TextStyle(
-                fontFamily: TaskCategoriesConstants.fontFamily,
-                color: Colors.grey[600],
+                fontFamily: 'SYMBIOAR+LT',
+                color: context.colorTextSecondary,
                 fontWeight: FontWeight.bold,
+                fontSize: AppDimensions.getBodyFontSize(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -792,37 +908,118 @@ class _TaskCategoriesWidgetState extends State<TaskCategoriesWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('معلومات التشخيص'),
+        title: Text(
+          'معلومات التشخيص',
+          style: TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            color: context.colorPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('مهمة اليوم: ${hasTodayTask ? "موجودة" : "غير موجودة"}'),
+              Text(
+                'مهمة اليوم: ${hasTodayTask ? "موجودة" : "غير موجودة"}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
               if (hasTodayTask)
-                Text('اسم مهمة اليوم: ${_tasksController.todayTask!.name}'),
-              SizedBox(height: 8),
-              Text('مهمة متأخرة: ${hasOverdueTask ? "موجودة" : "غير موجودة"}'),
+                Text(
+                  'اسم مهمة اليوم: ${_tasksController.todayTask!.name}',
+                  style: TextStyle(
+                    fontFamily: 'SYMBIOAR+LT',
+                    fontSize: AppDimensions.getBodyFontSize(context),
+                  ),
+                ),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
+              Text(
+                'مهمة متأخرة: ${hasOverdueTask ? "موجودة" : "غير موجودة"}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
               if (hasOverdueTask)
                 Text(
-                    'اسم المهمة المتأخرة: ${_tasksController.overdueTask!.name}'),
-              SizedBox(height: 16),
-              Text('إحصائيات المهام:'),
-              Text('إجمالي المهام: ${stats['total']}'),
-              Text('المهام المكتملة: ${stats['completed']}'),
-              Text('المهام المتأخرة: ${stats['overdue']}'),
-              Text('مهام اليوم: ${stats['today']}'),
-              Text('المهام القادمة: ${stats['upcoming']}'),
+                  'اسم المهمة المتأخرة: ${_tasksController.overdueTask!.name}',
+                  style: TextStyle(
+                    fontFamily: 'SYMBIOAR+LT',
+                    fontSize: AppDimensions.getBodyFontSize(context),
+                  ),
+                ),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                      size: SpacingSize.medium)),
+              Text(
+                'إحصائيات المهام:',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'إجمالي المهام: ${stats['total']}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
+              Text(
+                'المهام المكتملة: ${stats['completed']}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
+              Text(
+                'المهام المتأخرة: ${stats['overdue']}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
+              Text(
+                'مهام اليوم: ${stats['today']}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
+              Text(
+                'المهام القادمة: ${stats['upcoming']}',
+                style: TextStyle(
+                  fontFamily: 'SYMBIOAR+LT',
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                ),
+              ),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('إغلاق'),
+            child: Text(
+              'إغلاق',
+              style: TextStyle(
+                fontFamily: 'SYMBIOAR+LT',
+                color: context.colorPrimary,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+extension on BuildContext {
+  get colorErrorLight => null;
 }

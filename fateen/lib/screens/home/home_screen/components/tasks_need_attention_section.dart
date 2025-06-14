@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../controllers/tasks_controller.dart';
 import '../constants/tasks_constants.dart';
 import '../components/task_card.dart';
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 /// قسم "مهام تحتاج اهتمامك" في الصفحة الرئيسية
 class TasksNeedAttentionSection extends StatefulWidget {
@@ -82,7 +84,7 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
               'حدث خطأ أثناء تحميل البيانات: $e',
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -99,28 +101,24 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
 
   @override
   Widget build(BuildContext context) {
-    // استخدام MediaQuery للحصول على أبعاد الشاشة
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360; // للأجهزة الصغيرة
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // عنوان القسم
-        _buildSectionTitle(isSmallScreen),
+        _buildSectionTitle(),
 
         // محتوى القسم - مهام تحتاج اهتمام
-        _buildSectionContent(screenSize),
+        _buildSectionContent(),
       ],
     );
   }
 
   // بناء عنوان القسم
-  Widget _buildSectionTitle(bool isSmallScreen) {
+  Widget _buildSectionTitle() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height * 0.01,
-        top: MediaQuery.of(context).size.height * 0.02,
+        bottom: AppDimensions.getSpacing(context, size: SpacingSize.small),
+        top: AppDimensions.getSpacing(context, size: SpacingSize.medium),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -132,21 +130,26 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
               Text(
                 TasksConstants.tasksNeedAttentionTitle,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 17.0 : 19.0, // زيادة حجم النص
+                  fontSize: AppDimensions.getSubtitleFontSize(context),
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   letterSpacing: 0.3,
                   fontFamily: 'SYMBIOAR+LT',
-                  height: 1.2, // تحسين المسافة بين السطور
+                  height: 1.2,
                 ),
               ),
-              const SizedBox(height: 4), // زيادة المسافة
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      4),
               Container(
-                width: MediaQuery.of(context).size.width * 0.07,
-                height: 2.5, // زيادة سمك الخط
+                width:
+                    AppDimensions.getSpacing(context, size: SpacingSize.medium),
+                height: 2.5,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1),
-                  borderRadius: BorderRadius.circular(1),
+                  color: context.colorPrimaryLight,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius / 8),
                 ),
               ),
             ],
@@ -157,10 +160,10 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
   }
 
   // بناء محتوى القسم
-  Widget _buildSectionContent(Size screenSize) {
+  Widget _buildSectionContent() {
     // حالة التحميل
     if (_controller.isLoading) {
-      return _buildLoadingState(screenSize);
+      return _buildLoadingState();
     }
 
     // حالة الخطأ
@@ -176,11 +179,12 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
         'في وقت البناء: هل توجد مهمة اليوم؟ $hasTodayTask، هل توجد مهمة متأخرة؟ $hasOverdueTask');
 
     if (!hasTodayTask && !hasOverdueTask) {
-      return _buildEmptyState(screenSize);
+      return _buildEmptyState();
     }
 
-    // تباعد بين البطاقات يعتمد على حجم الشاشة
-    final cardSpacing = screenSize.height * 0.02; // 2% من ارتفاع الشاشة
+    // تباعد بين البطاقات
+    final cardSpacing =
+        AppDimensions.getSpacing(context, size: SpacingSize.medium);
 
     return Column(
       children: [
@@ -210,12 +214,12 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
   }
 
   // حالة التحميل
-  Widget _buildLoadingState(Size screenSize) {
+  Widget _buildLoadingState() {
     return SizedBox(
-      height: screenSize.height * 0.12, // 12% من ارتفاع الشاشة
-      child: const Center(
+      height: AppDimensions.cardHeightMedium, // استخدم قيمة ثابتة أو طريقة موجودة
+      child: Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF6366F1),
+          color: context.colorPrimaryLight,
         ),
       ),
     );
@@ -223,32 +227,34 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
 
   // حالة الخطأ
   Widget _buildErrorState() {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isSmallScreen = screenSize.width < 360;
-    final double fontSize = isSmallScreen ? 13.0 : 14.0;
-    final double iconSize = isSmallScreen ? 18.0 : 20.0;
-
     return Container(
-      padding: EdgeInsets.all(screenSize.width * 0.04),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        color: context.colorError.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
+        border: Border.all(color: context.colorError.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.red, size: iconSize),
-              SizedBox(width: screenSize.width * 0.02),
+              Icon(
+                Icons.error_outline,
+                color: context.colorError,
+                size: AppDimensions.getIconSize(context, size: IconSize.small, small: true),
+              ),
+              SizedBox(
+                  width: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
               Expanded(
                 child: Text(
                   'حدث خطأ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: fontSize + 1,
-                    color: Colors.red[800],
+                    fontSize:
+                        AppDimensions.getBodyFontSize(context),
+                    color: context.colorError,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
@@ -256,30 +262,39 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
               ),
             ],
           ),
-          SizedBox(height: screenSize.height * 0.01),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Text(
             _controller.errorMessage,
             style: TextStyle(
-              fontSize: fontSize,
+              fontSize: AppDimensions.getBodyFontSize(context),
               fontFamily: 'SYMBIOAR+LT',
+              color: context.colorTextPrimary,
               height: 1.2,
             ),
           ),
-          SizedBox(height: screenSize.height * 0.015),
+          SizedBox(
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: _loadData,
-              icon: Icon(Icons.refresh, size: iconSize - 2),
+              icon: Icon(
+                Icons.refresh,
+                size: AppDimensions.getIconSize(context,
+                    size: IconSize.small, small: true),
+              ),
               label: Text(
                 TasksConstants.retryButtonText,
                 style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: fontSize,
+                  fontSize: AppDimensions.getBodyFontSize(context),
                 ),
               ),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.red[800],
+                foregroundColor: context.colorError,
               ),
             ),
           ),
@@ -289,19 +304,20 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
   }
 
   // حالة فارغة
-  Widget _buildEmptyState(Size screenSize) {
-    final bool isSmallScreen = screenSize.width < 360;
+  Widget _buildEmptyState() {
     final double iconSize =
-        isSmallScreen ? screenSize.width * 0.14 : screenSize.width * 0.16;
+        AppDimensions.getIconSize(context, size: IconSize.large, small: false);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: screenSize.height * 0.02),
+      padding: EdgeInsets.only(
+        bottom: AppDimensions.getSpacing(context, size: SpacingSize.medium),
+      ),
       child: Container(
-        padding: EdgeInsets.all(screenSize.width * 0.05),
+        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          color: context.colorSurfaceLight,
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+          border: Border.all(color: context.colorBorder),
         ),
         child: Center(
           child: Column(
@@ -311,32 +327,36 @@ class _TasksNeedAttentionSectionState extends State<TasksNeedAttentionSection>
                 width: iconSize,
                 height: iconSize,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: context.colorSurface,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   TasksConstants.emptyTasksIcon,
-                  color: Colors.grey[400],
+                  color: context.colorTextHint,
                   size: iconSize * 0.5,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.02),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                      size: SpacingSize.medium)),
               Text(
                 TasksConstants.noTasksTitle,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 17.0 : 19.0, // زيادة حجم النص
+                  fontSize: AppDimensions.getSubtitleFontSize(context),
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
                 ),
               ),
-              SizedBox(height: screenSize.height * 0.01),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
               Text(
                 TasksConstants.noTasksMessage,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 13.0 : 15.0, // زيادة حجم النص
-                  color: Colors.grey[700],
+                  fontSize: AppDimensions.getBodyFontSize(context),
+                  color: context.colorTextSecondary,
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
                 ),

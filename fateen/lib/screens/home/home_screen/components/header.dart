@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../constants/headerConstants.dart';
 import '../controllers/header_controller.dart';
 import '../profile_screen.dart'; // استيراد ملف شاشة الملف الشخصي
+import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
+import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
 
 /// مكون الهيدر لعرض معلومات المستخدم والتخصص مع زر التعديل
 class HeaderComponent extends StatefulWidget {
@@ -103,19 +105,27 @@ class _HeaderComponentState extends State<HeaderComponent> {
     final double badgeTextSize =
         isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
 
-    final double iconSize =
-        isSmallScreen ? 16.0 : (isMediumScreen ? 18.0 : 20.0);
+    final double iconSize = AppDimensions.getIconSize(
+      context,
+      size: isSmallScreen ? IconSize.small : IconSize.regular,
+      small: isSmallScreen,
+    );
 
-    final double editIconSize =
-        isSmallScreen ? 16.0 : (isMediumScreen ? 18.0 : 20.0);
+    final double editIconSize = AppDimensions.getIconSize(
+      context,
+      size: isSmallScreen ? IconSize.small : IconSize.regular,
+      small: isSmallScreen,
+    );
 
     // تعديل المسافات لتكون ديناميكية مع حجم الشاشة
     final double verticalSpacingSmall =
-        screenHeight * 0.008; // 0.8% من الارتفاع
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
     final double verticalSpacingMedium =
-        screenHeight * 0.015; // 1.5% من الارتفاع
-    final double horizontalSpacingSmall = screenWidth * 0.015; // 1.5% من العرض
-    final double horizontalSpacingMedium = screenWidth * 0.025; // 2.5% من العرض
+        AppDimensions.getSpacing(context, size: SpacingSize.medium);
+    final double horizontalSpacingSmall =
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
+    final double horizontalSpacingMedium =
+        AppDimensions.getSpacing(context, size: SpacingSize.medium);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +143,8 @@ class _HeaderComponentState extends State<HeaderComponent> {
                   style: TextStyle(
                     fontSize: nameSize,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF4338CA),
+                    color:
+                        context.colorPrimaryDark, // استخدام اللون من AppColors
                     letterSpacing: 0.3,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2, // تحسين المسافة بين السطور
@@ -145,16 +156,18 @@ class _HeaderComponentState extends State<HeaderComponent> {
               SizedBox(width: horizontalSpacingSmall),
               // أيقونة تعديل الملف الشخصي
               Container(
-                padding:
-                    EdgeInsets.all(screenWidth * 0.015), // 1.5% من عرض الشاشة
+                padding: EdgeInsets.all(screenWidth * 0.015),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  color:
+                      context.colorSurfaceLight, // استخدام اللون من AppColors
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
+                  border: Border.all(
+                      color: context.colorBorder), // استخدام اللون من AppColors
                 ),
                 child: Icon(
                   Icons.edit_outlined,
-                  color: const Color(0xFF4338CA),
+                  color: context.colorPrimaryDark, // استخدام اللون من AppColors
                   size: editIconSize,
                 ),
               ),
@@ -173,7 +186,7 @@ class _HeaderComponentState extends State<HeaderComponent> {
             style: TextStyle(
               fontSize: majorSize,
               letterSpacing: 0.5,
-              color: const Color(0xFF9CA3AF),
+              color: context.colorTextHint, // استخدام اللون من AppColors
               fontWeight: FontWeight.w500,
               fontFamily: 'SYMBIOAR+LT',
               height: 1.2,
@@ -189,9 +202,9 @@ class _HeaderComponentState extends State<HeaderComponent> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.grey.shade300,
-                Colors.grey.shade100,
-                Colors.grey.shade300,
+                context.colorDivider, // استخدام اللون من AppColors
+                context.colorDivider.withOpacity(0.5),
+                context.colorDivider,
               ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -212,14 +225,16 @@ class _HeaderComponentState extends State<HeaderComponent> {
               ),
               decoration: BoxDecoration(
                 color: (isEvening
-                        ? const Color(0xFF6366F1)
-                        : const Color(0xFFEC4899))
+                        ? context
+                            .colorPrimaryLight // استخدام اللون من AppColors
+                        : context.colorAccent) // استخدام اللون من AppColors
                     .withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
                 border: Border.all(
                   color: (isEvening
-                          ? const Color(0xFF6366F1)
-                          : const Color(0xFFEC4899))
+                          ? context
+                              .colorPrimaryLight // استخدام اللون من AppColors
+                          : context.colorAccent) // استخدام اللون من AppColors
                       .withOpacity(0.15),
                 ),
               ),
@@ -232,13 +247,15 @@ class _HeaderComponentState extends State<HeaderComponent> {
                           transform: Matrix4.rotationY(3.14)..rotateZ(-0.4),
                           child: Icon(
                             Icons.nightlight_round,
-                            color: const Color(0xFF6366F1),
+                            color: context
+                                .colorPrimaryLight, // استخدام اللون من AppColors
                             size: iconSize,
                           ),
                         )
                       : Icon(
                           Icons.wb_sunny_outlined,
-                          color: const Color(0xFFEC4899),
+                          color:
+                              context.colorAccent, // استخدام اللون من AppColors
                           size: iconSize,
                         ),
                   SizedBox(width: horizontalSpacingSmall * 0.8),
@@ -248,8 +265,9 @@ class _HeaderComponentState extends State<HeaderComponent> {
                       fontSize: badgeTextSize,
                       fontWeight: FontWeight.w600,
                       color: isEvening
-                          ? const Color(0xFF6366F1)
-                          : const Color(0xFFEC4899),
+                          ? context
+                              .colorPrimaryLight // استخدام اللون من AppColors
+                          : context.colorAccent, // استخدام اللون من AppColors
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.2,
                     ),
@@ -265,17 +283,20 @@ class _HeaderComponentState extends State<HeaderComponent> {
                 vertical: verticalSpacingSmall * 0.8,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF4338CA).withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
+                color: context.colorPrimaryDark
+                    .withOpacity(0.08), // استخدام اللون من AppColors
+                borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
                 border: Border.all(
-                    color: const Color(0xFF4338CA).withOpacity(0.15)),
+                    color: context.colorPrimaryDark
+                        .withOpacity(0.15)), // استخدام اللون من AppColors
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.calendar_today_outlined,
                     size: iconSize - 2,
-                    color: const Color(0xFF4338CA),
+                    color:
+                        context.colorPrimaryDark, // استخدام اللون من AppColors
                   ),
                   SizedBox(width: horizontalSpacingSmall * 0.8),
                   Text(
@@ -283,7 +304,8 @@ class _HeaderComponentState extends State<HeaderComponent> {
                     style: TextStyle(
                       fontSize: badgeTextSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF4338CA),
+                      color: context
+                          .colorPrimaryDark, // استخدام اللون من AppColors
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.2,
                     ),
@@ -301,7 +323,8 @@ class _HeaderComponentState extends State<HeaderComponent> {
   Widget _buildLoadingWidget(Size screenSize) {
     final double width = screenSize.width;
     final double height = screenSize.height;
-    final double verticalSpacing = height * 0.015;
+    final double verticalSpacing =
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +346,7 @@ class _HeaderComponentState extends State<HeaderComponent> {
         // خط فاصل
         Container(
           height: 1,
-          color: Colors.grey.shade200,
+          color: context.colorDivider, // استخدام اللون من AppColors
         ),
         SizedBox(height: verticalSpacing),
 
@@ -391,8 +414,8 @@ class _ShimmerLoadingText extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(4),
+        color: context.colorShimmerBase, // استخدام اللون من AppColors
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
       ),
     );
   }
