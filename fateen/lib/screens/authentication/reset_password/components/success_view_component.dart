@@ -29,7 +29,7 @@ class SuccessViewComponent extends StatelessWidget {
               top: ResponsiveHelper.isLandscape(context) ? 30 : 40, bottom: 20),
           child: Icon(
             Icons.check_circle_outline,
-            color: AppColors.primaryLight, // Updated
+            color: context.colorPrimaryLight, // استخدام Extension
             size: ResponsiveHelper.getResponsiveValue(
               context,
               mobileSmallValue: 80.0,
@@ -50,7 +50,7 @@ class SuccessViewComponent extends StatelessWidget {
               fontSize: ResponsiveHelper.getResponsiveFontSize(context,
                   smallSize: 20, mediumSize: 22, largeSize: 24),
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark, // Updated
+              color: context.colorPrimaryDark, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -63,11 +63,11 @@ class SuccessViewComponent extends StatelessWidget {
           margin: EdgeInsets.symmetric(
               horizontal: horizontalPadding.horizontal / 2, vertical: 16.0),
           decoration: BoxDecoration(
-            color: AppColors.primaryExtraLight, // Updated
+            color: context.colorPrimaryExtraLight, // استخدام Extension
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow, // Updated
+                color: context.colorShadow, // استخدام Extension
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -79,7 +79,7 @@ class SuccessViewComponent extends StatelessWidget {
             style: TextStyle(
               fontSize: ResponsiveHelper.getResponsiveFontSize(context,
                   smallSize: 13, mediumSize: 14, largeSize: 16),
-              color: Colors.grey.shade700,
+              color: context.colorTextPrimary, // استخدام Extension
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
@@ -98,7 +98,8 @@ class SuccessViewComponent extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryDark.withOpacity(0.3), // Updated
+                color: context.colorPrimaryDark
+                    .withOpacity(0.3), // استخدام Extension
                 blurRadius: 12,
                 offset: const Offset(0, 4),
                 spreadRadius: -2,
@@ -118,8 +119,8 @@ class SuccessViewComponent extends StatelessWidget {
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
                     colors: [
-                      AppColors.primaryLight, // Updated
-                      AppColors.primaryDark, // Updated
+                      context.colorPrimaryLight, // استخدام Extension
+                      context.colorPrimaryDark, // استخدام Extension
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),

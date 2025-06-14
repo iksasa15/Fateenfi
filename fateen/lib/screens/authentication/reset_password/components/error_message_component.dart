@@ -24,7 +24,7 @@ class ErrorMessageComponent extends StatelessWidget {
       padding: EdgeInsets.all(padding),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.accent.withOpacity(0.1), // Updated
+        color: context.colorAccent.withOpacity(0.1), // استخدام Extension
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -32,7 +32,7 @@ class ErrorMessageComponent extends StatelessWidget {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: AppColors.accent, // Updated
+            color: context.colorAccent, // استخدام Extension
             size: iconSize,
           ),
           const SizedBox(width: 10),
@@ -40,7 +40,7 @@ class ErrorMessageComponent extends StatelessWidget {
             child: Text(
               errorMessage,
               style: TextStyle(
-                color: AppColors.accent, // Updated
+                color: context.colorAccent, // استخدام Extension
                 fontSize: fontSize,
                 fontFamily: 'SYMBIOAR+LT',
               ),

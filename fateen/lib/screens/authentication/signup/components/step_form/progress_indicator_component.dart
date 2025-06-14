@@ -33,7 +33,7 @@ class StepProgressIndicator extends StatelessWidget {
               Text(
                 'الخطوة $currentStepNumber من 7',
                 style: TextStyle(
-                  color: AppColors.textHint, // Updated
+                  color: context.colorTextHint, // استخدام Extension
                   fontSize: screenWidth * 0.035,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -49,7 +49,8 @@ class StepProgressIndicator extends StatelessWidget {
                 height: 8,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryPale.withOpacity(0.3), // Updated
+                  color: context.colorPrimaryPale
+                      .withOpacity(0.3), // استخدام Extension
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -62,8 +63,8 @@ class StepProgressIndicator extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primaryLight, // Updated
-                      AppColors.primaryDark, // Updated
+                      context.colorPrimaryLight, // استخدام Extension
+                      context.colorPrimaryDark, // استخدام Extension
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -71,7 +72,8 @@ class StepProgressIndicator extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryLight.withOpacity(0.3), // Updated
+                      color: context.colorPrimaryLight
+                          .withOpacity(0.3), // استخدام Extension
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

@@ -40,8 +40,8 @@ class SignupButtonComponent extends StatelessWidget {
                   BorderRadius.circular(AppDimensions.getLargeRadius(context)),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryDark
-                      .withOpacity(0.3), // Updated from SignupColors.darkPurple
+                  color: context.colorPrimaryDark
+                      .withOpacity(0.3), // استخدام Extension
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                   spreadRadius: -2,
@@ -62,10 +62,8 @@ class SignupButtonComponent extends StatelessWidget {
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
                       colors: [
-                        AppColors
-                            .primaryLight, // Updated from SignupColors.mediumPurple
-                        AppColors
-                            .primaryDark, // Updated from SignupColors.darkPurple
+                        context.colorPrimaryLight, // استخدام Extension
+                        context.colorPrimaryDark, // استخدام Extension
                       ],
                     ),
                     borderRadius: BorderRadius.circular(

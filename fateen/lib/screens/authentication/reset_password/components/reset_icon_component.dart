@@ -34,14 +34,14 @@ class ResetIconComponent extends StatelessWidget {
         width: containerSize,
         height: containerSize,
         decoration: BoxDecoration(
-          color: AppColors.primaryExtraLight, // Updated
+          color: context.colorPrimaryExtraLight, // استخدام Extension
           shape: BoxShape.circle,
         ),
         child: Center(
           child: Icon(
             Icons.lock_reset_rounded,
             size: iconSize,
-            color: AppColors.primaryDark, // Updated
+            color: context.colorPrimaryDark, // استخدام Extension
           ),
         ),
       ),

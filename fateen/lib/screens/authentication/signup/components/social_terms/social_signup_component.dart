@@ -103,15 +103,14 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.primaryPale
-                    .withOpacity(0.3), // Updated from SignupColors.lightPurple
+                color: context.colorPrimaryPale
+                    .withOpacity(0.3), // استخدام Extension
                 borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               ),
               child: Text(
                 SignupStrings.orLoginWith,
                 style: TextStyle(
-                  color: AppColors
-                      .primaryLight, // Updated from SignupColors.mediumPurple
+                  color: context.colorPrimaryLight, // استخدام Extension
                   fontSize: fontSize,
                   fontFamily: 'SYMBIOAR+LT',
                   fontWeight: FontWeight.w500,
@@ -164,7 +163,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'google',
             icon: Icons.g_mobiledata_rounded,
-            color: AppColors.google, // Updated to use AppColors.google
+            color: context.colorGoogle, // استخدام Extension
             onTap: () {/* تنفيذ تسجيل باستخدام جوجل */},
             size: buttonSize,
             iconSize: iconSize,
@@ -177,7 +176,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'facebook',
             icon: Icons.facebook_rounded,
-            color: AppColors.facebook, // Updated to use AppColors.facebook
+            color: context.colorFacebook, // استخدام Extension
             onTap: () {/* تنفيذ تسجيل باستخدام فيسبوك */},
             size: buttonSize,
             iconSize: iconSize,
@@ -190,7 +189,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             context: context,
             buttonKey: 'apple',
             icon: Icons.apple_rounded,
-            color: AppColors.apple, // Updated to use AppColors.apple
+            color: context.colorApple, // استخدام Extension
             onTap: () {/* تنفيذ تسجيل باستخدام آبل */},
             size: buttonSize,
             iconSize: iconSize,
@@ -228,26 +227,30 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
             width: size,
             height: size,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.colorSurface, // استخدام Extension
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color:
-                      isHovered ? color.withOpacity(0.2) : Colors.grey.shade200,
+                  color: isHovered
+                      ? color.withOpacity(0.2)
+                      : context.colorShadowColor, // استخدام Extension
                   blurRadius: isHovered ? 8 : 5,
                   spreadRadius: isHovered ? 2 : 1,
                   offset: isHovered ? const Offset(0, 3) : const Offset(0, 2),
                 ),
               ],
               border: Border.all(
-                color:
-                    isHovered ? color.withOpacity(0.3) : Colors.grey.shade200,
+                color: isHovered
+                    ? color.withOpacity(0.3)
+                    : context.colorBorder, // استخدام Extension
                 width: isHovered ? 1.5 : 1,
               ),
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: isHovered ? color.withOpacity(0.05) : Colors.white,
+                color: isHovered
+                    ? color.withOpacity(0.05)
+                    : context.colorSurface, // استخدام Extension
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(

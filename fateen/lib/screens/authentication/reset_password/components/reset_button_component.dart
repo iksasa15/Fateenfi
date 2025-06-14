@@ -48,7 +48,8 @@ class ResetButtonComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withOpacity(0.3), // Updated
+            color:
+                context.colorPrimaryDark.withOpacity(0.3), // استخدام Extension
             blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: -2,
@@ -68,8 +69,8 @@ class ResetButtonComponent extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  AppColors.primaryLight, // Updated
-                  AppColors.primaryDark, // Updated
+                  context.colorPrimaryLight, // استخدام Extension
+                  context.colorPrimaryDark, // استخدام Extension
                 ],
               ),
               borderRadius: BorderRadius.circular(12),

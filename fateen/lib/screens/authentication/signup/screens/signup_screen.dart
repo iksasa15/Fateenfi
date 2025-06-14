@@ -165,7 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
-              children: const [
+              children: [
                 Icon(
                   Icons.error_outline,
                   color: Colors.white,
@@ -181,7 +181,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                 ),
               ],
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: context
+                .colorWarning, // استخدام Extension بدلاً من Colors.orange
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -198,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
-            children: const [
+            children: [
               Icon(
                 Icons.error_outline,
                 color: Colors.white,
@@ -212,7 +213,8 @@ class _SignUpScreenState extends State<SignUpScreen>
               ),
             ],
           ),
-          backgroundColor: Colors.red,
+          backgroundColor:
+              context.colorError, // استخدام Extension بدلاً من Colors.red
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -253,8 +255,8 @@ class _SignUpScreenState extends State<SignUpScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors
-          .background, // Changed from SignupColors.backgroundColor to AppColors.background
+      backgroundColor: context
+          .colorBackground, // استخدام Extension بدلاً من AppColors.background
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
@@ -290,13 +292,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 subtitle:
                                     "قم بإكمال البيانات التالية لإنشاء حسابك", // استخدم SignupStrings.formInfoText بدلاً من هذا
                                 showWavingHand: false,
-                                iconColor: AppColors.accent.withOpacity(
-                                    0.7), // Changed from SignupColors.accentColor to AppColors.accent
+                                iconColor: context.colorAccent.withOpacity(
+                                    0.7), // استخدام Extension بدلاً من AppColors.accent
                                 gradientColors: [
-                                  AppColors
-                                      .primaryDark, // Changed from SignupColors.darkPurple to AppColors.primaryDark
-                                  AppColors
-                                      .primaryLight, // Changed from SignupColors.mediumPurple to AppColors.primaryLight
+                                  context
+                                      .colorPrimaryDark, // استخدام Extension بدلاً من AppColors.primaryDark
+                                  context
+                                      .colorPrimaryLight, // استخدام Extension بدلاً من AppColors.primaryLight
                                 ],
                               ),
                             ),

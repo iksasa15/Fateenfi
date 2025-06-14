@@ -61,8 +61,7 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
               Text(
                 SignupStrings.termsAgreementText,
                 style: TextStyle(
-                  color:
-                      AppColors.textHint, // Updated from SignupColors.hintColor
+                  color: context.colorTextHint, // استخدام Extension
                   fontSize: fontSize,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -89,8 +88,8 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
                           horizontal: 4, vertical: 2),
                       decoration: BoxDecoration(
                         color: _isHovered
-                            ? AppColors.primaryPale.withOpacity(
-                                0.3) // Updated from SignupColors.lightPurple
+                            ? context.colorPrimaryPale
+                                .withOpacity(0.3) // استخدام Extension
                             : Colors.transparent,
                         borderRadius:
                             BorderRadius.circular(AppDimensions.smallRadius),
@@ -98,16 +97,15 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
                       child: Text(
                         SignupStrings.termsText,
                         style: TextStyle(
-                          color: AppColors
-                              .primaryDark, // Updated from SignupColors.darkPurple
+                          color: context.colorPrimaryDark, // استخدام Extension
                           fontWeight: FontWeight.bold,
                           fontSize: fontSize,
                           fontFamily: 'SYMBIOAR+LT',
                           decoration: _isHovered
                               ? TextDecoration.underline
                               : TextDecoration.none,
-                          decorationColor: AppColors
-                              .primaryLight, // Updated from SignupColors.mediumPurple
+                          decorationColor:
+                              context.colorPrimaryLight, // استخدام Extension
                         ),
                       ),
                     ),

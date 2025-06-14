@@ -34,18 +34,18 @@ class NavigationButtonsComponent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // زر الرجوع - مع تأثير متحرك عند الظهور والاختفاء
-          _buildBackButton(isFirstStep, screenWidth, screenHeight),
+          _buildBackButton(context, isFirstStep, screenWidth, screenHeight),
 
           // زر التالي أو الإنهاء - مع تأثير نبض عندما يكون جاهزًا
           _buildActionButton(
-              isFirstStep, isLastStep, screenWidth, screenHeight),
+              context, isFirstStep, isLastStep, screenWidth, screenHeight),
         ],
       ),
     );
   }
 
-  Widget _buildBackButton(
-      bool isFirstStep, double screenWidth, double screenHeight) {
+  Widget _buildBackButton(BuildContext context, bool isFirstStep,
+      double screenWidth, double screenHeight) {
     return AnimatedOpacity(
       opacity: isFirstStep ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
@@ -63,13 +63,14 @@ class NavigationButtonsComponent extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: AppColors.textHint.withOpacity(0.3), // Updated
+                      color: context.colorTextHint
+                          .withOpacity(0.3), // استخدام Extension
                       width: 1,
                     ),
                   ),
-                  foregroundColor: AppColors.textHint, // Updated
-                  disabledForegroundColor:
-                      AppColors.textHint.withOpacity(0.4), // Updated
+                  foregroundColor: context.colorTextHint, // استخدام Extension
+                  disabledForegroundColor: context.colorTextHint
+                      .withOpacity(0.4), // استخدام Extension
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -77,13 +78,13 @@ class NavigationButtonsComponent extends StatelessWidget {
                     Icon(
                       Icons.arrow_back_ios,
                       size: screenWidth * 0.035,
-                      color: AppColors.textHint, // Updated
+                      color: context.colorTextHint, // استخدام Extension
                     ),
                     SizedBox(width: screenWidth * 0.01),
                     Text(
                       'رجوع',
                       style: TextStyle(
-                        color: AppColors.textHint, // Updated
+                        color: context.colorTextHint, // استخدام Extension
                         fontFamily: 'SYMBIOAR+LT',
                         fontWeight: FontWeight.w500,
                         fontSize: screenWidth * 0.035,
@@ -96,8 +97,8 @@ class NavigationButtonsComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(bool isFirstStep, bool isLastStep,
-      double screenWidth, double screenHeight) {
+  Widget _buildActionButton(BuildContext context, bool isFirstStep,
+      bool isLastStep, double screenWidth, double screenHeight) {
     // تعطيل الزر أثناء حالة التحميل أو عندما تكون البيانات غير صالحة
     final isButtonEnabled =
         controller.canMoveToNextStep && !controller.isLoading;
@@ -112,16 +113,17 @@ class NavigationButtonsComponent extends StatelessWidget {
             : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: isLastStep
-              ? AppColors.primaryDark
-              : AppColors.primaryLight, // Updated
+              ? context.colorPrimaryDark
+              : context.colorPrimaryLight, // استخدام Extension
           foregroundColor: Colors.white,
           disabledBackgroundColor: (isLastStep
-                  ? AppColors.primaryDark
-                  : AppColors.primaryLight) // Updated
+                  ? context.colorPrimaryDark
+                  : context.colorPrimaryLight) // استخدام Extension
               .withOpacity(0.5),
           disabledForegroundColor: Colors.white.withOpacity(0.7),
           elevation: isButtonEnabled ? 4 : 0,
-          shadowColor: AppColors.primaryLight.withOpacity(0.5), // Updated
+          shadowColor:
+              context.colorPrimaryLight.withOpacity(0.5), // استخدام Extension
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

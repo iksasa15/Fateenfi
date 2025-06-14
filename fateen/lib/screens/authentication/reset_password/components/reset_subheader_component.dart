@@ -26,7 +26,7 @@ class ResetSubheaderComponent extends StatelessWidget {
           style: TextStyle(
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.primaryDark, // Updated
+            color: context.colorPrimaryDark, // استخدام Extension
             fontFamily: 'SYMBIOAR+LT',
           ),
           textAlign: TextAlign.center,

@@ -60,7 +60,8 @@ class PasswordRequirementsComponent extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: calculatePasswordStrength(password),
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor:
+                  context.colorSurface.withOpacity(0.3), // استخدام Extension
               valueColor: AlwaysStoppedAnimation<Color>(
                   _getPasswordStrengthColor(password)),
               minHeight: 6,
@@ -74,36 +75,42 @@ class PasswordRequirementsComponent extends StatelessWidget {
             child: Column(
               children: [
                 _buildPasswordRequirement(
+                  context,
                   '٨ أحرف على الأقل',
                   hasMinLength,
                   helperTextSize,
                 ),
                 SizedBox(height: 4),
                 _buildPasswordRequirement(
+                  context,
                   'حرف كبير (A-Z)',
                   hasUppercase,
                   helperTextSize,
                 ),
                 SizedBox(height: 4),
                 _buildPasswordRequirement(
+                  context,
                   'حرف صغير (a-z)',
                   hasLowercase,
                   helperTextSize,
                 ),
                 SizedBox(height: 4),
                 _buildPasswordRequirement(
+                  context,
                   'رقم (0-9)',
                   hasDigit,
                   helperTextSize,
                 ),
                 SizedBox(height: 4),
                 _buildPasswordRequirement(
+                  context,
                   'رمز خاص (!@#\$%^&*)',
                   hasSpecialChar,
                   helperTextSize,
                 ),
                 SizedBox(height: 4),
                 _buildPasswordRequirement(
+                  context,
                   'لا تستخدم حروف عربية',
                   hasNoArabic,
                   helperTextSize,
@@ -118,20 +125,24 @@ class PasswordRequirementsComponent extends StatelessWidget {
 
   // دالة لبناء متطلب من متطلبات كلمة المرور
   Widget _buildPasswordRequirement(
-      String text, bool isFulfilled, double fontSize) {
+      BuildContext context, String text, bool isFulfilled, double fontSize) {
     return Row(
       textDirection: TextDirection.rtl,
       children: [
         Icon(
           isFulfilled ? Icons.check_circle : Icons.circle_outlined,
-          color: isFulfilled ? Colors.green : Colors.grey.shade400,
+          color: isFulfilled
+              ? Colors.green
+              : context.colorTextHint.withOpacity(0.5), // استخدام Extension
           size: fontSize * 1.2,
         ),
         SizedBox(width: 6),
         Text(
           text,
           style: TextStyle(
-            color: isFulfilled ? Colors.black87 : Colors.grey.shade600,
+            color: isFulfilled
+                ? context.colorTextPrimary
+                : context.colorTextHint, // استخدام Extension
             fontSize: fontSize,
             fontFamily: 'SYMBIOAR+LT',
           ),

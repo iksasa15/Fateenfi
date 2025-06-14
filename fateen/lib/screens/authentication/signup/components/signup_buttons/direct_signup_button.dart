@@ -20,7 +20,7 @@ class DirectSignupButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: Material(
-        color: AppColors.primaryLight, // Updated from SignupColors.mediumPurple
+        color: context.colorPrimaryLight, // استخدام Extension
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -31,9 +31,8 @@ class DirectSignupButton extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  AppColors
-                      .primaryLight, // Updated from SignupColors.mediumPurple
-                  AppColors.primaryDark, // Updated from SignupColors.darkPurple
+                  context.colorPrimaryLight, // استخدام Extension
+                  context.colorPrimaryDark, // استخدام Extension
                 ],
               ),
               borderRadius: BorderRadius.circular(16),

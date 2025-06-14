@@ -31,8 +31,8 @@ class ResetHeaderComponent extends StatelessWidget {
           ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
               colors: [
-                AppColors.primaryDark, // Updated
-                AppColors.primaryLight.withOpacity(0.9), // Updated
+                context.colorPrimaryDark, // استخدام Extension
+                context.colorPrimaryLight.withOpacity(0.9), // استخدام Extension
               ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
@@ -54,7 +54,8 @@ class ResetHeaderComponent extends StatelessWidget {
               // أيقونة ترحيبية لطيفة
               Icon(
                 Icons.lock_reset_rounded,
-                color: AppColors.accent.withOpacity(0.7), // Updated
+                color:
+                    context.colorAccent.withOpacity(0.7), // استخدام Extension
                 size: subtitleSize + 2,
               ),
               const SizedBox(width: 8),
@@ -63,7 +64,7 @@ class ResetHeaderComponent extends StatelessWidget {
                   ResetPasswordStrings.resetSubtitle,
                   style: TextStyle(
                     fontSize: subtitleSize,
-                    color: AppColors.textHint, // Updated
+                    color: context.colorTextHint, // استخدام Extension
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,
                   ),

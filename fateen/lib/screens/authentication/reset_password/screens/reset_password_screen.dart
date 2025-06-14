@@ -108,8 +108,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
         ResponsiveHelper.getResponsiveHorizontalPadding(context);
 
     return Scaffold(
-      backgroundColor: AppColors
-          .background, // Updated from ResetPasswordColors.backgroundColor
+      backgroundColor: context.colorBackground, // استخدام Extension
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -156,7 +155,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                                 style: TextStyle(
                                   fontSize:
                                       14 * screenSizeRatio.clamp(0.8, 1.2),
-                                  color: Colors.grey.shade700,
+                                  color: context
+                                      .colorTextSecondary, // استخدام Extension
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                                 textAlign: TextAlign.center,
@@ -199,8 +199,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                                     padding: EdgeInsets.symmetric(
                                         vertical: height * 0.015,
                                         horizontal: width * 0.04),
-                                    foregroundColor: AppColors
-                                        .primaryDark, // Updated from ResetPasswordColors.darkPurple
+                                    foregroundColor: context
+                                        .colorPrimaryDark, // استخدام Extension
                                   ),
                                   child: Text(
                                     ResetPasswordStrings.backToLoginText,

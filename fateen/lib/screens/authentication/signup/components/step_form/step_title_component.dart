@@ -34,7 +34,7 @@ class StepTitleComponent extends StatelessWidget {
               Text(
                 controller.getCurrentStepTitle(),
                 style: TextStyle(
-                  color: AppColors.primaryDark, // Updated
+                  color: context.colorPrimaryDark, // استخدام Extension
                   fontSize: screenWidth * 0.045,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'SYMBIOAR+LT',
@@ -51,9 +51,11 @@ class StepTitleComponent extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primaryLight.withOpacity(0.2), // Updated
-                      AppColors.primaryLight, // Updated
-                      AppColors.primaryLight.withOpacity(0.2), // Updated
+                      context.colorPrimaryLight
+                          .withOpacity(0.2), // استخدام Extension
+                      context.colorPrimaryLight, // استخدام Extension
+                      context.colorPrimaryLight
+                          .withOpacity(0.2), // استخدام Extension
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

@@ -23,11 +23,11 @@ class ErrorMessageComponent extends StatelessWidget {
       padding: EdgeInsets.all(
           AppDimensions.getSpacing(context, size: SpacingSize.small)),
       decoration: BoxDecoration(
-        color: AppColors.accent.withOpacity(0.08),
+        color: context.colorAccent.withOpacity(0.08), // استخدام Extension
         borderRadius:
             BorderRadius.circular(AppDimensions.getLargeRadius(context)),
         border: Border.all(
-          color: AppColors.accent.withOpacity(0.2),
+          color: context.colorAccent.withOpacity(0.2), // استخدام Extension
           width: 1,
         ),
       ),
@@ -38,12 +38,12 @@ class ErrorMessageComponent extends StatelessWidget {
             padding: EdgeInsets.all(
                 AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
             decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.1),
+              color: context.colorAccent.withOpacity(0.1), // استخدام Extension
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.error_outline_rounded,
-              color: AppColors.accent,
+              color: context.colorAccent, // استخدام Extension
               size: AppDimensions.getIconSize(context, small: isSmallScreen),
             ),
           ),
@@ -54,7 +54,7 @@ class ErrorMessageComponent extends StatelessWidget {
             child: Text(
               errorMessage,
               style: TextStyle(
-                color: AppColors.accent,
+                color: context.colorAccent, // استخدام Extension
                 fontSize: AppDimensions.getBodyFontSize(context,
                     small: isSmallScreen),
                 fontFamily: 'SYMBIOAR+LT',
