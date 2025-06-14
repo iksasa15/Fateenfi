@@ -99,12 +99,12 @@ class _AuthToggleBarState extends State<AuthToggleBar>
   Color _getTextColor(bool isLogin) {
     if (isLogin) {
       return Color.lerp(
-              Colors.white, AppColors.textPrimary, _animation.value) ??
+              Colors.white, context.colorTextPrimary, _animation.value) ??
           Colors.white;
     } else {
       return Color.lerp(
-              AppColors.textPrimary, Colors.white, _animation.value) ??
-          AppColors.textPrimary;
+              context.colorTextPrimary, Colors.white, _animation.value) ??
+          context.colorTextPrimary;
     }
   }
 
@@ -112,10 +112,10 @@ class _AuthToggleBarState extends State<AuthToggleBar>
   LinearGradient? _getGradient(bool isLogin) {
     if (isLogin) {
       return _animation.value < 0.5
-          ? const LinearGradient(
+          ? LinearGradient(
               colors: [
-                AppColors.primaryLight,
-                AppColors.primaryDark,
+                context.colorPrimaryLight,
+                context.colorPrimaryDark,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -123,10 +123,10 @@ class _AuthToggleBarState extends State<AuthToggleBar>
           : null;
     } else {
       return _animation.value >= 0.5
-          ? const LinearGradient(
+          ? LinearGradient(
               colors: [
-                AppColors.primaryLight,
-                AppColors.primaryDark,
+                context.colorPrimaryLight,
+                context.colorPrimaryDark,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -141,7 +141,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value < 0.5
           ? [
               BoxShadow(
-                color: AppColors.primaryDark.withOpacity(0.3),
+                color: context.colorPrimaryDark.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -151,7 +151,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value >= 0.5
           ? [
               BoxShadow(
-                color: AppColors.primaryDark.withOpacity(0.3),
+                color: context.colorPrimaryDark.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -187,11 +187,12 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       margin: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 32),
       height: buttonHeight,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface, // استخدام Extension بدلاً من Colors.white
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: context
+                .colorShadowColor, // استخدام Extension بدلاً من Colors.grey.shade200
             blurRadius: 8,
             spreadRadius: 1,
             offset: const Offset(0, 2),
