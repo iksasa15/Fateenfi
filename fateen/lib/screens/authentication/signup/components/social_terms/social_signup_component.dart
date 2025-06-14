@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class SocialSignupComponent extends StatefulWidget {
   const SocialSignupComponent({Key? key}) : super(key: key);
@@ -105,7 +105,7 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
               decoration: BoxDecoration(
                 color: SignupColors.lightPurple.withOpacity(0.3),
                 borderRadius:
-                    BorderRadius.circular(SignupDimensions.mediumRadius),
+                    BorderRadius.circular(AppDimensions.mediumRadius),
               ),
               child: Text(
                 SignupStrings.orLoginWith,
@@ -147,10 +147,10 @@ class _SocialSignupComponentState extends State<SocialSignupComponent>
 
     // تعديل الأحجام والهوامش حسب حجم الشاشة
     final buttonSize = isTablet
-        ? SignupDimensions.buttonHeight - 10
+        ? AppDimensions.buttonHeight - 10
         : (isSmallScreen
-            ? SignupDimensions.smallButtonHeight - 8
-            : SignupDimensions.buttonHeight - 14);
+            ? AppDimensions.smallButtonHeight - 8
+            : AppDimensions.buttonHeight - 14);
     final iconSize = isTablet ? 34.0 : (isSmallScreen ? 28.0 : 32.0);
     final spacing = isTablet ? 24.0 : (isSmallScreen ? 15.0 : 20.0);
 

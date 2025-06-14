@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class SignupHeaderComponent extends StatelessWidget {
   const SignupHeaderComponent({Key? key}) : super(key: key);
@@ -13,11 +13,11 @@ class SignupHeaderComponent extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
               8,
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -34,7 +34,7 @@ class SignupHeaderComponent extends StatelessWidget {
             child: Text(
               SignupStrings.signupTitle,
               style: TextStyle(
-                fontSize: SignupDimensions.getTitleFontSize(context,
+                fontSize: AppDimensions.getTitleFontSize(context,
                     small: isSmallScreen),
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // ستتغير بسبب الماسك
@@ -44,7 +44,7 @@ class SignupHeaderComponent extends StatelessWidget {
             ),
           ),
           SizedBox(
-              height: SignupDimensions.getSpacing(context,
+              height: AppDimensions.getSpacing(context,
                   size: SpacingSize.small)),
           Row(
             children: [
@@ -52,18 +52,18 @@ class SignupHeaderComponent extends StatelessWidget {
               Icon(
                 Icons.app_registration_rounded,
                 color: SignupColors.accentColor.withOpacity(0.7),
-                size: SignupDimensions.getSubtitleFontSize(context,
+                size: AppDimensions.getSubtitleFontSize(context,
                         small: isSmallScreen) +
                     2,
               ),
               SizedBox(
-                  width: SignupDimensions.getSpacing(context,
+                  width: AppDimensions.getSpacing(context,
                           size: SpacingSize.small) /
                       2),
               Text(
                 SignupStrings.formInfoText,
                 style: TextStyle(
-                  fontSize: SignupDimensions.getSubtitleFontSize(context,
+                  fontSize: AppDimensions.getSubtitleFontSize(context,
                       small: isSmallScreen),
                   color: SignupColors.hintColor,
                   fontFamily: 'SYMBIOAR+LT',

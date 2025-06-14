@@ -1,6 +1,7 @@
+import 'package:fateen/core/constants/appColor.dart' show AppColors;
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class ErrorMessageComponent extends StatelessWidget {
   final String errorMessage;
@@ -16,16 +17,16 @@ class ErrorMessageComponent extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.fromLTRB(
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
           0,
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.medium)),
       padding: EdgeInsets.all(
-          SignupDimensions.getSpacing(context, size: SpacingSize.small)),
+          AppDimensions.getSpacing(context, size: SpacingSize.small)),
       decoration: BoxDecoration(
         color: SignupColors.accentColor.withOpacity(0.08),
         borderRadius:
-            BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+            BorderRadius.circular(AppDimensions.getLargeRadius(context)),
         border: Border.all(
           color: SignupColors.accentColor.withOpacity(0.2),
           width: 1,
@@ -36,7 +37,7 @@ class ErrorMessageComponent extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.all(
-                SignupDimensions.getSpacing(context, size: SpacingSize.small) /
+                AppDimensions.getSpacing(context, size: SpacingSize.small) /
                     2),
             decoration: BoxDecoration(
               color: SignupColors.accentColor.withOpacity(0.1),
@@ -44,19 +45,19 @@ class ErrorMessageComponent extends StatelessWidget {
             ),
             child: Icon(
               Icons.error_outline_rounded,
-              color: SignupColors.accentColor,
-              size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+              color: AppColors.accentColor,
+              size: AppDimensions.getIconSize(context, small: isSmallScreen),
             ),
           ),
           SizedBox(
-              width: SignupDimensions.getSpacing(context,
+              width: AppDimensions.getSpacing(context,
                   size: SpacingSize.small)),
           Expanded(
             child: Text(
               errorMessage,
               style: TextStyle(
                 color: SignupColors.accentColor,
-                fontSize: SignupDimensions.getBodyFontSize(context,
+                fontSize: AppDimensions.getBodyFontSize(context,
                     small: isSmallScreen),
                 fontFamily: 'SYMBIOAR+LT',
                 fontWeight: FontWeight.w500,

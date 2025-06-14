@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class SignupMajorField extends StatefulWidget {
   final TextEditingController controller;
@@ -47,8 +47,8 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         final fontSize = isTablet
             ? 17.0
             : (isSmallScreen
-                ? SignupDimensions.smallBodyFontSize
-                : SignupDimensions.bodyFontSize);
+                ? AppDimensions.smallBodyFontSize
+                : AppDimensions.bodyFontSize);
         final labelSize = isTablet ? 16.0 : (isSmallScreen ? 13.0 : 14.0);
         final iconSize = isTablet ? 26.0 : (isSmallScreen ? 20.0 : 22.0);
         final verticalPadding = isTablet ? 24.0 : (isSmallScreen ? 16.0 : 18.0);

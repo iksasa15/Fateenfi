@@ -98,11 +98,11 @@ class _AuthToggleBarState extends State<AuthToggleBar>
   // دالة لحساب لون النص بناءً على قيمة الانيميشن
   Color _getTextColor(bool isLogin) {
     if (isLogin) {
-      return Color.lerp(Colors.white, AuthColors.textColor, _animation.value) ??
+      return Color.lerp(Colors.white, AppColors.textColor, _animation.value) ??
           Colors.white;
     } else {
-      return Color.lerp(AuthColors.textColor, Colors.white, _animation.value) ??
-          AuthColors.textColor;
+      return Color.lerp(AppColors.textColor, Colors.white, _animation.value) ??
+          AppColors.textColor;
     }
   }
 
@@ -112,8 +112,8 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value < 0.5
           ? const LinearGradient(
               colors: [
-                AuthColors.mediumPurple,
-                AuthColors.darkPurple,
+                AppColors.mediumPurple,
+                AppColors.darkPurple,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -123,8 +123,8 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value >= 0.5
           ? const LinearGradient(
               colors: [
-                AuthColors.mediumPurple,
-                AuthColors.darkPurple,
+                AppColors.mediumPurple,
+                AppColors.darkPurple,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -139,7 +139,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value < 0.5
           ? [
               BoxShadow(
-                color: AuthColors.darkPurple.withOpacity(0.3),
+                color: AppColors.darkPurple.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -149,7 +149,7 @@ class _AuthToggleBarState extends State<AuthToggleBar>
       return _animation.value >= 0.5
           ? [
               BoxShadow(
-                color: AuthColors.darkPurple.withOpacity(0.3),
+                color: AppColors.darkPurple.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

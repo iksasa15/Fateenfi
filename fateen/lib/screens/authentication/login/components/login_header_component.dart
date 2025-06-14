@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/appColor.dart';
 import '../constants/login_strings.dart';
-import '../../../../core/constants/appDimensions.dart'; // استخدام نفس الأبعاد من signup
+import '../../../../core/constants/app_dimensions.dart'; // استخدام نفس الأبعاد من signup
 
 class LoginHeaderComponent extends StatefulWidget {
   const LoginHeaderComponent({Key? key}) : super(key: key);
@@ -42,11 +42,11 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
     // استخدام نفس هيكل الهوامش تمامًا كما في signup_header_component
     return Container(
       padding: EdgeInsets.fromLTRB(
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
               8,
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,8 +54,8 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
           ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
               colors: [
-                AuthColors.darkPurple,
-                AuthColors.mediumPurple.withOpacity(0.9),
+                AppColors.darkPurple,
+                AppColors.mediumPurple.withOpacity(0.9),
               ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
@@ -63,7 +63,7 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
             child: Text(
               LoginStrings.loginTitle,
               style: TextStyle(
-                fontSize: SignupDimensions.getTitleFontSize(context,
+                fontSize: AppDimensions.getTitleFontSize(context,
                     small: isSmallScreen),
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // ستتغير بسبب الماسك
@@ -73,7 +73,7 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
             ),
           ),
           SizedBox(
-              height: SignupDimensions.getSpacing(context,
+              height: AppDimensions.getSpacing(context,
                   size: SpacingSize.small)),
           Row(
             children: [
@@ -85,8 +85,8 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
                     angle: _waveAnimation.value * 0.2,
                     child: Icon(
                       Icons.waving_hand_rounded,
-                      color: AuthColors.accentColor.withOpacity(0.7),
-                      size: SignupDimensions.getSubtitleFontSize(context,
+                      color: AppColors.accentColor.withOpacity(0.7),
+                      size: AppDimensions.getSubtitleFontSize(context,
                               small: isSmallScreen) +
                           2,
                     ),
@@ -94,16 +94,16 @@ class _LoginHeaderComponentState extends State<LoginHeaderComponent>
                 },
               ),
               SizedBox(
-                  width: SignupDimensions.getSpacing(context,
+                  width: AppDimensions.getSpacing(context,
                           size: SpacingSize.small) /
                       2),
               Expanded(
                 child: Text(
                   LoginStrings.formInfoText,
                   style: TextStyle(
-                    fontSize: SignupDimensions.getSubtitleFontSize(context,
+                    fontSize: AppDimensions.getSubtitleFontSize(context,
                         small: isSmallScreen),
-                    color: AuthColors.hintColor,
+                    color: AppColors.hintColor,
                     fontFamily: 'SYMBIOAR+LT',
                     letterSpacing: 0.2,
                   ),

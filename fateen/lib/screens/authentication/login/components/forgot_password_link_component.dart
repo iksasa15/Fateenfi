@@ -84,7 +84,7 @@ class _ForgotPasswordLinkComponentState
                     ),
                     decoration: BoxDecoration(
                       color: _isHovered
-                          ? AuthColors.lightPurple.withOpacity(0.2)
+                          ? AppColors.lightPurple.withOpacity(0.2)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(
                           LoginDimensions.getMediumRadius(context)),
@@ -95,7 +95,7 @@ class _ForgotPasswordLinkComponentState
                         Text(
                           LoginStrings.forgotPasswordText,
                           style: TextStyle(
-                            color: AuthColors.darkPurple,
+                            color: AppColors.darkPurple,
                             fontSize: LoginDimensions.getBodyFontSize(context,
                                 small: isSmallScreen),
                             fontWeight: FontWeight.w500,
@@ -103,7 +103,7 @@ class _ForgotPasswordLinkComponentState
                             decoration: _isHovered
                                 ? TextDecoration.underline
                                 : TextDecoration.none,
-                            decorationColor: AuthColors.darkPurple,
+                            decorationColor: AppColors.darkPurple,
                           ),
                         ),
                         SizedBox(
@@ -112,7 +112,7 @@ class _ForgotPasswordLinkComponentState
                                 2),
                         Icon(
                           Icons.lock_reset_rounded,
-                          color: AuthColors.darkPurple,
+                          color: AppColors.darkPurple,
                           size: LoginDimensions.getBodyFontSize(context,
                                   small: isSmallScreen) +
                               2,

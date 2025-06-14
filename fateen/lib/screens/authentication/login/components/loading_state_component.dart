@@ -50,9 +50,9 @@ class _LoadingStateComponentState extends State<LoadingStateComponent>
           shaderCallback: (bounds) {
             return LinearGradient(
               colors: [
-                AuthColors.shimmerBase,
-                AuthColors.shimmerHighlight,
-                AuthColors.shimmerBase,
+                AppColors.shimmerBase,
+                AppColors.shimmerHighlight,
+                AppColors.shimmerBase,
               ],
               stops: const [0.1, 0.5, 0.9],
               begin: Alignment(_animation.value - 1, 0),

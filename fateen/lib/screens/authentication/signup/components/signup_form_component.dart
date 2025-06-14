@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/signup_colors.dart';
 import '../constants/signup_strings.dart';
-import '../../../../core/constants/appDimensions.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../signup_controller/controllers/signup_controller.dart';
 
 class SignupFormComponent extends StatelessWidget {
@@ -114,13 +114,13 @@ class SignupFormComponent extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getMediumRadius(context)),
+              BorderRadius.circular(AppDimensions.getMediumRadius(context)),
           onTap: () {
             controller.togglePasswordVisibility();
           },
           child: Padding(
             padding: EdgeInsets.all(
-                SignupDimensions.getSpacing(context, size: SpacingSize.small)),
+                AppDimensions.getSpacing(context, size: SpacingSize.small)),
             child: Hero(
               tag: 'password-visibility',
               child: AnimatedSwitcher(
@@ -138,7 +138,7 @@ class SignupFormComponent extends StatelessWidget {
                   color: controller.passwordVisible
                       ? SignupColors.mediumPurple
                       : SignupColors.hintColor,
-                  size: SignupDimensions.getIconSize(context,
+                  size: AppDimensions.getIconSize(context,
                       small: isSmallScreen),
                 ),
               ),
@@ -171,15 +171,15 @@ class SignupFormComponent extends StatelessWidget {
       width: maxWidth,
       margin: EdgeInsets.symmetric(
         vertical:
-            SignupDimensions.getSpacing(context, size: SpacingSize.small) / 2,
+            AppDimensions.getSpacing(context, size: SpacingSize.small) / 2,
         horizontal:
-            SignupDimensions.getSpacing(context, size: SpacingSize.small) / 2,
+            AppDimensions.getSpacing(context, size: SpacingSize.small) / 2,
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           boxShadow: [
             BoxShadow(
               color: SignupColors.shadowColor.withOpacity(0.05),
@@ -200,7 +200,7 @@ class SignupFormComponent extends StatelessWidget {
           style: TextStyle(
             color: SignupColors.textColor,
             fontSize:
-                SignupDimensions.getBodyFontSize(context, small: isSmallScreen),
+                AppDimensions.getBodyFontSize(context, small: isSmallScreen),
             fontFamily: 'SYMBIOAR+LT',
             letterSpacing: 0.2,
           ),
@@ -210,14 +210,14 @@ class SignupFormComponent extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             labelStyle: TextStyle(
               color: SignupColors.textColor.withOpacity(0.7),
-              fontSize: SignupDimensions.getLabelFontSize(context,
+              fontSize: AppDimensions.getLabelFontSize(context,
                   small: isSmallScreen),
               fontFamily: 'SYMBIOAR+LT',
               fontWeight: FontWeight.w500,
             ),
             hintStyle: TextStyle(
               color: SignupColors.hintColor,
-              fontSize: SignupDimensions.getLabelFontSize(context,
+              fontSize: AppDimensions.getLabelFontSize(context,
                   small: isSmallScreen),
               fontFamily: 'SYMBIOAR+LT',
             ),
@@ -226,14 +226,14 @@ class SignupFormComponent extends StatelessWidget {
               color: focusNode?.hasFocus ?? false
                   ? SignupColors.mediumPurple
                   : SignupColors.hintColor,
-              size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+              size: AppDimensions.getIconSize(context, small: isSmallScreen),
             ),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+                  AppDimensions.getLargeRadius(context)),
               borderSide: BorderSide(
                 color: Colors.grey.shade200,
                 width: 1,
@@ -241,7 +241,7 @@ class SignupFormComponent extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+                  AppDimensions.getLargeRadius(context)),
               borderSide: BorderSide(
                 color: SignupColors.mediumPurple,
                 width: 1.5,
@@ -249,7 +249,7 @@ class SignupFormComponent extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+                  AppDimensions.getLargeRadius(context)),
               borderSide: BorderSide(
                 color: SignupColors.accentColor,
                 width: 1,
@@ -257,7 +257,7 @@ class SignupFormComponent extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+                  AppDimensions.getLargeRadius(context)),
               borderSide: BorderSide(
                 color: SignupColors.accentColor,
                 width: 1.5,
@@ -265,15 +265,15 @@ class SignupFormComponent extends StatelessWidget {
             ),
             errorStyle: TextStyle(
               color: SignupColors.accentColor,
-              fontSize: SignupDimensions.getLabelFontSize(context,
+              fontSize: AppDimensions.getLabelFontSize(context,
                       small: isSmallScreen) -
                   1,
               fontFamily: 'SYMBIOAR+LT',
             ),
             contentPadding: EdgeInsets.symmetric(
-              vertical: SignupDimensions.getInputFieldPadding(context,
+              vertical: AppDimensions.getInputFieldPadding(context,
                   small: isSmallScreen),
-              horizontal: SignupDimensions.getSpacing(context,
+              horizontal: AppDimensions.getSpacing(context,
                   size: SpacingSize.medium),
             ),
           ),

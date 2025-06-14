@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class SignupMajorField extends StatefulWidget {
   final TextEditingController controller;
@@ -45,13 +45,13 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         return Padding(
           padding: EdgeInsets.symmetric(
               vertical:
-                  SignupDimensions.getSpacing(context, size: SpacingSize.small),
-              horizontal: SignupDimensions.getSpacing(context,
+                  AppDimensions.getSpacing(context, size: SpacingSize.small),
+              horizontal: AppDimensions.getSpacing(context,
                   size: SpacingSize.large)),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(
-                  SignupDimensions.getLargeRadius(context)),
+                  AppDimensions.getLargeRadius(context)),
               boxShadow: [
                 BoxShadow(
                   color: SignupColors.shadowColor.withOpacity(0.05),
@@ -79,7 +79,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
       style: TextStyle(
         color: SignupColors.textColor,
         fontSize:
-            SignupDimensions.getBodyFontSize(context, small: isSmallScreen),
+            AppDimensions.getBodyFontSize(context, small: isSmallScreen),
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
       ),
@@ -90,27 +90,27 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         labelStyle: TextStyle(
           color: SignupColors.textColor.withOpacity(0.7),
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
           color: SignupColors.hintColor,
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           Icons.school_outlined,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+          size: AppDimensions.getIconSize(context, small: isSmallScreen),
         ),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: Colors.grey.shade200,
             width: 1,
@@ -118,7 +118,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.mediumPurple,
             width: 1.5,
@@ -126,7 +126,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1,
@@ -134,7 +134,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1.5,
@@ -143,15 +143,15 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         errorStyle: TextStyle(
           color: SignupColors.accentColor,
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen) -
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen) -
                   1,
           fontFamily: 'SYMBIOAR+LT',
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: SignupDimensions.getInputFieldPadding(context,
+          vertical: AppDimensions.getInputFieldPadding(context,
               small: isSmallScreen),
           horizontal:
-              SignupDimensions.getSpacing(context, size: SpacingSize.medium),
+              AppDimensions.getSpacing(context, size: SpacingSize.medium),
         ),
         errorText: widget.errorText,
       ),
@@ -168,7 +168,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
       style: TextStyle(
         color: SignupColors.textColor,
         fontSize:
-            SignupDimensions.getBodyFontSize(context, small: isSmallScreen),
+            AppDimensions.getBodyFontSize(context, small: isSmallScreen),
         fontFamily: 'SYMBIOAR+LT',
         letterSpacing: 0.2,
       ),
@@ -183,33 +183,33 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
               ? SignupColors.mediumPurple
               : SignupColors.textColor.withOpacity(0.7),
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.w500,
         ),
         hintStyle: TextStyle(
           color: SignupColors.hintColor,
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen),
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen),
           fontFamily: 'SYMBIOAR+LT',
         ),
         prefixIcon: Icon(
           Icons.school_outlined,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen),
+          size: AppDimensions.getIconSize(context, small: isSmallScreen),
         ),
         suffixIcon: Icon(
           Icons.arrow_drop_down,
           color:
               _isFocused ? SignupColors.mediumPurple : SignupColors.hintColor,
-          size: SignupDimensions.getIconSize(context, small: isSmallScreen) + 4,
+          size: AppDimensions.getIconSize(context, small: isSmallScreen) + 4,
         ),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: Colors.grey.shade200,
             width: 1,
@@ -217,7 +217,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.mediumPurple,
             width: 1.5,
@@ -225,7 +225,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1,
@@ -233,7 +233,7 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius:
-              BorderRadius.circular(SignupDimensions.getLargeRadius(context)),
+              BorderRadius.circular(AppDimensions.getLargeRadius(context)),
           borderSide: BorderSide(
             color: SignupColors.accentColor,
             width: 1.5,
@@ -242,15 +242,15 @@ class _SignupMajorFieldState extends State<SignupMajorField> {
         errorStyle: TextStyle(
           color: SignupColors.accentColor,
           fontSize:
-              SignupDimensions.getLabelFontSize(context, small: isSmallScreen) -
+              AppDimensions.getLabelFontSize(context, small: isSmallScreen) -
                   1,
           fontFamily: 'SYMBIOAR+LT',
         ),
         contentPadding: EdgeInsets.symmetric(
-          vertical: SignupDimensions.getInputFieldPadding(context,
+          vertical: AppDimensions.getInputFieldPadding(context,
               small: isSmallScreen),
           horizontal:
-              SignupDimensions.getSpacing(context, size: SpacingSize.medium),
+              AppDimensions.getSpacing(context, size: SpacingSize.medium),
         ),
         errorText: widget.errorText,
       ),

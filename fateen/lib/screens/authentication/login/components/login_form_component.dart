@@ -180,7 +180,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
         children: [
           Icon(
             Icons.error_outline,
-            color: AuthColors.accentColor,
+            color: AppColors.accentColor,
             size: 18,
           ),
           SizedBox(width: 8),
@@ -188,7 +188,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             child: Text(
               message,
               style: TextStyle(
-                color: AuthColors.accentColor,
+                color: AppColors.accentColor,
                 fontSize: 13,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -241,7 +241,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                   Text(
                     LoginStrings.forgotPasswordText,
                     style: TextStyle(
-                      color: AuthColors.darkPurple,
+                      color: AppColors.darkPurple,
                       fontSize: LoginDimensions.getBodyFontSize(context,
                           small: isSmallScreen),
                       fontWeight: FontWeight.w500,
@@ -254,7 +254,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                           2),
                   Icon(
                     Icons.lock_reset_rounded,
-                    color: AuthColors.darkPurple,
+                    color: AppColors.darkPurple,
                     size: LoginDimensions.getBodyFontSize(context,
                             small: isSmallScreen) +
                         2,
@@ -301,10 +301,10 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
                   : Icons.visibility_off_outlined,
               key: ValueKey<bool>(widget.controller.passwordVisible),
               color: widget.controller.isLoggingIn
-                  ? AuthColors.hintColor.withOpacity(0.5)
+                  ? AppColors.hintColor.withOpacity(0.5)
                   : (widget.controller.passwordVisible
-                      ? AuthColors.mediumPurple
-                      : AuthColors.hintColor),
+                      ? AppColors.mediumPurple
+                      : AppColors.hintColor),
               size: iconSize,
             ),
           ),
@@ -384,8 +384,8 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
         },
         style: TextStyle(
           color: enabled
-              ? AuthColors.textColor
-              : AuthColors.textColor.withOpacity(0.6),
+              ? AppColors.textColor
+              : AppColors.textColor.withOpacity(0.6),
           fontSize: fontSize,
           fontFamily: 'SYMBIOAR+LT',
         ),
@@ -394,29 +394,29 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
           labelText: title,
           labelStyle: TextStyle(
             color: !enabled
-                ? AuthColors.textColor.withOpacity(0.4)
+                ? AppColors.textColor.withOpacity(0.4)
                 : isError
-                    ? AuthColors.accentColor
+                    ? AppColors.accentColor
                     : (focusNode.hasFocus
-                        ? AuthColors.mediumPurple
-                        : AuthColors.textColor.withOpacity(0.7)),
+                        ? AppColors.mediumPurple
+                        : AppColors.textColor.withOpacity(0.7)),
             fontSize: labelSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
           hintStyle: TextStyle(
-            color: AuthColors.hintColor.withOpacity(enabled ? 1.0 : 0.5),
+            color: AppColors.hintColor.withOpacity(enabled ? 1.0 : 0.5),
             fontSize: labelSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
           prefixIcon: Icon(
             icon,
             color: !enabled
-                ? AuthColors.hintColor.withOpacity(0.5)
+                ? AppColors.hintColor.withOpacity(0.5)
                 : isError
-                    ? AuthColors.accentColor
+                    ? AppColors.accentColor
                     : (focusNode.hasFocus || controller.text.isNotEmpty
-                        ? AuthColors.mediumPurple
-                        : AuthColors.hintColor),
+                        ? AppColors.mediumPurple
+                        : AppColors.hintColor),
             size: iconSize,
           ),
           suffixIcon: suffixIcon,
@@ -426,7 +426,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             borderRadius:
                 BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: isError ? AuthColors.accentColor : Colors.grey.shade200,
+              color: isError ? AppColors.accentColor : Colors.grey.shade200,
               width: isError ? 1.5 : 1,
             ),
           ),
@@ -434,7 +434,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             borderRadius:
                 BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: isError ? AuthColors.accentColor : AuthColors.mediumPurple,
+              color: isError ? AppColors.accentColor : AppColors.mediumPurple,
               width: 1.5,
             ),
           ),
@@ -450,7 +450,7 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             borderRadius:
                 BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: AuthColors.accentColor,
+              color: AppColors.accentColor,
               width: 1,
             ),
           ),
@@ -458,12 +458,12 @@ class _LoginFormComponentState extends State<LoginFormComponent> {
             borderRadius:
                 BorderRadius.circular(LoginDimensions.getMediumRadius(context)),
             borderSide: BorderSide(
-              color: AuthColors.accentColor,
+              color: AppColors.accentColor,
               width: 1.5,
             ),
           ),
           errorStyle: TextStyle(
-            color: AuthColors.accentColor,
+            color: AppColors.accentColor,
             fontSize: isSmallScreen ? 10 : 12,
             fontFamily: 'SYMBIOAR+LT',
           ),

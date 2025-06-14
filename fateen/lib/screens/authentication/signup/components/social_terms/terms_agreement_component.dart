@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/signup_colors.dart';
 import '../../constants/signup_strings.dart';
-import '../../../../../core/constants/appDimensions.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class TermsAgreementComponent extends StatefulWidget {
   final VoidCallback onTap;
@@ -91,7 +91,7 @@ class _TermsAgreementComponentState extends State<TermsAgreementComponent>
                             ? SignupColors.lightPurple.withOpacity(0.3)
                             : Colors.transparent,
                         borderRadius:
-                            BorderRadius.circular(SignupDimensions.smallRadius),
+                            BorderRadius.circular(AppDimensions.smallRadius),
                       ),
                       child: Text(
                         SignupStrings.termsText,

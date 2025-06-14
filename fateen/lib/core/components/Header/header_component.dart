@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/appColor.dart';
-import '../../constants/appDimensions.dart';
+import '../../constants/app_dimensions.dart';
 
 class HeaderComponent extends StatefulWidget {
   final String title;
@@ -16,8 +16,8 @@ class HeaderComponent extends StatefulWidget {
     required this.subtitle,
     this.showWavingHand = true,
     this.gradientColors = const [
-      AuthColors.darkPurple,
-      AuthColors.mediumPurple,
+      AppColors.darkPurple,
+      AppColors.mediumPurple,
     ],
     this.iconColor,
     this.subtitleColor,
@@ -55,16 +55,15 @@ class _HeaderComponentState extends State<HeaderComponent>
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.width < 360;
     final actualIconColor =
-        widget.iconColor ?? AuthColors.accentColor.withOpacity(0.7);
-    final actualSubtitleColor = widget.subtitleColor ?? AuthColors.hintColor;
+        widget.iconColor ?? AppColors.accentColor.withOpacity(0.7);
+    final actualSubtitleColor = widget.subtitleColor ?? AppColors.hintColor;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.extraLarge) +
-              8,
-          SignupDimensions.getSpacing(context, size: SpacingSize.large),
-          SignupDimensions.getSpacing(context, size: SpacingSize.medium)),
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.extraLarge) + 8,
+          AppDimensions.getSpacing(context, size: SpacingSize.large),
+          AppDimensions.getSpacing(context, size: SpacingSize.medium)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -83,7 +82,7 @@ class _HeaderComponentState extends State<HeaderComponent>
             child: Text(
               widget.title,
               style: TextStyle(
-                fontSize: SignupDimensions.getTitleFontSize(context,
+                fontSize: AppDimensions.getTitleFontSize(context,
                     small: isSmallScreen),
                 fontWeight: FontWeight.bold,
                 color: Colors.white, // ستتغير بسبب الماسك
@@ -93,8 +92,8 @@ class _HeaderComponentState extends State<HeaderComponent>
             ),
           ),
           SizedBox(
-              height: SignupDimensions.getSpacing(context,
-                  size: SpacingSize.small)),
+              height:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Row(
             children: [
               // أيقونة ترحيبية متحركة - تظهر فقط إذا كانت showWavingHand = true
@@ -107,7 +106,7 @@ class _HeaderComponentState extends State<HeaderComponent>
                       child: Icon(
                         Icons.waving_hand_rounded,
                         color: actualIconColor,
-                        size: SignupDimensions.getSubtitleFontSize(context,
+                        size: AppDimensions.getSubtitleFontSize(context,
                                 small: isSmallScreen) +
                             2,
                       ),
@@ -116,14 +115,14 @@ class _HeaderComponentState extends State<HeaderComponent>
                 ),
               if (widget.showWavingHand)
                 SizedBox(
-                    width: SignupDimensions.getSpacing(context,
+                    width: AppDimensions.getSpacing(context,
                             size: SpacingSize.small) /
                         2),
               Expanded(
                 child: Text(
                   widget.subtitle,
                   style: TextStyle(
-                    fontSize: SignupDimensions.getSubtitleFontSize(context,
+                    fontSize: AppDimensions.getSubtitleFontSize(context,
                         small: isSmallScreen),
                     color: actualSubtitleColor,
                     fontFamily: 'SYMBIOAR+LT',

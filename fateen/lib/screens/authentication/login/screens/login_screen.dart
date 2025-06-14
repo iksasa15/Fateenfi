@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ],
             ),
-            backgroundColor: AuthColors.accentColor,
+            backgroundColor: AppColors.accentColor,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
