@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../models/task.dart';
-import '../constants/tasks_colors.dart';
 import '../constants/tasks_icons.dart';
-
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 class TaskCard extends StatelessWidget {
   final Task task;
   final VoidCallback onTap;
@@ -30,18 +30,18 @@ class TaskCard extends StatelessWidget {
   // بناء بطاقة في عرض القائمة
   Widget _buildListCard(BuildContext context) {
     final formatter = DateFormat('dd/MM/yyyy');
-    final priorityColor = TasksColors.getPriorityColor(task.priority);
-    final isCompleted = task.status == 'مكتملة';
-    final isOverdue = task.isOverdue();
+    final Color priorityColor = _getPriorityColor(context, task.priority);
+    final bool isCompleted = task.status == 'مكتملة';
+    final bool isOverdue = task.isOverdue();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: AppDimensions.smallSpacing + 4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: context.colorShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -49,13 +49,13 @@ class TaskCard extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           onTap: onTap,
           onLongPress: onLongPress,
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -71,23 +71,27 @@ class TaskCard extends StatelessWidget {
                           // عرض المادة إذا كانت متوفرة
                           if (task.course != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              margin: const EdgeInsets.only(top: 1, left: 8),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppDimensions.smallSpacing,
+                                vertical: 4,
+                              ),
+                              margin: EdgeInsets.only(
+                                  top: 1, left: AppDimensions.smallSpacing),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F3FF),
-                                borderRadius: BorderRadius.circular(8),
+                                color: context.colorPrimaryPale,
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.smallRadius),
                                 border: Border.all(
-                                  color: const Color(0xFFE3E0F8),
+                                  color: context.colorPrimaryExtraLight,
                                   width: 1,
                                 ),
                               ),
                               child: Text(
                                 task.course!.courseName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF4338CA),
+                                  color: context.colorPrimaryDark,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                                 maxLines: 1,
@@ -99,11 +103,11 @@ class TaskCard extends StatelessWidget {
                             child: Text(
                               task.name,
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: AppDimensions.bodyFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: isCompleted
-                                    ? Colors.grey
-                                    : const Color(0xFF4338CA),
+                                    ? context.colorTextSecondary
+                                    : context.colorPrimaryDark,
                                 decoration: isCompleted
                                     ? TextDecoration.lineThrough
                                     : null,
@@ -119,15 +123,18 @@ class TaskCard extends StatelessWidget {
                     GestureDetector(
                       onTap: onComplete,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.smallSpacing,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: isCompleted
-                              ? TasksColors.kGreenColor.withOpacity(0.1)
+                              ? context.colorSuccess.withOpacity(0.1)
                               : isOverdue
-                                  ? TasksColors.kAccentColor.withOpacity(0.1)
-                                  : const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(10),
+                                  ? context.colorAccent.withOpacity(0.1)
+                                  : context.colorPrimaryPale,
+                          borderRadius: BorderRadius.circular(
+                              AppDimensions.smallRadius + 2),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -140,12 +147,12 @@ class TaskCard extends StatelessWidget {
                                       : TasksIcons.taskOutlined,
                               size: 14,
                               color: isCompleted
-                                  ? TasksColors.kGreenColor
+                                  ? context.colorSuccess
                                   : isOverdue
-                                      ? TasksColors.kAccentColor
-                                      : const Color(0xFF6366F1),
+                                      ? context.colorAccent
+                                      : context.colorPrimaryLight,
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Text(
                               isCompleted
                                   ? "مكتملة"
@@ -153,13 +160,13 @@ class TaskCard extends StatelessWidget {
                                       ? "متأخرة"
                                       : "قيد التنفيذ",
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: AppDimensions.smallLabelFontSize - 1,
                                 fontWeight: FontWeight.w500,
                                 color: isCompleted
-                                    ? TasksColors.kGreenColor
+                                    ? context.colorSuccess
                                     : isOverdue
-                                        ? TasksColors.kAccentColor
-                                        : const Color(0xFF6366F1),
+                                        ? context.colorAccent
+                                        : context.colorPrimaryLight,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -170,27 +177,28 @@ class TaskCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.smallSpacing + 4),
 
                 // وصف المهمة مختصر
                 if (task.description.isNotEmpty)
                   Text(
                     task.description,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.smallBodyFontSize,
                       color: isCompleted
-                          ? Colors.grey.shade400
-                          : const Color(0xFF374151),
+                          ? context.colorTextHint
+                          : context.colorTextPrimary,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                if (task.description.isNotEmpty) const SizedBox(height: 12),
+                if (task.description.isNotEmpty)
+                  SizedBox(height: AppDimensions.smallSpacing + 4),
 
-                const Divider(height: 1, thickness: 1),
-                const SizedBox(height: 12),
+                Divider(height: 1, thickness: 1, color: context.colorDivider),
+                SizedBox(height: AppDimensions.smallSpacing + 4),
 
                 // تفاصيل المهمة (التاريخ والأولوية)
                 Row(
@@ -201,37 +209,39 @@ class TaskCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F3FF),
-                              borderRadius: BorderRadius.circular(8),
+                              color: context.colorPrimaryPale,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               TasksIcons.calendar,
                               size: 16,
-                              color: Color(0xFF6366F1),
+                              color: context.colorPrimaryLight,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.smallSpacing),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 "التاريخ",
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Color(0xFF9CA3AF),
+                                  color: context.colorTextHint,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
                               Text(
                                 formatter.format(task.dueDate),
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize:
+                                      AppDimensions.smallLabelFontSize - 1,
                                   fontWeight: FontWeight.w500,
                                   color: isOverdue && !isCompleted
-                                      ? TasksColors.kAccentColor
-                                      : const Color(0xFF374151),
+                                      ? context.colorAccent
+                                      : context.colorTextPrimary,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
@@ -241,7 +251,7 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppDimensions.smallSpacing + 4),
 
                     // الأولوية
                     Expanded(
@@ -249,10 +259,11 @@ class TaskCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: priorityColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius),
                             ),
                             child: Icon(
                               TasksIcons.getPriorityIcon(task.priority),
@@ -260,22 +271,23 @@ class TaskCard extends StatelessWidget {
                               color: priorityColor,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.smallSpacing),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 "الأولوية",
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Color(0xFF9CA3AF),
+                                  color: context.colorTextHint,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
                               Text(
                                 task.priority,
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize:
+                                      AppDimensions.smallLabelFontSize - 1,
                                   fontWeight: FontWeight.w500,
                                   color: priorityColor,
                                   fontFamily: 'SYMBIOAR+LT',
@@ -299,17 +311,17 @@ class TaskCard extends StatelessWidget {
   // بناء بطاقة في عرض الشبكة
   Widget _buildGridCard(BuildContext context) {
     final formatter = DateFormat('dd/MM/yyyy');
-    final priorityColor = TasksColors.getPriorityColor(task.priority);
-    final isCompleted = task.status == 'مكتملة';
-    final isOverdue = task.isOverdue();
+    final Color priorityColor = _getPriorityColor(context, task.priority);
+    final bool isCompleted = task.status == 'مكتملة';
+    final bool isOverdue = task.isOverdue();
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: context.colorShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -317,13 +329,13 @@ class TaskCard extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           onTap: onTap,
           onLongPress: onLongPress,
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -338,11 +350,12 @@ class TaskCard extends StatelessWidget {
                         height: 32,
                         decoration: BoxDecoration(
                           color: isCompleted
-                              ? TasksColors.kGreenColor.withOpacity(0.1)
+                              ? context.colorSuccess.withOpacity(0.1)
                               : isOverdue
-                                  ? TasksColors.kAccentColor.withOpacity(0.1)
-                                  : const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(8),
+                                  ? context.colorAccent.withOpacity(0.1)
+                                  : context.colorPrimaryPale,
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                         ),
                         child: Icon(
                           isCompleted
@@ -351,10 +364,10 @@ class TaskCard extends StatelessWidget {
                                   ? TasksIcons.overdue
                                   : TasksIcons.taskOutlined,
                           color: isCompleted
-                              ? TasksColors.kGreenColor
+                              ? context.colorSuccess
                               : isOverdue
-                                  ? TasksColors.kAccentColor
-                                  : const Color(0xFF6366F1),
+                                  ? context.colorAccent
+                                  : context.colorPrimaryLight,
                           size: 16,
                         ),
                       ),
@@ -363,22 +376,25 @@ class TaskCard extends StatelessWidget {
                     // عرض المادة إذا كانت متوفرة
                     if (task.course != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.smallSpacing,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(8),
+                          color: context.colorPrimaryPale,
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                           border: Border.all(
-                            color: const Color(0xFFE3E0F8),
+                            color: context.colorPrimaryExtraLight,
                             width: 1,
                           ),
                         ),
                         child: Text(
                           task.course!.courseName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF4338CA),
+                            color: context.colorPrimaryDark,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
                           maxLines: 1,
@@ -388,15 +404,17 @@ class TaskCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.smallSpacing + 4),
 
                 // عنوان المهمة
                 Text(
                   task.name,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isCompleted ? Colors.grey : const Color(0xFF4338CA),
+                    fontSize: AppDimensions.bodyFontSize,
+                    color: isCompleted
+                        ? context.colorTextSecondary
+                        : context.colorPrimaryDark,
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
@@ -404,7 +422,7 @@ class TaskCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: AppDimensions.smallSpacing),
 
                 // وصف المهمة
                 Expanded(
@@ -413,8 +431,8 @@ class TaskCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       color: isCompleted
-                          ? Colors.grey.shade400
-                          : const Color(0xFF374151),
+                          ? context.colorTextHint
+                          : context.colorTextPrimary,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                     maxLines: 3,
@@ -422,15 +440,14 @@ class TaskCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: AppDimensions.smallSpacing),
 
                 // معلومات في أسفل البطاقة
                 Row(
                   children: [
                     // الأولوية
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: priorityColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -443,7 +460,7 @@ class TaskCard extends StatelessWidget {
                             size: 10,
                             color: priorityColor,
                           ),
-                          const SizedBox(width: 2),
+                          SizedBox(width: 2),
                           Text(
                             task.priority,
                             style: TextStyle(
@@ -455,30 +472,29 @@ class TaskCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
 
                     // تاريخ التسليم
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F3FF),
+                        color: context.colorPrimaryPale,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             TasksIcons.calendar,
                             size: 10,
-                            color: Color(0xFF6366F1),
+                            color: context.colorPrimaryLight,
                           ),
-                          const SizedBox(width: 2),
+                          SizedBox(width: 2),
                           Text(
                             formatter.format(task.dueDate),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: Color(0xFF6366F1),
+                              color: context.colorPrimaryLight,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -493,5 +509,19 @@ class TaskCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // طريقة مساعدة للحصول على لون الأولوية استناداً إلى نص الأولوية
+  Color _getPriorityColor(BuildContext context, String priority) {
+    switch (priority) {
+      case 'عالية':
+        return context.colorError;
+      case 'متوسطة':
+        return context.colorWarning;
+      case 'منخفضة':
+        return context.colorSuccess;
+      default:
+        return context.colorInfo;
+    }
   }
 }

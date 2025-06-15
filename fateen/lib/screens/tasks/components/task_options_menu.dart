@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import '../../../models/task.dart';
-import '../constants/tasks_colors.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
-
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 class TaskOptionsMenu extends StatelessWidget {
   final Task task;
   final VoidCallback onEdit;
@@ -32,46 +32,51 @@ class TaskOptionsMenu extends StatelessWidget {
         Container(
           width: 40,
           height: 4,
-          margin: EdgeInsets.symmetric(vertical: 10),
+          margin: EdgeInsets.symmetric(vertical: AppDimensions.smallSpacing),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(2),
+            color: context.colorDivider,
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius / 4),
           ),
         ),
         _buildOptionItem(
+          context,
           TasksStrings.editTaskOption,
           TasksIcons.edit,
-          TasksColors.kMediumPurple,
+          context.colorMediumPurple,
           onEdit,
         ),
         _buildOptionItem(
+          context,
           isCompleted
               ? TasksStrings.markAsIncompleteOption
               : TasksStrings.markAsCompleteOption,
           isCompleted ? TasksIcons.taskOutlined : TasksIcons.taskCompleted,
-          isCompleted ? Colors.orange : Colors.green,
+          isCompleted ? context.colorWarning : context.colorSuccess,
           onToggleComplete,
         ),
         _buildOptionItem(
+          context,
           TasksStrings.duplicateTask,
           TasksIcons.copy,
-          Colors.blue,
+          context.colorInfo,
           onDuplicate,
         ),
-        Divider(),
+        Divider(color: context.colorDivider),
         _buildOptionItem(
+          context,
           TasksStrings.deleteTask,
           TasksIcons.delete,
-          TasksColors.kAccentColor,
+          context.colorAccent,
           onDelete,
           isDestructive: true,
         ),
-        SizedBox(height: 20),
+        SizedBox(height: AppDimensions.largeSpacing),
       ],
     );
   }
 
   Widget _buildOptionItem(
+    BuildContext context,
     String title,
     IconData icon,
     Color color,
@@ -81,7 +86,10 @@ class TaskOptionsMenu extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.sectionPadding,
+          vertical: AppDimensions.smallSpacing + 4,
+        ),
         child: Row(
           children: [
             Container(
@@ -89,23 +97,23 @@ class TaskOptionsMenu extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               ),
               child: Icon(
                 icon,
                 color: color,
-                size: 20,
+                size: AppDimensions.smallIconSize,
               ),
             ),
-            SizedBox(width: 16),
+            SizedBox(width: AppDimensions.defaultSpacing),
             Text(
               title,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                fontSize: 16,
+                fontSize: AppDimensions.bodyFontSize,
                 color: isDestructive
-                    ? TasksColors.kAccentColor
-                    : Colors.grey.shade800,
+                    ? context.colorAccent
+                    : context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),

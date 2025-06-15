@@ -14,6 +14,8 @@ import '../constants/tasks_colors.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
 import '../services/notifications_service.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 class TasksScreen extends StatefulWidget {
   final String? selectedCourseName;
@@ -89,8 +91,9 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
   void _showTaskOptions(Task task) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppDimensions.largeRadius + 4)),
       ),
       builder: (context) {
         return TaskOptionsMenu(
@@ -123,21 +126,23 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.sectionPadding,
+            vertical: AppDimensions.defaultSpacing + 8),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: context.colorShadowColor,
                 blurRadius: 15,
                 spreadRadius: 0,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(AppDimensions.sectionPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -145,37 +150,37 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: TasksColors.kAccentColor.withOpacity(0.1),
+                  color: context.colorAccent.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.delete_outline,
-                  color: TasksColors.kAccentColor,
+                  color: context.colorAccent,
                   size: 30,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: AppDimensions.defaultSpacing),
+              Text(
                 TasksStrings.deleteTask,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.subtitleFontSize + 2,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF374151),
+                  color: context.colorTextPrimary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.smallSpacing),
               Text(
                 TasksStrings.deleteConfirmation,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
+                style: TextStyle(
+                  fontSize: AppDimensions.smallButtonFontSize - 1,
+                  color: context.colorTextSecondary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimensions.defaultSpacing + 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -183,33 +188,37 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.smallSpacing + 4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                         ),
                         side: BorderSide(
-                          color: Colors.grey.shade300,
+                          color: context.colorDivider,
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         TasksStrings.cancel,
                         style: TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: context.colorTextSecondary,
                           fontFamily: 'SYMBIOAR+LT',
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.smallSpacing + 4),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        backgroundColor: TasksColors.kAccentColor,
+                        padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.smallSpacing + 4),
+                        backgroundColor: context.colorAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                         ),
                       ),
                       child: const Text(
@@ -242,7 +251,9 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
               ),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius)),
+              backgroundColor: context.colorSuccess,
             ),
           );
         }
@@ -256,7 +267,9 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
               ),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius)),
+              backgroundColor: context.colorError,
             ),
           );
         }
@@ -272,18 +285,19 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.sectionPadding,
+              vertical: AppDimensions.defaultSpacing + 8),
           child: Container(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.75,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: context.colorShadowColor,
                   blurRadius: 15,
                   spreadRadius: 0,
                   offset: const Offset(0, 4),
@@ -291,7 +305,7 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -299,16 +313,19 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                   Container(
                     width: 40,
                     height: 5,
-                    margin: const EdgeInsets.only(top: 12, bottom: 10),
+                    margin: EdgeInsets.only(
+                        top: AppDimensions.smallSpacing + 4,
+                        bottom: AppDimensions.smallSpacing + 2),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: context.colorDivider,
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
 
                   // شريط العنوان
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.defaultSpacing),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -319,16 +336,17 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                              color: context.colorSurface,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius + 2),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: context.colorDivider,
                                 width: 1.0,
                               ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.close,
-                              color: Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               size: 18,
                             ),
                           ),
@@ -336,22 +354,24 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
 
                         // العنوان
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 7),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultSpacing - 2,
+                              vertical: AppDimensions.smallSpacing - 1),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
+                            color: context.colorSurface,
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.smallRadius + 2),
                             border: Border.all(
-                              color: Colors.grey.shade200,
+                              color: context.colorDivider,
                               width: 1.0,
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             TasksStrings.chooseFilter,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: AppDimensions.smallBodyFontSize + 1,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -363,38 +383,41 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.smallSpacing + 4),
 
                   // وصف مع أيقونة
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.defaultSpacing),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.smallSpacing + 4,
+                          vertical: AppDimensions.smallSpacing + 2),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        color: context.colorSurface,
+                        borderRadius: BorderRadius.circular(
+                            AppDimensions.smallRadius + 2),
                         border: Border.all(
-                          color: const Color(0xFF4338CA).withOpacity(0.1),
+                          color: context.colorPrimaryDark.withOpacity(0.1),
                           width: 1.0,
                         ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
-                            color: Color(0xFF4338CA),
+                            color: context.colorPrimaryDark,
                             size: 18,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.smallSpacing),
                           Expanded(
                             child: Text(
                               "اختر تصفية المهام حسب الحالة أو الموعد",
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: AppDimensions.smallLabelFontSize,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.grey.shade800,
+                                color: context.colorTextPrimary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -404,10 +427,12 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.smallSpacing + 4),
 
-                  const Divider(
-                      height: 1, thickness: 1, color: Color(0xFFE3E0F8)),
+                  Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: context.colorPrimaryExtraLight),
 
                   // قائمة الفلاتر
                   Expanded(
@@ -425,9 +450,11 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                             height: 40,
                             decoration: BoxDecoration(
                               color: filterColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius + 2),
                               border: Border.all(
-                                color: const Color(0xFF4338CA).withOpacity(0.1),
+                                color:
+                                    context.colorPrimaryDark.withOpacity(0.1),
                                 width: 1.0,
                               ),
                             ),
@@ -443,27 +470,27 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                               fontWeight: filter == _controller.selectedFilter
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color: const Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                           subtitle: Text(
                             '$count${TasksStrings.taskCountSuffix}',
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: TextStyle(
+                              fontSize: AppDimensions.smallLabelFontSize - 1,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                           trailing: filter == _controller.selectedFilter
                               ? Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Color(0xFF6366F1),
+                                    color: context.colorPrimaryLight,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     TasksIcons.check,
-                                    color: Colors.white,
+                                    color: context.colorSurface,
                                     size: 16,
                                   ),
                                 )
@@ -492,14 +519,14 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
         (_controller.selectedFilter != TasksStrings.allTasks);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFF),
+      backgroundColor: context.colorBackground,
       // إعادة زر العائم
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openTaskEditor(),
-        backgroundColor: const Color(0xFF4338CA),
-        foregroundColor: Colors.white,
+        backgroundColor: context.colorPrimaryDark,
+        foregroundColor: context.colorSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         ),
         child: const Icon(TasksIcons.add),
       ),
@@ -513,14 +540,18 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
             // شريط البحث
             if (_controller.isSearching)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.smallSpacing + 4,
+                    vertical: AppDimensions.smallSpacing),
+                margin: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.defaultSpacing,
+                    vertical: AppDimensions.smallSpacing),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: context.colorSurface,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.mediumRadius),
                   border: Border.all(
-                    color: const Color(0xFFE3E0F8),
+                    color: context.colorPrimaryExtraLight,
                     width: 1.0,
                   ),
                 ),
@@ -530,33 +561,34 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        color: context.colorSurface,
+                        borderRadius: BorderRadius.circular(
+                            AppDimensions.smallRadius + 2),
                         border: Border.all(
-                          color: const Color(0xFF4338CA).withOpacity(0.1),
+                          color: context.colorPrimaryDark.withOpacity(0.1),
                           width: 1.0,
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.search,
-                        color: Color(0xFF6366F1),
+                        color: context.colorPrimaryLight,
                         size: 16,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppDimensions.smallSpacing),
                     Expanded(
                       child: TextField(
                         controller: _searchController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: TasksStrings.searchHint,
                           border: InputBorder.none,
                           hintStyle: TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: context.colorTextHint,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
                         ),
-                        style: const TextStyle(
-                          color: Color(0xFF4338CA),
+                        style: TextStyle(
+                          color: context.colorPrimaryDark,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                         onChanged: _controller.setSearchText,
@@ -564,9 +596,9 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close,
-                        color: Color(0xFF6366F1),
+                        color: context.colorPrimaryLight,
                         size: 20,
                       ),
                       onPressed: () {
@@ -585,7 +617,8 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
             if (_controller.selectedFilter != TasksStrings.allTasks &&
                 !_controller.isSearching)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.defaultSpacing),
                 child: TaskFilter(
                   selectedFilter: _controller.selectedFilter,
                   filterColor:
@@ -599,24 +632,26 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
             // عدد المهام والنتائج
             if (_controller.searchText.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.smallSpacing + 2,
+                      vertical: AppDimensions.smallSpacing - 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F3FF),
-                    borderRadius: BorderRadius.circular(8),
+                    color: context.colorPrimaryPale,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                     border: Border.all(
-                      color: const Color(0xFFE3E0F8),
+                      color: context.colorPrimaryExtraLight,
                       width: 1,
                     ),
                   ),
                   child: Text(
                     '${TasksStrings.searchResults}${filteredTasks.length}${TasksStrings.taskCountSuffix}',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: AppDimensions.smallButtonFontSize - 1,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4338CA),
+                      color: context.colorPrimaryDark,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -625,17 +660,19 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
 
             // شريط التحكم - تم تحديثه ليتوافق مع تصميم صفحة المقررات
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.defaultSpacing,
+                  vertical: AppDimensions.smallSpacing + 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // إضافة عنوان على اليمين
-                  const Text(
+                  Text(
                     "عرض المهام",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppDimensions.bodyFontSize + 1,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4338CA),
+                      color: context.colorPrimaryDark,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -651,24 +688,25 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                             width: 45,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F3FF),
-                              borderRadius: BorderRadius.circular(12),
+                              color: context.colorPrimaryPale,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.mediumRadius),
                               border: Border.all(
-                                color: const Color(0xFFE3E0F8),
+                                color: context.colorPrimaryExtraLight,
                                 width: 1,
                               ),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Icon(
                                 Icons.filter_list_rounded,
-                                color: Color(0xFF4338CA),
+                                color: context.colorPrimaryDark,
                                 size: 22,
                               ),
                             ),
                           ),
                         ),
 
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.smallSpacing),
 
                       // زر تبديل العرض (قائمة/شبكة)
                       GestureDetector(
@@ -677,10 +715,11 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                           width: 45,
                           height: 45,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5F3FF),
-                            borderRadius: BorderRadius.circular(12),
+                            color: context.colorPrimaryPale,
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.mediumRadius),
                             border: Border.all(
-                              color: const Color(0xFFE3E0F8),
+                              color: context.colorPrimaryExtraLight,
                               width: 1,
                             ),
                           ),
@@ -689,14 +728,14 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                               _controller.isGridView
                                   ? Icons.view_list_rounded
                                   : Icons.grid_view_rounded,
-                              color: const Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               size: 22,
                             ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.smallSpacing),
 
                       // زر البحث
                       if (!_controller.isSearching)
@@ -706,17 +745,18 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                             width: 45,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F3FF),
-                              borderRadius: BorderRadius.circular(12),
+                              color: context.colorPrimaryPale,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.mediumRadius),
                               border: Border.all(
-                                color: const Color(0xFFE3E0F8),
+                                color: context.colorPrimaryExtraLight,
                                 width: 1,
                               ),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Icon(
                                 Icons.search_rounded,
-                                color: Color(0xFF4338CA),
+                                color: context.colorPrimaryDark,
                                 size: 22,
                               ),
                             ),
@@ -731,9 +771,9 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
             // عرض المهام
             Expanded(
               child: _controller.isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(color: Color(0xFF6366F1)),
+                  ? Center(
+                      child: CircularProgressIndicator(
+                          color: context.colorPrimaryLight),
                     )
                   : filteredTasks.isEmpty
                       ? EmptyTasksState(
@@ -742,7 +782,8 @@ class _TasksScreenState extends State<TasksScreen> with WidgetsBindingObserver {
                           onAddTask: () => _openTaskEditor(),
                         )
                       : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultSpacing),
                           child: _controller.isGridView
                               ? TaskGrid(
                                   tasks: filteredTasks,

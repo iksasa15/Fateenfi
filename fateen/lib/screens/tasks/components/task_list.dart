@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import '../../../models/task.dart';
 import '../constants/tasks_strings.dart';
-import '../constants/tasks_colors.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 import 'task_card.dart';
 
 class TaskList extends StatelessWidget {
@@ -47,13 +48,13 @@ class TaskList extends StatelessWidget {
             Text(
               TasksStrings.urgentTasks,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: TasksColors.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
             ...urgentTasks.map((task) => TaskCard(
                   task: task,
                   onTap: () => onTaskTap(task),
@@ -63,7 +64,8 @@ class TaskList extends StatelessWidget {
           ],
 
           // المسافة بين المهام العاجلة والعادية
-          if (hasUrgent && hasRegular && !isSearching) SizedBox(height: 20),
+          if (hasUrgent && hasRegular && !isSearching)
+            SizedBox(height: AppDimensions.largeSpacing),
 
           // عنوان للمهام العادية
           if (hasRegular && (hasUrgent || isSearching)) ...[
@@ -71,13 +73,13 @@ class TaskList extends StatelessWidget {
               Text(
                 TasksStrings.importantTasks,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: AppDimensions.subtitleFontSize,
                   fontWeight: FontWeight.bold,
-                  color: TasksColors.kDarkPurple,
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
-            if (!isSearching) SizedBox(height: 12),
+            if (!isSearching) SizedBox(height: AppDimensions.smallSpacing + 4),
           ],
 
           // عرض المهام العادية
@@ -92,20 +94,20 @@ class TaskList extends StatelessWidget {
 
           // المسافة بين المهام العادية والمكتملة
           if (hasCompleted && (hasUrgent || hasRegular) && !isSearching)
-            SizedBox(height: 20),
+            SizedBox(height: AppDimensions.largeSpacing),
 
           // عنوان للمهام المكتملة
           if (hasCompleted && !isSearching) ...[
             Text(
               TasksStrings.completedTasks,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: TasksColors.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
           ],
 
           // عرض المهام المكتملة
@@ -119,7 +121,7 @@ class TaskList extends StatelessWidget {
           ],
 
           // إضافة مساحة في النهاية للتمرير
-          SizedBox(height: 80),
+          SizedBox(height: AppDimensions.extraLargeSpacing * 2.5),
         ],
       ),
     );

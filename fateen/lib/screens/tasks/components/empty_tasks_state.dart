@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
-
+ import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 class EmptyTasksState extends StatelessWidget {
   final bool isFiltering;
   final String? courseName;
@@ -34,7 +35,7 @@ class EmptyTasksState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(AppDimensions.extraLargeSpacing - 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -42,39 +43,39 @@ class EmptyTasksState extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F3FF),
-                borderRadius: BorderRadius.circular(16),
+                color: context.colorPrimaryPale,
+                borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               ),
-              child: const Icon(
+              child: Icon(
                 TasksIcons.task,
                 size: 60,
-                color: Color(0xFF6366F1),
+                color: context.colorPrimaryLight,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.extraLargeSpacing - 8),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: AppDimensions.subtitleFontSize + 2,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4338CA),
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.smallSpacing),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.extraLargeSpacing),
               child: Text(
                 message,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
+                style: TextStyle(
+                  fontSize: AppDimensions.labelFontSize,
+                  color: context.colorTextHint,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-            // زر "إضافة مهمة" الكبير تم إزالته من هنا
           ],
         ),
       ),

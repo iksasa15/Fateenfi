@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import '../../../models/task.dart';
 import '../constants/tasks_strings.dart';
-import '../constants/tasks_colors.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 import 'task_card.dart';
 
 class TaskGrid extends StatelessWidget {
@@ -47,20 +48,20 @@ class TaskGrid extends StatelessWidget {
             Text(
               TasksStrings.urgentTasks,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: TasksColors.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
             GridView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
+                crossAxisSpacing: AppDimensions.defaultSpacing - 1,
+                mainAxisSpacing: AppDimensions.defaultSpacing - 1,
                 childAspectRatio: 0.85,
               ),
               itemCount: urgentTasks.length,
@@ -77,20 +78,21 @@ class TaskGrid extends StatelessWidget {
           ],
 
           // المسافة بين المهام العاجلة والعادية
-          if (hasUrgent && hasRegular && !isSearching) SizedBox(height: 20),
+          if (hasUrgent && hasRegular && !isSearching)
+            SizedBox(height: AppDimensions.largeSpacing),
 
           // عنوان للمهام العادية
           if (hasRegular && hasUrgent && !isSearching) ...[
             Text(
               TasksStrings.importantTasks,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: TasksColors.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
           ],
 
           // عرض المهام العادية
@@ -100,8 +102,8 @@ class TaskGrid extends StatelessWidget {
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
+                crossAxisSpacing: AppDimensions.defaultSpacing - 1,
+                mainAxisSpacing: AppDimensions.defaultSpacing - 1,
                 childAspectRatio: 0.85,
               ),
               itemCount: regularTasks.length,
@@ -118,20 +120,20 @@ class TaskGrid extends StatelessWidget {
 
           // المسافة بين المهام العادية والمكتملة
           if (hasCompleted && (hasUrgent || hasRegular) && !isSearching)
-            SizedBox(height: 20),
+            SizedBox(height: AppDimensions.largeSpacing),
 
           // عنوان للمهام المكتملة
           if (hasCompleted && !isSearching) ...[
             Text(
               TasksStrings.completedTasks,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: TasksColors.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
           ],
 
           // عرض المهام المكتملة
@@ -141,8 +143,8 @@ class TaskGrid extends StatelessWidget {
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
+                crossAxisSpacing: AppDimensions.defaultSpacing - 1,
+                mainAxisSpacing: AppDimensions.defaultSpacing - 1,
                 childAspectRatio: 0.85,
               ),
               itemCount: completedTasks.length,
@@ -158,7 +160,7 @@ class TaskGrid extends StatelessWidget {
             ),
 
           // إضافة مساحة في النهاية للتمرير
-          SizedBox(height: 80),
+          SizedBox(height: AppDimensions.extraLargeSpacing * 2.5),
         ],
       ),
     );

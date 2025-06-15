@@ -1,7 +1,8 @@
 // lib/screens/tasks/components/task_header.dart
 
 import 'package:flutter/material.dart';
-import '../constants/tasks_colors.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 import '../constants/tasks_strings.dart';
 
 class TaskHeader extends StatelessWidget {
@@ -16,12 +17,12 @@ class TaskHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: context.colorSurface,
       child: Column(
         children: [
           // الصف الأول: زر الرجوع والعنوان
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(AppDimensions.sectionPadding),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -30,10 +31,10 @@ class TaskHeader extends StatelessWidget {
                   courseName != null
                       ? '${TasksStrings.courseTasks}: $courseName'
                       : TasksStrings.title,
-                  style: const TextStyle(
-                    fontSize: 26,
+                  style: TextStyle(
+                    fontSize: AppDimensions.titleFontSize,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF374151),
+                    color: context.colorTextPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -48,7 +49,7 @@ class TaskHeader extends StatelessWidget {
           Container(
             height: 1,
             width: double.infinity,
-            color: Colors.grey.shade200,
+            color: context.colorDivider,
           ),
         ],
       ),

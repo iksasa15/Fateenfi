@@ -1,9 +1,10 @@
 // lib/screens/tasks/components/task_filter.dart
 
 import 'package:flutter/material.dart';
-import '../constants/tasks_colors.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 class TaskFilter extends StatelessWidget {
   final String selectedFilter;
@@ -20,39 +21,45 @@ class TaskFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 16, bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: EdgeInsets.only(
+        top: AppDimensions.defaultSpacing,
+        bottom: AppDimensions.smallSpacing,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimensions.smallSpacing + 4,
+        vertical: AppDimensions.smallSpacing,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F3FF),
-        borderRadius: BorderRadius.circular(12),
+        color: context.colorPrimaryPale,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         border: Border.all(
-          color: const Color(0xFFE3E0F8),
+          color: context.colorPrimaryExtraLight,
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(AppDimensions.smallSpacing - 2),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               border: Border.all(
-                color: const Color(0xFFE3E0F8),
+                color: context.colorPrimaryExtraLight,
                 width: 1,
               ),
             ),
             child: Icon(
               TasksIcons.filter,
               color: filterColor,
-              size: 16,
+              size: AppDimensions.smallIconSize - 4,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: AppDimensions.smallSpacing),
           Text(
             '${TasksStrings.filterBy}$selectedFilter',
-            style: const TextStyle(
-              color: Color(0xFF4338CA),
+            style: TextStyle(
+              color: context.colorPrimaryDark,
               fontWeight: FontWeight.w500,
               fontFamily: 'SYMBIOAR+LT',
             ),
@@ -61,11 +68,12 @@ class TaskFilter extends StatelessWidget {
           TextButton(
             onPressed: onFilterCleared,
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: const Size(0, 0),
-              foregroundColor: const Color(0xFF6366F1),
+              padding:
+                  EdgeInsets.symmetric(horizontal: AppDimensions.smallSpacing),
+              minimumSize: Size(0, 0),
+              foregroundColor: context.colorPrimaryLight,
             ),
-            child: const Text(
+            child: Text(
               TasksStrings.clearFilter,
               style: TextStyle(
                 fontWeight: FontWeight.bold,

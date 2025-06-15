@@ -5,10 +5,10 @@ import 'package:intl/intl.dart';
 import '../../../models/task.dart';
 import '../../../models/course.dart';
 import '../controllers/task_editor_controller.dart';
-import '../constants/tasks_colors.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
-
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 class TaskEditor extends StatefulWidget {
   final Task? task;
   final List<String> categories;
@@ -29,10 +29,7 @@ class TaskEditor extends StatefulWidget {
 
 class _TaskEditorState extends State<TaskEditor> {
   late TaskEditorController _controller;
-
-  // نضيف متغير لتتبع المادة المختارة
   String? _selectedCourseId;
-  // إضافة متغيرات للتحقق من الخطأ
   String? _dueDateError;
 
   @override
@@ -41,7 +38,6 @@ class _TaskEditorState extends State<TaskEditor> {
     _controller = TaskEditorController();
     _controller.init(widget.task, widget.selectedCourse);
 
-    // تهيئة المادة المختارة
     if (_controller.selectedCourse != null) {
       _selectedCourseId = _controller.selectedCourse!.id;
     }
@@ -67,23 +63,25 @@ class _TaskEditorState extends State<TaskEditor> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppDimensions.extraLargeRadius)),
         ),
         child: Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.sectionPadding,
+              vertical: AppDimensions.extraLargeRadius),
           child: Container(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: context.colorShadowColor,
                   blurRadius: 15,
                   spreadRadius: 0,
                   offset: const Offset(0, 4),
@@ -91,28 +89,22 @@ class _TaskEditorState extends State<TaskEditor> {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               child: Column(
                 children: [
-                  // مقبض السحب
                   _buildDragHandle(),
-
-                  // شريط العنوان
                   _buildToolbar(
                     title: widget.task == null
                         ? TasksStrings.addTask
                         : TasksStrings.editTask,
                     onBackPressed: () => Navigator.pop(context),
                   ),
-
-                  // المحتوى القابل للتمرير
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // حقل العنوان
                           _buildTextField(
                             controller: _controller.titleController,
                             labelText: TasksStrings.taskTitle,
@@ -120,46 +112,25 @@ class _TaskEditorState extends State<TaskEditor> {
                             icon: TasksIcons.task,
                             hintText: TasksStrings.enterTaskTitle,
                           ),
-
-                          const SizedBox(height: 16),
-
-                          // حقل الوصف
+                          SizedBox(height: AppDimensions.defaultSpacing),
                           _buildDescriptionField(
                             controller: _controller.descriptionController,
                             labelText: TasksStrings.taskDescription,
                             icon: TasksIcons.description,
                             hintText: TasksStrings.taskDescriptionHint,
                           ),
-
-                          const SizedBox(height: 20),
-
-                          // تاريخ ووقت التسليم
+                          SizedBox(height: AppDimensions.largeSpacing),
                           _buildDueDateTimePicker(),
-
-                          const SizedBox(height: 20),
-
-                          // الأولوية
+                          SizedBox(height: AppDimensions.largeSpacing),
                           _buildPrioritySection(),
-
-                          const SizedBox(height: 20),
-
-                          // اختيار المادة
+                          SizedBox(height: AppDimensions.largeSpacing),
                           if (_controller.availableCourses.isNotEmpty)
                             _buildCourseSelector(),
-
-                          const SizedBox(height: 20),
-
-                          // قسم التذكير
+                          SizedBox(height: AppDimensions.largeSpacing),
                           _buildReminderSection(),
-
-                          const SizedBox(height: 20),
-
-                          // الوسوم
+                          SizedBox(height: AppDimensions.largeSpacing),
                           _buildTagsSection(),
-
-                          const SizedBox(height: 28),
-
-                          // زر الحفظ
+                          SizedBox(height: AppDimensions.extraLargeSpacing - 4),
                           _buildPrimaryButton(
                             text: widget.task == null
                                 ? TasksStrings.add
@@ -183,12 +154,10 @@ class _TaskEditorState extends State<TaskEditor> {
 
   // التحقق من صحة التاريخ والوقت قبل الحفظ
   void _validateAndSaveTask() {
-    // إعادة تعيين الأخطاء السابقة
     setState(() {
       _dueDateError = null;
     });
 
-    // التأكد من أن تاريخ التسليم ليس في الماضي عند إنشاء مهمة جديدة
     if (widget.task == null) {
       final DateTime now = DateTime.now();
       if (_controller.dueDate
@@ -200,7 +169,6 @@ class _TaskEditorState extends State<TaskEditor> {
       }
     }
 
-    // التأكد من أن تاريخ التذكير لا يأتي بعد تاريخ التسليم
     if (_controller.hasReminder && _controller.reminderDateTime != null) {
       if (_controller.reminderDateTime!.isAfter(_controller.dueDate)) {
         setState(() {
@@ -210,17 +178,14 @@ class _TaskEditorState extends State<TaskEditor> {
       }
     }
 
-    // إذا كان التحقق ناجحاً، حفظ المهمة
     _saveTask();
   }
 
-  // حفظ المهمة
   Future<void> _saveTask() async {
     final success = await _controller.saveTask();
 
     if (success) {
       if (mounted) {
-        // سجل لأغراض التصحيح
         print(
             "Task saved successfully with course: ${_controller.selectedCourse?.courseName ?? 'None'}");
         print("Task has reminder: ${_controller.hasReminder ? 'Yes' : 'No'}");
@@ -235,9 +200,9 @@ class _TaskEditorState extends State<TaskEditor> {
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
+            backgroundColor: context.colorSuccess,
           ),
         );
 
@@ -245,7 +210,6 @@ class _TaskEditorState extends State<TaskEditor> {
         widget.onSaveComplete(true);
       }
     } else {
-      // إظهار رسالة خطأ
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -254,16 +218,15 @@ class _TaskEditorState extends State<TaskEditor> {
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
+            backgroundColor: context.colorError,
           ),
         );
       }
     }
   }
 
-  // إضافة وسم جديد
   void _showAddTagDialog(BuildContext context) {
     final TextEditingController tagController = TextEditingController();
 
@@ -273,50 +236,51 @@ class _TaskEditorState extends State<TaskEditor> {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.sectionPadding,
+              vertical: AppDimensions.extraLargeRadius),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: context.colorShadowColor,
                   blurRadius: 15,
                   spreadRadius: 0,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppDimensions.sectionPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   TasksStrings.newTag,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: AppDimensions.subtitleFontSize + 2,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4338CA),
+                    color: context.colorPrimaryDark,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimensions.defaultSpacing),
                 _buildTextField(
                   controller: tagController,
                   labelText: TasksStrings.addTag,
                   icon: TasksIcons.tag,
                   autoFocus: true,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppDimensions.extraLargeSpacing - 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.grey.shade600,
+                        foregroundColor: context.colorTextSecondary,
                       ),
                       child: Text(
                         TasksStrings.cancel,
@@ -325,7 +289,7 @@ class _TaskEditorState extends State<TaskEditor> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppDimensions.smallSpacing),
                     ElevatedButton(
                       onPressed: () {
                         if (tagController.text.trim().isNotEmpty) {
@@ -334,9 +298,10 @@ class _TaskEditorState extends State<TaskEditor> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4338CA),
+                        backgroundColor: context.colorPrimaryDark,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                         ),
                       ),
                       child: Text(
@@ -356,16 +321,17 @@ class _TaskEditorState extends State<TaskEditor> {
     );
   }
 
-  // عنصر مقبض السحب
   Widget _buildDragHandle() {
     return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 10),
+      padding: EdgeInsets.only(
+          top: AppDimensions.smallSpacing + 4,
+          bottom: AppDimensions.smallSpacing + 2),
       child: Center(
         child: Container(
           width: 40,
           height: 5,
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: context.colorDivider,
             borderRadius: BorderRadius.circular(3),
           ),
         ),
@@ -373,7 +339,6 @@ class _TaskEditorState extends State<TaskEditor> {
     );
   }
 
-  // بناء شريط العنوان
   Widget _buildToolbar({
     required String title,
     required VoidCallback onBackPressed,
@@ -381,91 +346,93 @@ class _TaskEditorState extends State<TaskEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // الصف الأول: زر الرجوع والعنوان
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // زر الرجوع
               GestureDetector(
                 onTap: onBackPressed,
                 child: Container(
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius + 2),
                     border: Border.all(
-                      color: Colors.grey.shade200,
+                      color: context.colorDivider,
                       width: 1.0,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
-                    color: Color(0xFF4338CA),
+                    color: context.colorPrimaryDark,
                     size: 18,
                   ),
                 ),
               ),
-              // العنوان
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.defaultSpacing - 2,
+                    vertical: AppDimensions.smallSpacing - 1),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  color: context.colorSurface,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius + 2),
                   border: Border.all(
-                    color: Colors.grey.shade200,
+                    color: context.colorDivider,
                     width: 1.0,
                   ),
                 ),
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: TextStyle(
+                    fontSize: AppDimensions.smallBodyFontSize + 1,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4338CA),
+                    color: context.colorPrimaryDark,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
               ),
-              // مساحة فارغة للمحاذاة
               const SizedBox(width: 36),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-
-        // وصف مع أيقونة
+        SizedBox(height: AppDimensions.defaultSpacing),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.smallSpacing + 4,
+                vertical: AppDimensions.smallSpacing + 2),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              color: context.colorSurface,
+              borderRadius:
+                  BorderRadius.circular(AppDimensions.smallRadius + 2),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.1),
+                color: context.colorPrimaryDark.withOpacity(0.1),
                 width: 1.0,
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline,
-                  color: Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   size: 18,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: AppDimensions.smallSpacing),
                 Expanded(
                   child: Text(
                     "قم بإدخال تفاصيل المهمة وحدد المواعيد والأولويات",
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppDimensions.smallLabelFontSize,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade800,
+                      color: context.colorTextPrimary,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -474,14 +441,12 @@ class _TaskEditorState extends State<TaskEditor> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-
-        const Divider(height: 1, thickness: 1, color: Color(0xFFE3E0F8)),
+        SizedBox(height: AppDimensions.defaultSpacing),
+        Divider(height: 1, thickness: 1, color: context.colorPrimaryExtraLight),
       ],
     );
   }
 
-  // بناء حقل إدخال
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -492,77 +457,73 @@ class _TaskEditorState extends State<TaskEditor> {
     bool autoFocus = false,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // عنوان الحقل
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               labelText,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
           ),
-
-          // حقل الإدخال
           Container(
-            height: 50,
+            height: AppDimensions.extraSmallButtonHeight + 2,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
                 color: errorText != null
-                    ? const Color(0xFFEC4899)
-                    : const Color(0xFF4338CA).withOpacity(0.2),
+                    ? context.colorAccent
+                    : context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
             child: Row(
               children: [
-                // أيقونة حقل الإدخال
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.smallSpacing + 2),
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius + 2),
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: context.colorPrimaryDark.withOpacity(0.1),
                       width: 1.0,
                     ),
                   ),
                   child: Icon(
                     icon ?? Icons.text_fields,
                     color: controller.text.isEmpty
-                        ? const Color(0xFF6366F1)
-                        : const Color(0xFF4338CA),
+                        ? context.colorPrimaryLight
+                        : context.colorPrimaryDark,
                     size: 16,
                   ),
                 ),
-
-                // حقل الإدخال نفسه
                 Expanded(
                   child: TextField(
                     controller: controller,
                     keyboardType: keyboardType,
                     autofocus: autoFocus,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 14,
-                      color: Color(0xFF374151),
+                      fontSize: AppDimensions.smallButtonFontSize - 1,
+                      color: context.colorTextPrimary,
                     ),
                     decoration: InputDecoration(
                       hintText: hintText,
-                      hintStyle: const TextStyle(
-                        color: Color(0xFF9CA3AF),
-                        fontSize: 14,
+                      hintStyle: TextStyle(
+                        color: context.colorTextHint,
+                        fontSize: AppDimensions.smallButtonFontSize - 1,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                       errorText: null,
@@ -570,31 +531,29 @@ class _TaskEditorState extends State<TaskEditor> {
                         height: 0,
                         fontSize: 0,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.defaultSpacing - 2,
                       ),
                       border: InputBorder.none,
                       errorBorder: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: context.colorSurface,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-
-          // عرض رسالة الخطأ إن وجدت
           if (errorText != null)
             Padding(
-              padding: const EdgeInsets.only(top: 4, right: 4),
+              padding: EdgeInsets.only(top: 4, right: 4),
               child: Text(
                 errorText,
-                style: const TextStyle(
-                  color: Color(0xFFEC4899),
-                  fontSize: 12,
+                style: TextStyle(
+                  color: context.colorAccent,
+                  fontSize: AppDimensions.smallLabelFontSize - 1,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -612,19 +571,19 @@ class _TaskEditorState extends State<TaskEditor> {
     String? hintText,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان الحقل
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               labelText,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -634,10 +593,10 @@ class _TaskEditorState extends State<TaskEditor> {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
@@ -646,23 +605,25 @@ class _TaskEditorState extends State<TaskEditor> {
               children: [
                 // أيقونة حقل الإدخال
                 Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.smallSpacing + 2,
+                      vertical: AppDimensions.smallSpacing + 2),
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius + 2),
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: context.colorPrimaryDark.withOpacity(0.1),
                       width: 1.0,
                     ),
                   ),
                   child: Icon(
                     icon ?? Icons.text_fields,
                     color: controller.text.isEmpty
-                        ? const Color(0xFF6366F1)
-                        : const Color(0xFF4338CA),
+                        ? context.colorPrimaryLight
+                        : context.colorPrimaryDark,
                     size: 16,
                   ),
                 ),
@@ -672,26 +633,26 @@ class _TaskEditorState extends State<TaskEditor> {
                   child: TextField(
                     controller: controller,
                     maxLines: 5,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 14,
-                      color: Color(0xFF374151),
+                      fontSize: AppDimensions.smallButtonFontSize - 1,
+                      color: context.colorTextPrimary,
                     ),
                     decoration: InputDecoration(
                       hintText: hintText,
-                      hintStyle: const TextStyle(
-                        color: Color(0xFF9CA3AF),
-                        fontSize: 14,
+                      hintStyle: TextStyle(
+                        color: context.colorTextHint,
+                        fontSize: AppDimensions.smallButtonFontSize - 1,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.defaultSpacing - 2,
                       ),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: context.colorSurface,
                     ),
                   ),
                 ),
@@ -701,13 +662,13 @@ class _TaskEditorState extends State<TaskEditor> {
 
           // عداد الكلمات والأحرف
           Padding(
-            padding: const EdgeInsets.only(top: 4, right: 4),
+            padding: EdgeInsets.only(top: 4, right: 4),
             child: Text(
               "${_controller.descriptionController.text.split(' ').where((word) => word.isNotEmpty).length}${TasksStrings.wordCount}"
               "${_controller.descriptionController.text.length}${TasksStrings.charCount}",
               style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 12,
+                color: context.colorTextSecondary,
+                fontSize: AppDimensions.smallLabelFontSize - 1,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -725,19 +686,19 @@ class _TaskEditorState extends State<TaskEditor> {
             widget.task == null;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان الحقل
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               TasksStrings.dueDate,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -758,14 +719,13 @@ class _TaskEditorState extends State<TaskEditor> {
                           : DateTime.now(),
                       firstDate: widget.task != null
                           ? DateTime.now().subtract(Duration(days: 365))
-                          : DateTime
-                              .now(), // لا يسمح بتواريخ في الماضي للمهام الجديدة
+                          : DateTime.now(),
                       lastDate: DateTime.now().add(Duration(days: 365)),
                       builder: (context, child) {
                         return Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: ColorScheme.light(
-                              primary: const Color(0xFF4338CA),
+                              primary: context.colorPrimaryDark,
                             ),
                           ),
                           child: child!,
@@ -774,21 +734,21 @@ class _TaskEditorState extends State<TaskEditor> {
                     );
                     if (date != null) {
                       setState(() {
-                        _dueDateError =
-                            null; // إعادة ضبط الخطأ عند تحديد تاريخ جديد
+                        _dueDateError = null;
                       });
                       _controller.setDueDate(date);
                     }
                   },
                   child: Container(
-                    height: 50,
+                    height: AppDimensions.extraSmallButtonHeight + 2,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      color: context.colorSurface,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
                       border: Border.all(
                         color: _dueDateError != null || isDateInPast
-                            ? const Color(0xFFEC4899)
-                            : const Color(0xFF4338CA).withOpacity(0.2),
+                            ? context.colorAccent
+                            : context.colorPrimaryDark.withOpacity(0.2),
                         width: 1.0,
                       ),
                     ),
@@ -796,22 +756,24 @@ class _TaskEditorState extends State<TaskEditor> {
                       children: [
                         // أيقونة التاريخ
                         Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.smallSpacing + 2),
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
+                            color: context.colorSurface,
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.smallRadius + 2),
                             border: Border.all(
-                              color: const Color(0xFF4338CA).withOpacity(0.1),
+                              color: context.colorPrimaryDark.withOpacity(0.1),
                               width: 1.0,
                             ),
                           ),
                           child: Icon(
                             TasksIcons.calendar,
                             color: _dueDateError != null || isDateInPast
-                                ? const Color(0xFFEC4899)
-                                : const Color(0xFF4338CA),
+                                ? context.colorAccent
+                                : context.colorPrimaryDark,
                             size: 16,
                           ),
                         ),
@@ -823,20 +785,21 @@ class _TaskEditorState extends State<TaskEditor> {
                                 .format(_controller.dueDate),
                             style: TextStyle(
                               fontFamily: 'SYMBIOAR+LT',
-                              fontSize: 14,
+                              fontSize: AppDimensions.smallButtonFontSize - 1,
                               color: _dueDateError != null || isDateInPast
-                                  ? const Color(0xFFEC4899)
-                                  : const Color(0xFF374151),
+                                  ? context.colorAccent
+                                  : context.colorTextPrimary,
                             ),
                           ),
                         ),
 
                         // أيقونة السهم
                         Container(
-                          margin: const EdgeInsets.only(left: 4, right: 8),
-                          child: const Icon(
+                          margin: EdgeInsets.only(
+                              left: 4, right: AppDimensions.smallSpacing),
+                          child: Icon(
                             Icons.keyboard_arrow_down_rounded,
-                            color: Color(0xFF4338CA),
+                            color: context.colorPrimaryDark,
                             size: 20,
                           ),
                         ),
@@ -846,7 +809,7 @@ class _TaskEditorState extends State<TaskEditor> {
                 ),
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: AppDimensions.smallSpacing),
 
               // الوقت
               Expanded(
@@ -860,7 +823,7 @@ class _TaskEditorState extends State<TaskEditor> {
                         return Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: ColorScheme.light(
-                              primary: const Color(0xFF4338CA),
+                              primary: context.colorPrimaryDark,
                             ),
                           ),
                           child: child!,
@@ -869,21 +832,21 @@ class _TaskEditorState extends State<TaskEditor> {
                     );
                     if (time != null) {
                       setState(() {
-                        _dueDateError =
-                            null; // إعادة ضبط الخطأ عند تحديد وقت جديد
+                        _dueDateError = null;
                       });
                       _controller.setDueTime(time);
                     }
                   },
                   child: Container(
-                    height: 50,
+                    height: AppDimensions.extraSmallButtonHeight + 2,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      color: context.colorSurface,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
                       border: Border.all(
                         color: _dueDateError != null
-                            ? const Color(0xFFEC4899)
-                            : const Color(0xFF4338CA).withOpacity(0.2),
+                            ? context.colorAccent
+                            : context.colorPrimaryDark.withOpacity(0.2),
                         width: 1.0,
                       ),
                     ),
@@ -891,22 +854,24 @@ class _TaskEditorState extends State<TaskEditor> {
                       children: [
                         // أيقونة الوقت
                         Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.smallSpacing + 2),
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
+                            color: context.colorSurface,
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.smallRadius + 2),
                             border: Border.all(
-                              color: const Color(0xFF4338CA).withOpacity(0.1),
+                              color: context.colorPrimaryDark.withOpacity(0.1),
                               width: 1.0,
                             ),
                           ),
                           child: Icon(
                             TasksIcons.time,
                             color: _dueDateError != null
-                                ? const Color(0xFFEC4899)
-                                : const Color(0xFF4338CA),
+                                ? context.colorAccent
+                                : context.colorPrimaryDark,
                             size: 16,
                           ),
                         ),
@@ -917,10 +882,10 @@ class _TaskEditorState extends State<TaskEditor> {
                             _controller.dueTime.format(context),
                             style: TextStyle(
                               fontFamily: 'SYMBIOAR+LT',
-                              fontSize: 14,
+                              fontSize: AppDimensions.smallButtonFontSize - 1,
                               color: _dueDateError != null
-                                  ? const Color(0xFFEC4899)
-                                  : const Color(0xFF374151),
+                                  ? context.colorAccent
+                                  : context.colorTextPrimary,
                             ),
                           ),
                         ),
@@ -935,12 +900,12 @@ class _TaskEditorState extends State<TaskEditor> {
           // عرض رسالة الخطأ
           if (_dueDateError != null || isDateInPast)
             Padding(
-              padding: const EdgeInsets.only(top: 4, right: 4),
+              padding: EdgeInsets.only(top: 4, right: 4),
               child: Text(
                 _dueDateError ?? "لا يمكن تحديد تاريخ في الماضي",
-                style: const TextStyle(
-                  color: Color(0xFFEC4899),
-                  fontSize: 12,
+                style: TextStyle(
+                  color: context.colorAccent,
+                  fontSize: AppDimensions.smallLabelFontSize - 1,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -953,19 +918,19 @@ class _TaskEditorState extends State<TaskEditor> {
   // بناء قسم الأولوية
   Widget _buildPrioritySection() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               TasksStrings.priority,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -974,16 +939,18 @@ class _TaskEditorState extends State<TaskEditor> {
           // بطاقة تحوي خيارات الأولوية
           Container(
             width: double.infinity,
-            height: 60,
+            height: AppDimensions.buttonHeight + 4,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.smallSpacing + 2,
+                vertical: AppDimensions.smallSpacing),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -995,11 +962,11 @@ class _TaskEditorState extends State<TaskEditor> {
                   TasksStrings.lowPriority,
                 ].map((priority) {
                   final isSelected = _controller.priority == priority;
-                  final priorityColor = TasksColors.getPriorityColor(priority);
+                  final priorityColor = _getPriorityColor(context, priority);
                   final icon = TasksIcons.getPriorityIcon(priority);
 
                   return Padding(
-                    padding: const EdgeInsets.only(left: 5),
+                    padding: EdgeInsets.only(left: 5),
                     child: _buildChoiceChip(
                       label: priority,
                       icon: icon,
@@ -1024,19 +991,19 @@ class _TaskEditorState extends State<TaskEditor> {
   // بناء قسم اختيار المادة
   Widget _buildCourseSelector() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               TasksStrings.course,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -1045,12 +1012,14 @@ class _TaskEditorState extends State<TaskEditor> {
           // نستخدم أزرار اختيار بدلاً من القائمة المنسدلة
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            padding: EdgeInsets.symmetric(
+                vertical: AppDimensions.smallSpacing + 2,
+                horizontal: AppDimensions.smallSpacing + 4),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
@@ -1064,29 +1033,30 @@ class _TaskEditorState extends State<TaskEditor> {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        color: context.colorSurface,
+                        borderRadius: BorderRadius.circular(
+                            AppDimensions.smallRadius + 2),
                         border: Border.all(
-                          color: const Color(0xFF4338CA).withOpacity(0.1),
+                          color: context.colorPrimaryDark.withOpacity(0.1),
                           width: 1.0,
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         TasksIcons.course,
-                        color: Color(0xFF4338CA),
+                        color: context.colorPrimaryDark,
                         size: 16,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: AppDimensions.smallSpacing + 2),
                     Text(
                       _selectedCourseId == null
                           ? TasksStrings.selectCourse
                           : "المادة المختارة: ${_controller.selectedCourse?.courseName}",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: AppDimensions.smallButtonFontSize - 1,
                         color: _selectedCourseId == null
-                            ? const Color(0xFF9CA3AF)
-                            : const Color(0xFF374151),
+                            ? context.colorTextHint
+                            : context.colorTextPrimary,
                         fontWeight: _selectedCourseId != null
                             ? FontWeight.w600
                             : FontWeight.normal,
@@ -1097,23 +1067,23 @@ class _TaskEditorState extends State<TaskEditor> {
                 ),
 
                 // قائمة الاختيارات
-                const SizedBox(height: 10),
+                SizedBox(height: AppDimensions.smallSpacing + 2),
 
                 _controller.availableCourses.isEmpty
                     ? Center(
                         child: Text(
                           "لا توجد مقررات متاحة",
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
+                            fontSize: AppDimensions.smallButtonFontSize - 1,
+                            color: context.colorTextSecondary,
                             fontStyle: FontStyle.italic,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
                         ),
                       )
                     : Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: AppDimensions.smallSpacing,
+                        runSpacing: AppDimensions.smallSpacing,
                         children: [
                           // خيار "بدون مادة"
                           _buildCourseChoiceChip(
@@ -1167,29 +1137,32 @@ class _TaskEditorState extends State<TaskEditor> {
         label,
         style: TextStyle(
           fontFamily: 'SYMBIOAR+LT',
-          fontSize: 13,
-          color: isSelected ? const Color(0xFF4338CA) : const Color(0xFF374151),
+          fontSize: AppDimensions.smallLabelFontSize,
+          color:
+              isSelected ? context.colorPrimaryDark : context.colorTextPrimary,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
       selected: isSelected,
-      selectedColor: const Color(0xFFF5F3FF),
-      backgroundColor: Colors.white,
+      selectedColor: context.colorPrimaryPale,
+      backgroundColor: context.colorSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         side: BorderSide(
-          color: isSelected ? const Color(0xFF6366F1) : Colors.grey.shade300,
+          color: isSelected ? context.colorPrimaryLight : context.colorDivider,
           width: 1.0,
         ),
       ),
       elevation: 0,
       shadowColor: Colors.transparent,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.smallSpacing + 4,
+          vertical: AppDimensions.smallSpacing),
       onSelected: onSelected,
     );
   }
 
-  // بناء قسم التذكير - تم تحديثه لمعالجة مشكلة التجاوز
+  // بناء قسم التذكير
   Widget _buildReminderSection() {
     // تحقق من وجود أخطاء في وقت التذكير
     bool hasReminderTimeError = _controller.hasReminder &&
@@ -1197,19 +1170,19 @@ class _TaskEditorState extends State<TaskEditor> {
         _controller.reminderDateTime!.isAfter(_controller.dueDate);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               TasksStrings.reminder,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -1218,42 +1191,44 @@ class _TaskEditorState extends State<TaskEditor> {
           // مفتاح تفعيل التذكير
           Container(
             width: double.infinity,
-            height: 50,
+            height: AppDimensions.extraSmallButtonHeight + 2,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.smallSpacing + 2),
             child: Row(
               children: [
                 Container(
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius + 2),
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: context.colorPrimaryDark.withOpacity(0.1),
                       width: 1.0,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     TasksIcons.reminder,
-                    color: Color(0xFF4338CA),
+                    color: context.colorPrimaryDark,
                     size: 16,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: AppDimensions.smallSpacing + 2),
                 Expanded(
                   child: Text(
                     TasksStrings.enableReminder,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF374151),
+                    style: TextStyle(
+                      fontSize: AppDimensions.smallButtonFontSize - 1,
+                      color: context.colorTextPrimary,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -1275,14 +1250,14 @@ class _TaskEditorState extends State<TaskEditor> {
                       }
                     }
                   },
-                  activeColor: const Color(0xFF4338CA),
+                  activeColor: context.colorPrimaryDark,
                 ),
               ],
             ),
           ),
 
           if (_controller.hasReminder) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing + 4),
             // إصلاح مشكلة تجاوز المحتوى عبر استخدام محتوى قابل للتمرير
             ConstrainedBox(
               constraints: BoxConstraints(maxHeight: 70), // تحديد ارتفاع أقصى
@@ -1311,8 +1286,8 @@ class _TaskEditorState extends State<TaskEditor> {
                     builder: (context, child) {
                       return Theme(
                         data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: Color(0xFF4338CA),
+                          colorScheme: ColorScheme.light(
+                            primary: context.colorPrimaryDark,
                           ),
                         ),
                         child: child!,
@@ -1342,8 +1317,8 @@ class _TaskEditorState extends State<TaskEditor> {
                       builder: (context, child) {
                         return Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: Color(0xFF4338CA),
+                            colorScheme: ColorScheme.light(
+                              primary: context.colorPrimaryDark,
                             ),
                           ),
                           child: child!,
@@ -1380,40 +1355,42 @@ class _TaskEditorState extends State<TaskEditor> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.mediumRadius),
                     border: Border.all(
                       color: hasReminderTimeError
-                          ? const Color(0xFFEC4899)
-                          : const Color(0xFF4338CA).withOpacity(0.2),
+                          ? context.colorAccent
+                          : context.colorPrimaryDark.withOpacity(0.2),
                       width: 1.0,
                     ),
                   ),
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(AppDimensions.smallSpacing + 4),
                   child: Row(
                     children: [
                       Container(
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          color: context.colorSurface,
+                          borderRadius: BorderRadius.circular(
+                              AppDimensions.smallRadius + 2),
                           border: Border.all(
                             color: hasReminderTimeError
-                                ? const Color(0xFFEC4899).withOpacity(0.2)
-                                : const Color(0xFF4338CA).withOpacity(0.1),
+                                ? context.colorAccent.withOpacity(0.2)
+                                : context.colorPrimaryDark.withOpacity(0.1),
                             width: 1.0,
                           ),
                         ),
                         child: Icon(
                           TasksIcons.time,
                           color: hasReminderTimeError
-                              ? const Color(0xFFEC4899)
-                              : const Color(0xFF4338CA),
+                              ? context.colorAccent
+                              : context.colorPrimaryDark,
                           size: 16,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: AppDimensions.smallSpacing + 2),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1423,27 +1400,27 @@ class _TaskEditorState extends State<TaskEditor> {
                             Text(
                               TasksStrings.reminderTime,
                               style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
+                                fontSize: AppDimensions.smallLabelFontSize - 1,
+                                color: context.colorTextSecondary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2),
                             Text(
                               _controller.reminderDateTime != null
                                   ? DateFormat('yyyy-MM-dd – HH:mm')
                                       .format(_controller.reminderDateTime!)
                                   : TasksStrings.reminderTime,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: AppDimensions.smallButtonFontSize - 1,
                                 fontWeight: _controller.reminderDateTime != null
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: hasReminderTimeError
-                                    ? const Color(0xFFEC4899)
+                                    ? context.colorAccent
                                     : _controller.reminderDateTime != null
-                                        ? const Color(0xFF4338CA)
-                                        : const Color(0xFF9CA3AF),
+                                        ? context.colorPrimaryDark
+                                        : context.colorTextHint,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -1451,9 +1428,9 @@ class _TaskEditorState extends State<TaskEditor> {
                           ],
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: Color(0xFF4338CA),
+                        color: context.colorPrimaryDark,
                       ),
                     ],
                   ),
@@ -1464,12 +1441,12 @@ class _TaskEditorState extends State<TaskEditor> {
             // رسالة خطأ وقت التذكير
             if (hasReminderTimeError)
               Padding(
-                padding: const EdgeInsets.only(top: 4, right: 4),
+                padding: EdgeInsets.only(top: 4, right: 4),
                 child: Text(
                   "تاريخ التذكير يجب أن يكون قبل تاريخ التسليم",
-                  style: const TextStyle(
-                    color: Color(0xFFEC4899),
-                    fontSize: 12,
+                  style: TextStyle(
+                    color: context.colorAccent,
+                    fontSize: AppDimensions.smallLabelFontSize - 1,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -1483,19 +1460,19 @@ class _TaskEditorState extends State<TaskEditor> {
   // بناء قسم الوسوم
   Widget _buildTagsSection() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.defaultSpacing - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان القسم
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               TasksStrings.tags,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.labelFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -1505,14 +1482,14 @@ class _TaskEditorState extends State<TaskEditor> {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(AppDimensions.smallSpacing + 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1520,8 +1497,8 @@ class _TaskEditorState extends State<TaskEditor> {
                   Text(
                     "لم يتم إضافة وسوم بعد",
                     style: TextStyle(
-                      fontSize: 14,
-                      color: const Color(0xFF9CA3AF),
+                      fontSize: AppDimensions.smallButtonFontSize - 1,
+                      color: context.colorTextHint,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -1532,19 +1509,19 @@ class _TaskEditorState extends State<TaskEditor> {
                     ..._controller.tags.map((tag) => Chip(
                           label: Text(
                             tag,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'SYMBIOAR+LT',
-                              color: Color(0xFF4338CA),
-                              fontSize: 13,
+                              color: context.colorPrimaryDark,
+                              fontSize: AppDimensions.smallLabelFontSize,
                             ),
                           ),
-                          deleteIcon: const Icon(
+                          deleteIcon: Icon(
                             Icons.close,
                             size: 16,
-                            color: Color(0xFF6366F1),
+                            color: context.colorPrimaryLight,
                           ),
-                          backgroundColor: const Color(0xFFF5F3FF),
-                          padding: const EdgeInsets.symmetric(
+                          backgroundColor: context.colorPrimaryPale,
+                          padding: EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 0,
                           ),
@@ -1556,28 +1533,28 @@ class _TaskEditorState extends State<TaskEditor> {
                       label: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.add,
                             size: 14,
-                            color: Color(0xFF4338CA),
+                            color: context.colorPrimaryDark,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
                             TasksStrings.addTag,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'SYMBIOAR+LT',
-                              color: Color(0xFF4338CA),
-                              fontSize: 13,
+                              color: context.colorPrimaryDark,
+                              fontSize: AppDimensions.smallLabelFontSize,
                             ),
                           ),
                         ],
                       ),
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(
-                        color: Color(0xFF6366F1),
+                      backgroundColor: context.colorSurface,
+                      side: BorderSide(
+                        color: context.colorPrimaryLight,
                         width: 1.0,
                       ),
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 0,
                       ),
@@ -1611,37 +1588,39 @@ class _TaskEditorState extends State<TaskEditor> {
               icon,
               size: 14,
               color: isSelected
-                  ? const Color(0xFF4338CA)
-                  : color ?? const Color(0xFF374151),
+                  ? context.colorPrimaryDark
+                  : color ?? context.colorTextPrimary,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
           ],
           Text(
             label,
             style: TextStyle(
               fontFamily: 'SYMBIOAR+LT',
-              fontSize: 13,
+              fontSize: AppDimensions.smallLabelFontSize,
               color: isSelected
-                  ? const Color(0xFF4338CA)
-                  : const Color(0xFF374151),
+                  ? context.colorPrimaryDark
+                  : context.colorTextPrimary,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ],
       ),
       selected: isSelected,
-      selectedColor: Colors.white,
-      backgroundColor: Colors.white,
+      selectedColor: context.colorSurface,
+      backgroundColor: context.colorSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius + 2),
         side: BorderSide(
-          color: isSelected ? const Color(0xFF6366F1) : Colors.grey.shade300,
+          color: isSelected ? context.colorPrimaryLight : context.colorDivider,
           width: 1.0,
         ),
       ),
       elevation: 0,
       shadowColor: Colors.transparent,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.smallSpacing + 4,
+          vertical: AppDimensions.smallSpacing),
       onSelected: onSelected,
     );
   }
@@ -1655,12 +1634,12 @@ class _TaskEditorState extends State<TaskEditor> {
   }) {
     return Container(
       width: double.infinity,
-      height: 48,
+      height: AppDimensions.extraSmallButtonHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4338CA).withOpacity(0.25),
+            color: context.colorPrimaryDark.withOpacity(0.25),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -1669,17 +1648,18 @@ class _TaskEditorState extends State<TaskEditor> {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4338CA),
+          backgroundColor: context.colorPrimaryDark,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.shade300,
+          disabledBackgroundColor: context.colorDisabledState,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
         ),
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -1693,13 +1673,13 @@ class _TaskEditorState extends State<TaskEditor> {
                 children: [
                   if (icon != null) ...[
                     Icon(icon, size: 18),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppDimensions.smallSpacing),
                   ],
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                      fontSize: AppDimensions.smallButtonFontSize,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -1707,5 +1687,19 @@ class _TaskEditorState extends State<TaskEditor> {
               ),
       ),
     );
+  }
+
+  // طريقة مساعدة للحصول على لون الأولوية استناداً إلى نص الأولوية
+  Color _getPriorityColor(BuildContext context, String priority) {
+    switch (priority) {
+      case 'عالية':
+        return context.colorError;
+      case 'متوسطة':
+        return context.colorWarning;
+      case 'منخفضة':
+        return context.colorSuccess;
+      default:
+        return context.colorInfo;
+    }
   }
 }

@@ -14,7 +14,8 @@ import '../components/Editor/task_editor_reminder_section.dart';
 import '../components/Editor/task_editor_tags_section.dart';
 import '../components/Editor/task_editor_button.dart';
 import '../constants/editor_strings.dart';
-
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 class TaskEditorScreen extends StatefulWidget {
   final Task? task;
   final List<String> categories;
@@ -83,9 +84,9 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
+            backgroundColor: context.colorSuccess,
           ),
         );
 
@@ -101,9 +102,9 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
+            backgroundColor: context.colorError,
           ),
         );
       }
@@ -117,17 +118,19 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
       child: Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.sectionPadding,
+            vertical: AppDimensions.defaultSpacing + 8),
         child: Container(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.85,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: context.colorShadowColor,
                 blurRadius: 15,
                 spreadRadius: 0,
                 offset: const Offset(0, 4),
@@ -135,7 +138,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
             child: Column(
               children: [
                 // Header with close button and title
@@ -149,7 +152,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                 // Content
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -161,7 +164,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           hintText: EditorStrings.enterTaskTitle,
                         ),
 
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppDimensions.defaultSpacing),
 
                         // Description field
                         TaskEditorDescriptionField(
@@ -170,7 +173,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           hintText: EditorStrings.taskDescriptionHint,
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: AppDimensions.largeSpacing),
 
                         // Date & Time picker
                         TaskEditorDatePicker(
@@ -180,7 +183,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           onTimeChanged: _controller.setDueTime,
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: AppDimensions.largeSpacing),
 
                         // Priority selector
                         TaskEditorPrioritySelector(
@@ -188,7 +191,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           onPriorityChanged: _controller.setPriority,
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: AppDimensions.largeSpacing),
 
                         // Course selector (if available)
                         if (_controller.availableCourses.isNotEmpty)
@@ -199,7 +202,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                             onCourseSelected: _updateSelectedCourse,
                           ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: AppDimensions.largeSpacing),
 
                         // Reminder section
                         TaskEditorReminderSection(
@@ -211,7 +214,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                               _controller.setReminderDateTime,
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: AppDimensions.largeSpacing),
 
                         // Tags section
                         TaskEditorTagsSection(
@@ -220,7 +223,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
                           onTagRemoved: _controller.removeTag,
                         ),
 
-                        const SizedBox(height: 28),
+                        SizedBox(height: AppDimensions.extraLargeSpacing - 4),
 
                         // Save button
                         TaskEditorButton(
