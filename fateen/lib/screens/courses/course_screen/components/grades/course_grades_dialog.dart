@@ -4,6 +4,8 @@ import '../../constants/grades/course_grades_colors.dart';
 import '../../controllers/course_grades_controller.dart';
 import '../../../../../models/course.dart';
 import 'course_grades_form.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesDialog extends StatelessWidget {
   final String title;
@@ -16,9 +18,11 @@ class CourseGradesDialog extends StatelessWidget {
   final Function(String?, String, double, double) onSave;
   final VoidCallback onCancel;
   final bool isLoading;
+  final BuildContext context;
 
   const CourseGradesDialog({
     Key? key,
+    required this.context,
     required this.title,
     required this.description,
     required this.controller,
@@ -39,11 +43,11 @@ class CourseGradesDialog extends StatelessWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.65,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: context.colorShadowColor,
             blurRadius: 15,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -63,7 +67,9 @@ class CourseGradesDialog extends StatelessWidget {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -89,16 +95,18 @@ class CourseGradesDialog extends StatelessWidget {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: context.colorSurface,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: CourseGradesColors.borderColor,
+                              color: context.isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade200,
                               width: 1.0,
                             ),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.close,
-                            color: CourseGradesColors.darkPurple,
+                            color: context.colorPrimaryDark,
                             size: 18,
                           ),
                         ),
@@ -108,19 +116,21 @@ class CourseGradesDialog extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 7),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colorSurface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: CourseGradesColors.borderColor,
+                            color: context.isDarkMode
+                                ? Colors.grey.shade700
+                                : Colors.grey.shade200,
                             width: 1.0,
                           ),
                         ),
                         child: Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: CourseGradesColors.darkPurple,
+                            color: context.colorPrimaryDark,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
                         ),
@@ -136,18 +146,18 @@ class CourseGradesDialog extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colorSurface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: CourseGradesColors.darkPurple.withOpacity(0.1),
+                        color: context.colorPrimaryDark.withOpacity(0.1),
                         width: 1.0,
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.info_outline,
-                          color: CourseGradesColors.darkPurple,
+                          color: context.colorPrimaryDark,
                           size: 18,
                         ),
                         const SizedBox(width: 8),
@@ -159,7 +169,7 @@ class CourseGradesDialog extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: CourseGradesColors.textColor,
+                              color: context.colorTextPrimary,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -176,6 +186,7 @@ class CourseGradesDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: CourseGradesForm(
+                context: context,
                 controller: controller,
                 course: course,
                 currentEditingAssignment: currentEditingAssignment,

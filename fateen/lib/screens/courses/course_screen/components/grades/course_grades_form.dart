@@ -6,6 +6,8 @@ import '../../constants/grades/course_grades_constants.dart';
 import '../../constants/grades/course_grades_colors.dart';
 import '../../controllers/course_grades_controller.dart';
 import '../../../../../models/course.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesForm extends StatefulWidget {
   final CourseGradesController controller;
@@ -16,9 +18,11 @@ class CourseGradesForm extends StatefulWidget {
   final Function(String?, String, double, double) onSave;
   final VoidCallback onCancel;
   final bool isLoading;
+  final BuildContext context;
 
   const CourseGradesForm({
     Key? key,
+    required this.context,
     required this.controller,
     required this.course,
     this.currentEditingAssignment,
@@ -230,7 +234,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: widget.context.colorSurface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -250,8 +254,8 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
               padding: const EdgeInsets.only(top: 8, right: 4),
               child: Text(
                 _assignmentError!,
-                style: const TextStyle(
-                  color: CourseGradesColors.accentColor,
+                style: TextStyle(
+                  color: widget.context.colorError,
                   fontSize: 12,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -284,12 +288,12 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: CourseGradesColors.lightPurple,
+            color: widget.context.colorPrimaryLight,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.grade_outlined,
-            color: CourseGradesColors.darkPurple,
+            color: widget.context.colorPrimaryDark,
             size: 22,
           ),
         ),
@@ -298,10 +302,10 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
           widget.currentEditingAssignment != null
               ? 'تعديل درجة'
               : 'إضافة درجة جديدة',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: CourseGradesColors.textColor,
+            color: widget.context.colorTextPrimary,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -313,12 +317,12 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'نوع التقييم',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: CourseGradesColors.textColor,
+            color: widget.context.colorTextPrimary,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -329,12 +333,16 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         Container(
           height: 60,
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: widget.context.isDarkMode
+                ? widget.context.colorSurface
+                : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: _assignmentError != null && !_isCustomAssignment
-                  ? CourseGradesColors.accentColor
-                  : Colors.grey.shade200,
+                  ? widget.context.colorError
+                  : widget.context.isDarkMode
+                      ? Colors.grey.shade700
+                      : Colors.grey.shade200,
             ),
           ),
           child: ListView.builder(
@@ -368,18 +376,20 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? CourseGradesColors.darkPurple
-                          : Colors.white,
+                          ? widget.context.colorPrimaryDark
+                          : widget.context.colorSurface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
-                            ? CourseGradesColors.darkPurple
-                            : Colors.grey.shade300,
+                            ? widget.context.colorPrimaryDark
+                            : widget.context.isDarkMode
+                                ? Colors.grey.shade700
+                                : Colors.grey.shade300,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: CourseGradesColors.darkPurple
+                                color: widget.context.colorPrimaryDark
                                     .withOpacity(0.2),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
@@ -394,7 +404,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
                           size: 18,
                           color: isSelected
                               ? Colors.white
-                              : CourseGradesColors.darkPurple,
+                              : widget.context.colorPrimaryDark,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -407,7 +417,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
                                 : FontWeight.normal,
                             color: isSelected
                                 ? Colors.white
-                                : CourseGradesColors.textColor,
+                                : widget.context.colorTextPrimary,
                           ),
                         ),
                       ],
@@ -441,12 +451,12 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'اسم التقييم المخصص',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: CourseGradesColors.textColor,
+            color: widget.context.colorTextPrimary,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -455,46 +465,53 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
 
         TextField(
           controller: _customAssignmentController,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'SYMBIOAR+LT',
             fontSize: 15,
+            color: widget.context.colorTextPrimary,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: widget.context.isDarkMode
+                ? widget.context.colorSurface
+                : Colors.grey.shade50,
             hintText: 'أدخل اسم التقييم',
             hintStyle: TextStyle(
-              color: Colors.grey.shade400,
+              color: widget.context.colorTextSecondary,
               fontFamily: 'SYMBIOAR+LT',
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _assignmentError != null
-                    ? CourseGradesColors.accentColor
-                    : Colors.grey.shade300,
+                    ? widget.context.colorError
+                    : widget.context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _assignmentError != null
-                    ? CourseGradesColors.accentColor
-                    : Colors.grey.shade300,
+                    ? widget.context.colorError
+                    : widget.context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: CourseGradesColors.darkPurple,
+              borderSide: BorderSide(
+                color: widget.context.colorPrimaryDark,
                 width: 2,
               ),
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.create_outlined,
-              color: CourseGradesColors.darkPurple,
+              color: widget.context.colorPrimaryDark,
               size: 20,
             ),
           ),
@@ -513,8 +530,8 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
             padding: const EdgeInsets.only(top: 6, right: 4),
             child: Text(
               _assignmentError!,
-              style: const TextStyle(
-                color: CourseGradesColors.accentColor,
+              style: TextStyle(
+                color: widget.context.colorError,
                 fontSize: 12,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -564,10 +581,10 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: CourseGradesColors.textColor,
+            color: widget.context.colorTextPrimary,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -577,38 +594,45 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
         TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'SYMBIOAR+LT',
             fontSize: 15,
+            color: widget.context.colorTextPrimary,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: widget.context.isDarkMode
+                ? widget.context.colorSurface
+                : Colors.grey.shade50,
             hintText: 'أدخل الدرجة',
             hintStyle: TextStyle(
-              color: Colors.grey.shade400,
+              color: widget.context.colorTextSecondary,
               fontFamily: 'SYMBIOAR+LT',
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: error != null
-                    ? CourseGradesColors.accentColor
-                    : Colors.grey.shade300,
+                    ? widget.context.colorError
+                    : widget.context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: error != null
-                    ? CourseGradesColors.accentColor
-                    : Colors.grey.shade300,
+                    ? widget.context.colorError
+                    : widget.context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: CourseGradesColors.darkPurple,
+              borderSide: BorderSide(
+                color: widget.context.colorPrimaryDark,
                 width: 2,
               ),
             ),
@@ -616,7 +640,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             prefixIcon: Icon(
               icon,
-              color: CourseGradesColors.darkPurple,
+              color: widget.context.colorPrimaryDark,
               size: 20,
             ),
           ),
@@ -637,8 +661,8 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
             padding: const EdgeInsets.only(top: 6, right: 4),
             child: Text(
               error,
-              style: const TextStyle(
-                color: CourseGradesColors.accentColor,
+              style: TextStyle(
+                color: widget.context.colorError,
                 fontSize: 12,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -656,8 +680,8 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
           child: OutlinedButton(
             onPressed: widget.isLoading ? null : widget.onCancel,
             style: OutlinedButton.styleFrom(
-              foregroundColor: CourseGradesColors.darkPurple,
-              side: const BorderSide(color: CourseGradesColors.darkPurple),
+              foregroundColor: widget.context.colorPrimaryDark,
+              side: BorderSide(color: widget.context.colorPrimaryDark),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -682,7 +706,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
           child: ElevatedButton(
             onPressed: widget.isLoading ? null : _submitForm,
             style: ElevatedButton.styleFrom(
-              backgroundColor: CourseGradesColors.darkPurple,
+              backgroundColor: widget.context.colorPrimaryDark,
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -690,7 +714,7 @@ class _CourseGradesFormState extends State<CourseGradesForm> {
               ),
               padding: const EdgeInsets.symmetric(vertical: 14),
               disabledBackgroundColor:
-                  CourseGradesColors.darkPurple.withOpacity(0.6),
+                  widget.context.colorPrimaryDark.withOpacity(0.6),
             ),
             child: widget.isLoading
                 ? const SizedBox(

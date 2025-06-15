@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../constants/grades/course_grades_colors.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesAddButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isLoading;
+  final BuildContext context;
 
   const CourseGradesAddButton({
     Key? key,
+    required this.context,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
@@ -20,7 +24,7 @@ class CourseGradesAddButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: CourseGradesColors.darkPurple,
+          backgroundColor: this.context.colorPrimaryDark,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -28,7 +32,7 @@ class CourseGradesAddButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           disabledBackgroundColor:
-              CourseGradesColors.darkPurple.withOpacity(0.6),
+              this.context.colorPrimaryDark.withOpacity(0.6),
         ),
         child: isLoading
             ? const SizedBox(

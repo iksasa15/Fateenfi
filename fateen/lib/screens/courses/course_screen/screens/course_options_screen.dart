@@ -1,5 +1,6 @@
 // screens/course_options_screen.dart
 
+import 'package:fateen/core/constants/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/course_options_components.dart';
@@ -47,30 +48,30 @@ class CourseOptionsScreen extends StatelessWidget {
 
       // تكييف المساحة الداخلية - تقليل المساحة العلوية والسفلية
       final contentPadding = isWeb
-          ? EdgeInsets.symmetric(horizontal: 16, vertical: 6) // تقليل vertical
+          ? const EdgeInsets.symmetric(
+              horizontal: 16, vertical: 6) // تقليل vertical
           : isTablet
-              ? EdgeInsets.symmetric(horizontal: 14, vertical: 4)
-              : EdgeInsets.symmetric(horizontal: 12, vertical: 2);
+              ? const EdgeInsets.symmetric(horizontal: 14, vertical: 4)
+              : const EdgeInsets.symmetric(horizontal: 12, vertical: 2);
+
+      // تهيئة ألوان الخيارات
+      final optionColors = CourseOptionsComponents.getOptionColors(context);
 
       return Container(
         height: sheetHeight,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          color: context.colorSurface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           children: [
             // رأس البطاقة - تقليل المساحة الداخلية
-            Container(
-              child:
-                  CourseOptionsComponents.buildEnhancedHeader(course, context),
-              padding: EdgeInsets.only(bottom: 0), // تقليل padding
-            ),
+            CourseOptionsComponents.buildEnhancedHeader(course, context),
 
             // قائمة الخيارات وزر الحذف في قائمة واحدة
             Expanded(
               child: ListView(
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 // تقليل padding كثيراً
                 padding: EdgeInsets.only(
                   left: contentPadding.horizontal / 2,
@@ -81,10 +82,11 @@ class CourseOptionsScreen extends StatelessWidget {
                 children: [
                   // خيار التعديل
                   CourseOptionsComponents.buildEnhancedOptionTile(
+                    context: context,
                     title: _constants.editCourseTitle,
                     subtitle: _constants.editCourseDescription,
                     icon: Icons.edit_outlined,
-                    iconColor: CourseOptionsComponents.optionColors[0],
+                    iconColor: optionColors[0],
                     onTap: () {
                       Navigator.pop(context); // إغلاق نافذة الخيارات أولاً
 
@@ -103,10 +105,11 @@ class CourseOptionsScreen extends StatelessWidget {
 
                   // خيار الملفات
                   CourseOptionsComponents.buildEnhancedOptionTile(
+                    context: context,
                     title: _constants.filesTitle,
                     subtitle: _constants.filesDescription,
                     icon: Icons.file_copy_outlined,
-                    iconColor: CourseOptionsComponents.optionColors[1],
+                    iconColor: optionColors[1],
                     onTap: () {
                       Navigator.pop(context); // إغلاق نافذة الخيارات أولاً
 
@@ -125,10 +128,11 @@ class CourseOptionsScreen extends StatelessWidget {
 
                   // خيار الدرجات
                   CourseOptionsComponents.buildEnhancedOptionTile(
+                    context: context,
                     title: _constants.gradesTitle,
                     subtitle: _constants.gradesDescription,
                     icon: Icons.grade_outlined,
-                    iconColor: CourseOptionsComponents.optionColors[2],
+                    iconColor: optionColors[2],
                     onTap: () {
                       Navigator.pop(context); // إغلاق نافذة الخيارات أولاً
 
@@ -147,10 +151,11 @@ class CourseOptionsScreen extends StatelessWidget {
 
                   // خيار الإشعارات
                   CourseOptionsComponents.buildEnhancedOptionTile(
+                    context: context,
                     title: _constants.notificationsTitle,
                     subtitle: _constants.notificationsDescription,
                     icon: Icons.notifications_outlined,
-                    iconColor: CourseOptionsComponents.optionColors[3],
+                    iconColor: optionColors[3],
                     onTap: () {
                       Navigator.pop(context); // إغلاق نافذة الخيارات أولاً
 
@@ -169,6 +174,7 @@ class CourseOptionsScreen extends StatelessWidget {
 
                   // زر الحذف مباشرة بعد الإشعارات
                   CourseOptionsComponents.buildEnhancedDeleteButton(
+                    context: context, // إضافة معلمة context المفقودة
                     text: _constants.deleteButtonText,
                     onDelete: () {
                       // إظهار مربع حوار التأكيد

@@ -1,10 +1,12 @@
 // components/course_notifications_components.dart
 import 'package:flutter/material.dart';
 import '../constants/course_notifications_constants.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseNotificationsComponents {
   // عرض إشعارات معطلة
-  static Widget buildDisabledNotificationsView() {
+  static Widget buildDisabledNotificationsView(BuildContext context) {
     return Center(
       child: Column(
         children: [
@@ -12,7 +14,7 @@ class CourseNotificationsComponents {
           Icon(
             Icons.notifications_off_outlined,
             size: 60,
-            color: CourseNotificationsConstants.kLightPurple,
+            color: context.colorPrimaryLight,
           ),
           const SizedBox(height: 16),
           Text(
@@ -20,7 +22,7 @@ class CourseNotificationsComponents {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: CourseNotificationsConstants.kDarkPurple,
+              color: context.colorPrimaryDark,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -29,7 +31,7 @@ class CourseNotificationsComponents {
             CourseNotificationsConstants.notificationsDisabledHint,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: context.colorTextSecondary,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -40,6 +42,7 @@ class CourseNotificationsComponents {
 
   // بناء خيار مع مفتاح تبديل
   static Widget buildSwitchOption({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required bool value,
@@ -56,7 +59,7 @@ class CourseNotificationsComponents {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: CourseNotificationsConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -64,7 +67,7 @@ class CourseNotificationsComponents {
               subtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: value ? Colors.green : Colors.grey,
+                color: value ? context.colorSuccess : context.colorTextHint,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -72,7 +75,7 @@ class CourseNotificationsComponents {
         ),
         Switch(
           value: value,
-          activeColor: CourseNotificationsConstants.kDarkPurple,
+          activeColor: context.colorPrimaryDark,
           onChanged: onChanged,
         ),
       ],
@@ -81,6 +84,7 @@ class CourseNotificationsComponents {
 
   // بناء رقاقة اختيار
   static Widget buildChoiceChip({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required Function(bool) onSelected,
@@ -88,26 +92,23 @@ class CourseNotificationsComponents {
     return ChoiceChip(
       label: Text(
         label,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'SYMBIOAR+LT',
         ),
       ),
       selected: isSelected,
-      selectedColor: CourseNotificationsConstants.kLightPurple,
+      selectedColor: context.colorPrimaryPale,
       labelStyle: TextStyle(
-        color: isSelected
-            ? CourseNotificationsConstants.kDarkPurple
-            : Colors.black87,
+        color: isSelected ? context.colorPrimaryDark : context.colorTextPrimary,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         fontFamily: 'SYMBIOAR+LT',
       ),
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor:
+          context.isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: isSelected
-              ? CourseNotificationsConstants.kDarkPurple
-              : Colors.transparent,
+          color: isSelected ? context.colorPrimaryDark : Colors.transparent,
         ),
       ),
       onSelected: onSelected,
@@ -116,6 +117,7 @@ class CourseNotificationsComponents {
 
   // بناء زر رئيسي
   static Widget buildPrimaryButton({
+    required BuildContext context,
     required String text,
     required VoidCallback onPressed,
     IconData? icon,
@@ -125,7 +127,7 @@ class CourseNotificationsComponents {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: CourseNotificationsConstants.kDarkPurple,
+          backgroundColor: context.colorPrimaryDark,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -156,13 +158,14 @@ class CourseNotificationsComponents {
   }
 
   // بناء علامة السحب
-  static Widget buildDragHandle() {
+  static Widget buildDragHandle(BuildContext context) {
     return Center(
       child: Container(
         width: 40,
         height: 5,
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color:
+              context.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
           borderRadius: BorderRadius.circular(8),
         ),
       ),

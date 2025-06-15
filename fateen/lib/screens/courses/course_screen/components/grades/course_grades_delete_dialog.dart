@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../constants/grades/course_grades_constants.dart';
 import '../../constants/grades/course_grades_colors.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesDeleteDialog extends StatelessWidget {
   final String assignment;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   final bool isLoading;
+  final BuildContext context;
 
   const CourseGradesDeleteDialog({
     Key? key,
+    required this.context,
     required this.assignment,
     required this.onConfirm,
     required this.onCancel,
@@ -19,11 +23,13 @@ class CourseGradesDeleteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
+      backgroundColor: context.colorSurface,
+      title: Text(
         CourseGradesConstants.deleteConfirmTitle,
         style: TextStyle(
           fontFamily: 'SYMBIOAR+LT',
           fontWeight: FontWeight.bold,
+          color: context.colorTextPrimary,
         ),
       ),
       content: Column(
@@ -32,14 +38,16 @@ class CourseGradesDeleteDialog extends StatelessWidget {
           Text(
             CourseGradesConstants.deleteConfirmMessage
                 .replaceAll('%s', assignment),
-            style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
+            style: TextStyle(
+              fontFamily: 'SYMBIOAR+LT',
+              color: context.colorTextPrimary,
+            ),
           ),
           if (isLoading)
             const Padding(
               padding: EdgeInsets.only(top: 16.0),
               child: Center(
                 child: CircularProgressIndicator(
-                  color: CourseGradesColors.darkPurple,
                   strokeWidth: 2,
                 ),
               ),
@@ -49,20 +57,20 @@ class CourseGradesDeleteDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: isLoading ? null : onCancel,
-          child: const Text(
+          child: Text(
             CourseGradesConstants.cancelButton,
             style: TextStyle(
-              color: CourseGradesColors.textLightColor,
+              color: context.colorTextSecondary,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
         ),
         TextButton(
           onPressed: isLoading ? null : onConfirm,
-          child: const Text(
+          child: Text(
             CourseGradesConstants.deleteButton,
             style: TextStyle(
-              color: CourseGradesColors.errorColor,
+              color: context.colorError,
               fontWeight: FontWeight.bold,
               fontFamily: 'SYMBIOAR+LT',
             ),

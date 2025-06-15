@@ -6,6 +6,9 @@ import '../../../../models/course.dart';
 import '../components/course_add_components.dart';
 import '../constants/course_notifications_constants.dart';
 import '../controllers/course_notifications_controller.dart';
+// استيراد نظام الألوان
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseNotificationsScreen extends StatefulWidget {
   final Course course;
@@ -111,7 +114,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
               "حدث خطأ: $error",
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -151,7 +154,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                   .replaceAll("%d", successCount.toString()),
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -174,7 +177,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
               "لم يتم جدولة أي تذكير، حاول مرة أخرى لاحقاً",
               style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.orange,
+            backgroundColor: context.colorWarning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -202,11 +205,11 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
               0.45, // تقليل الارتفاع الأقصى من 0.8 إلى 0.6
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.colorSurface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: context.colorShadowColor,
               blurRadius: 15,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -223,7 +226,9 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: context.isDarkMode
+                      ? Colors.grey.shade700
+                      : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -251,16 +256,18 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                               width: 32, // تصغير حجم الزر
                               height: 32, // تصغير حجم الزر
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.colorSurface,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Colors.grey.shade200,
+                                  color: context.isDarkMode
+                                      ? Colors.grey.shade700
+                                      : Colors.grey.shade200,
                                   width: 1.0,
                                 ),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.close,
-                                color: Color(0xFF4338CA),
+                                color: context.colorPrimaryDark,
                                 size: 16, // تصغير حجم الأيقونة
                               ),
                             ),
@@ -271,19 +278,21 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6), // تقليل المساحة
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.colorSurface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: context.isDarkMode
+                                    ? Colors.grey.shade700
+                                    : Colors.grey.shade200,
                                 width: 1.0,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               "خيارات الإشعارات",
                               style: TextStyle(
                                 fontSize: 14, // تصغير حجم الخط
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4338CA),
+                                color: context.colorPrimaryDark,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -302,18 +311,18 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8), // تقليل المساحة
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colorSurface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF4338CA).withOpacity(0.1),
+                            color: context.colorPrimaryDark.withOpacity(0.1),
                             width: 1.0,
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.info_outline,
-                              color: Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               size: 16, // تصغير حجم الأيقونة
                             ),
                             const SizedBox(width: 6), // تقليل المساحة
@@ -323,7 +332,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                 style: TextStyle(
                                   fontSize: 12, // تصغير حجم الخط
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade800,
+                                  color: context.colorTextPrimary,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
@@ -344,10 +353,10 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                 bottom: 4, right: 4), // تقليل المساحة
                             child: Text(
                               "إعدادات الإشعارات",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13, // تصغير حجم الخط
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF374151),
+                                color: context.colorTextPrimary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -357,10 +366,11 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                           Container(
                             height: 45, // تقليل الارتفاع
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.colorSurface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: const Color(0xFF4338CA).withOpacity(0.2),
+                                color:
+                                    context.colorPrimaryDark.withOpacity(0.2),
                                 width: 1.0,
                               ),
                             ),
@@ -373,10 +383,10 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                   width: 28, // تصغير حجم الحاوية
                                   height: 28, // تصغير حجم الحاوية
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: context.colorSurface,
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                      color: const Color(0xFF4338CA)
+                                      color: context.colorPrimaryDark
                                           .withOpacity(0.1),
                                       width: 1.0,
                                     ),
@@ -386,8 +396,8 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                         ? Icons.notifications_active
                                         : Icons.notifications_off,
                                     color: _controller.notificationsEnabled
-                                        ? const Color(0xFF4338CA)
-                                        : Colors.grey,
+                                        ? context.colorPrimaryDark
+                                        : context.colorTextSecondary,
                                     size: 14, // تصغير حجم الأيقونة
                                   ),
                                 ),
@@ -401,8 +411,8 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                     style: TextStyle(
                                       fontSize: 13, // تصغير حجم الخط
                                       color: _controller.notificationsEnabled
-                                          ? Colors.green
-                                          : Colors.grey.shade600,
+                                          ? context.colorSuccess
+                                          : context.colorTextSecondary,
                                       fontFamily: 'SYMBIOAR+LT',
                                     ),
                                   ),
@@ -413,7 +423,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                   scale: 0.9, // تصغير حجم زر التبديل
                                   child: Switch(
                                     value: _controller.notificationsEnabled,
-                                    activeColor: const Color(0xFF4338CA),
+                                    activeColor: context.colorPrimaryDark,
                                     onChanged: (value) =>
                                         _handleToggleNotifications(),
                                   ),
@@ -436,10 +446,10 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                 bottom: 4, right: 4), // تقليل المساحة
                             child: Text(
                               "وقت المحاضرة",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13, // تصغير حجم الخط
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF374151),
+                                color: context.colorTextPrimary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -449,10 +459,11 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                           Container(
                             height: 45, // تقليل الارتفاع
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.colorSurface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: const Color(0xFF4338CA).withOpacity(0.2),
+                                color:
+                                    context.colorPrimaryDark.withOpacity(0.2),
                                 width: 1.0,
                               ),
                             ),
@@ -465,17 +476,17 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                   width: 28, // تصغير حجم الحاوية
                                   height: 28, // تصغير حجم الحاوية
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: context.colorSurface,
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                      color: const Color(0xFF4338CA)
+                                      color: context.colorPrimaryDark
                                           .withOpacity(0.1),
                                       width: 1.0,
                                     ),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.access_time,
-                                    color: Color(0xFF4338CA),
+                                    color: context.colorPrimaryDark,
                                     size: 14, // تصغير حجم الأيقونة
                                   ),
                                 ),
@@ -484,10 +495,10 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                 Expanded(
                                   child: Text(
                                     widget.course.lectureTime ?? "غير محدد",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13, // تصغير حجم الخط
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xFF374151),
+                                      color: context.colorTextPrimary,
                                       fontFamily: 'SYMBIOAR+LT',
                                     ),
                                   ),
@@ -510,10 +521,10 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                 bottom: 4, right: 4), // تقليل المساحة
                             child: Text(
                               "إرسال التذكير",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13, // تصغير حجم الخط
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF374151),
+                                color: context.colorTextPrimary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -523,10 +534,11 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                           Container(
                             height: 50, // تقليل الارتفاع
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.colorSurface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: const Color(0xFF4338CA).withOpacity(0.2),
+                                color:
+                                    context.colorPrimaryDark.withOpacity(0.2),
                                 width: 1.0,
                               ),
                             ),
@@ -547,6 +559,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                                       scale: 0.9, // تصغير حجم الخيارات
                                       child:
                                           CourseAddComponents.buildChoiceChip(
+                                        context: context,
                                         label: option,
                                         isSelected: isSelected,
                                         onSelected: (selected) =>
@@ -568,6 +581,7 @@ class _CourseNotificationsScreenState extends State<CourseNotificationsScreen> {
                       SizedBox(
                         height: 42, // تقليل ارتفاع الزر
                         child: CourseAddComponents.buildPrimaryButton(
+                          context: context,
                           text: "إرسال التذكير",
                           onPressed: _saveNotificationSettings,
                           isLoading: _isLoading,

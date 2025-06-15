@@ -2,50 +2,32 @@
 import 'package:flutter/material.dart';
 import '../constants/course_card_constants.dart';
 import '../../../../models/course.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseCardComponent {
-  // ألوان التطبيق
-  static const Color kPrimaryColor = Color(0xFF6366F1);
-  static const Color kLightPurple = Color(0xFFF5F3FF);
-  static const Color kMediumPurple = Color(0xFF6366F1);
-  static const Color kDarkPurple = Color(0xFF4338CA);
-  static const Color kTextColor = Color(0xFF374151);
-  static const Color kHintColor = Color(0xFF9CA3AF);
-  static const Color kBackgroundColor = Colors.white;
-  static const Color kShadowColor = Color(0x10000000);
-
-  // ألوان العناصر
-  static const List<Color> kIconBackgrounds = [
-    Color(0xFFF0F9FF), // أزرق فاتح
-    Color(0xFFFEF3F2), // أحمر فاتح
-    Color(0xFFF5F3FF), // بنفسجي فاتح
-  ];
-
-  static const List<Color> kIconColors = [
-    Color(0xFF0EA5E9), // أزرق
-    Color(0xFFF43F5E), // أحمر
-    Color(0xFF8B5CF6), // بنفسجي
-  ];
-
   /// بناء بطاقة المقرر بتصميم عصري ومتناسق
   static Widget buildCourseCard(BuildContext context, Course course, int index,
       VoidCallback onTap, Function(Course) onEdit, Function(Course) onDelete) {
     final daysString = course.days.join(' · ');
+    final isDarkMode = context.isDarkMode;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return Dismissible(
           key: Key(course.id ?? "course-${course.courseName}-$index"),
           background: _buildDismissibleBackground(
-            Colors.blue.shade50,
-            kPrimaryColor,
+            context,
+            context.colorPrimaryPale,
+            context.colorPrimaryDark,
             Icons.edit,
             EdgeInsets.only(right: 15),
             MainAxisAlignment.start,
           ),
           secondaryBackground: _buildDismissibleBackground(
-            Colors.red.shade50,
-            Colors.red,
+            context,
+            Colors.red.shade50.withOpacity(isDarkMode ? 0.2 : 1.0),
+            context.colorError,
             Icons.delete,
             EdgeInsets.only(left: 15),
             MainAxisAlignment.end,
@@ -86,11 +68,11 @@ class CourseCardComponent {
               duration: Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
               decoration: BoxDecoration(
-                color: kBackgroundColor,
+                color: context.colorSurface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: kShadowColor,
+                    color: context.colorShadow,
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                     spreadRadius: 0,
@@ -103,8 +85,8 @@ class CourseCardComponent {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
                   onTap: onTap,
-                  splashColor: kLightPurple,
-                  highlightColor: kLightPurple.withOpacity(0.3),
+                  splashColor: context.colorPrimaryPale,
+                  highlightColor: context.colorPrimaryPale.withOpacity(0.3),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
@@ -115,7 +97,7 @@ class CourseCardComponent {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // أيقونة المقرر مع تأثير بصري
-                            _buildCourseIcon(index),
+                            _buildCourseIcon(context, index),
                             SizedBox(width: 10),
 
                             // معلومات المقرر
@@ -128,7 +110,7 @@ class CourseCardComponent {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: kDarkPurple,
+                                      color: context.colorPrimaryDark,
                                       fontFamily: 'SYMBIOAR+LT',
                                       height: 1.2,
                                     ),
@@ -140,10 +122,11 @@ class CourseCardComponent {
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: kLightPurple,
+                                      color: context.colorPrimaryPale,
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                        color: kPrimaryColor.withOpacity(0.2),
+                                        color: context.colorPrimaryLight
+                                            .withOpacity(0.2),
                                         width: 1,
                                       ),
                                     ),
@@ -152,7 +135,7 @@ class CourseCardComponent {
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
-                                        color: kPrimaryColor,
+                                        color: context.colorPrimaryLight,
                                         fontFamily: 'SYMBIOAR+LT',
                                       ),
                                     ),
@@ -170,9 +153,9 @@ class CourseCardComponent {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.grey.shade50,
-                                Colors.grey.shade200,
-                                Colors.grey.shade50,
+                                context.colorDivider.withOpacity(0.3),
+                                context.colorDivider,
+                                context.colorDivider.withOpacity(0.3),
                               ],
                             ),
                           ),
@@ -195,17 +178,41 @@ class CourseCardComponent {
   }
 
   // أيقونة المقرر مع تأثير - حجم أصغر
-  static Widget _buildCourseIcon(int index) {
-    final colorIndex = index % kIconBackgrounds.length;
+  static Widget _buildCourseIcon(BuildContext context, int index) {
+    final List<Color> iconBackgrounds = context.isDarkMode
+        ? [
+            context.colorPrimary.withOpacity(0.2),
+            context.colorError.withOpacity(0.2),
+            context.colorPrimaryLight.withOpacity(0.2),
+          ]
+        : [
+            Color(0xFFF0F9FF), // أزرق فاتح
+            Color(0xFFFEF3F2), // أحمر فاتح
+            Color(0xFFF5F3FF), // بنفسجي فاتح
+          ];
+
+    final List<Color> iconColors = context.isDarkMode
+        ? [
+            context.colorInfo,
+            context.colorError,
+            context.colorPrimaryLight,
+          ]
+        : [
+            Color(0xFF0EA5E9), // أزرق
+            Color(0xFFF43F5E), // أحمر
+            Color(0xFF8B5CF6), // بنفسجي
+          ];
+
+    final colorIndex = index % iconBackgrounds.length;
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: kIconBackgrounds[colorIndex],
+        color: iconBackgrounds[colorIndex],
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: kIconColors[colorIndex].withOpacity(0.15),
+            color: iconColors[colorIndex].withOpacity(0.15),
             blurRadius: 8,
             spreadRadius: 0,
             offset: Offset(0, 2),
@@ -220,7 +227,7 @@ class CourseCardComponent {
             width: 22,
             height: 22,
             decoration: BoxDecoration(
-              color: kIconColors[colorIndex].withOpacity(0.1),
+              color: iconColors[colorIndex].withOpacity(0.1),
               shape: BoxShape.circle,
             ),
           ),
@@ -230,7 +237,7 @@ class CourseCardComponent {
               Icons.book,
               Icons.auto_stories
             ][colorIndex],
-            color: kIconColors[colorIndex],
+            color: iconColors[colorIndex],
             size: 20,
           ),
         ],
@@ -253,6 +260,7 @@ class CourseCardComponent {
           Expanded(
             flex: isSmallScreen ? 4 : 3,
             child: _buildEnhancedDetailItem(
+              context,
               Icons.calendar_today_rounded,
               CourseCardConstants.daysLabel,
               daysString.isEmpty
@@ -267,6 +275,7 @@ class CourseCardComponent {
           Expanded(
             flex: isSmallScreen ? 3 : 3,
             child: _buildEnhancedDetailItem(
+              context,
               Icons.access_time_rounded,
               CourseCardConstants.timeLabel,
               course.lectureTime ?? CourseCardConstants.undefinedLabel,
@@ -279,6 +288,7 @@ class CourseCardComponent {
           Expanded(
             flex: isSmallScreen ? 3 : 3,
             child: _buildEnhancedDetailItem(
+              context,
               Icons.location_on_rounded,
               CourseCardConstants.roomLabel,
               course.classroom.isEmpty
@@ -293,14 +303,38 @@ class CourseCardComponent {
   }
 
   // عنصر تفاصيل محسن بتصميم أصغر
-  static Widget _buildEnhancedDetailItem(
-      IconData icon, String label, String value, int colorIndex) {
+  static Widget _buildEnhancedDetailItem(BuildContext context, IconData icon,
+      String label, String value, int colorIndex) {
+    final List<Color> iconBackgrounds = context.isDarkMode
+        ? [
+            context.colorPrimary.withOpacity(0.2),
+            context.colorError.withOpacity(0.2),
+            context.colorPrimaryLight.withOpacity(0.2),
+          ]
+        : [
+            Color(0xFFF0F9FF), // أزرق فاتح
+            Color(0xFFFEF3F2), // أحمر فاتح
+            Color(0xFFF5F3FF), // بنفسجي فاتح
+          ];
+
+    final List<Color> iconColors = context.isDarkMode
+        ? [
+            context.colorInfo,
+            context.colorError,
+            context.colorPrimaryLight,
+          ]
+        : [
+            Color(0xFF0EA5E9), // أزرق
+            Color(0xFFF43F5E), // أحمر
+            Color(0xFF8B5CF6), // بنفسجي
+          ];
+
     return Container(
       decoration: BoxDecoration(
-        color: kIconBackgrounds[colorIndex].withOpacity(0.6),
+        color: iconBackgrounds[colorIndex].withOpacity(0.6),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: kIconColors[colorIndex].withOpacity(0.15),
+          color: iconColors[colorIndex].withOpacity(0.15),
           width: 1,
         ),
       ),
@@ -314,7 +348,7 @@ class CourseCardComponent {
               Icon(
                 icon,
                 size: 12,
-                color: kIconColors[colorIndex],
+                color: iconColors[colorIndex],
               ),
               SizedBox(width: 3),
               Text(
@@ -322,7 +356,7 @@ class CourseCardComponent {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                  color: kIconColors[colorIndex],
+                  color: iconColors[colorIndex],
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -336,7 +370,7 @@ class CourseCardComponent {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: kTextColor,
+              color: context.colorTextPrimary,
               fontFamily: 'SYMBIOAR+LT',
               height: 1.2,
             ),
@@ -350,6 +384,7 @@ class CourseCardComponent {
 
   // خلفية للسحب بحجم أصغر
   static Widget _buildDismissibleBackground(
+    BuildContext context,
     Color backgroundColor,
     Color iconColor,
     IconData icon,
@@ -376,11 +411,9 @@ class CourseCardComponent {
     );
   }
 
-  // باقي الكود كما هو...
   static Widget buildEmptyCoursesView(BuildContext context,
       {VoidCallback? onAddCourse}) {
     return LayoutBuilder(builder: (context, constraints) {
-      // تحقق من حجم الشاشة للتكيف مع مختلف الأجهزة
       final screenHeight = MediaQuery.of(context).size.height;
       final imageSize = constraints.maxWidth > 600 ? 150.0 : 120.0;
 
@@ -403,11 +436,11 @@ class CourseCardComponent {
                         width: imageSize,
                         height: imageSize,
                         decoration: BoxDecoration(
-                          color: kLightPurple,
+                          color: context.colorPrimaryPale,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: kPrimaryColor.withOpacity(0.2),
+                              color: context.colorPrimary.withOpacity(0.2),
                               blurRadius: 15,
                               spreadRadius: 1,
                             ),
@@ -417,7 +450,7 @@ class CourseCardComponent {
                           child: Icon(
                             Icons.school_rounded,
                             size: imageSize * 0.5,
-                            color: kPrimaryColor,
+                            color: context.colorPrimary,
                           ),
                         ),
                       ),
@@ -430,7 +463,7 @@ class CourseCardComponent {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: kDarkPurple,
+                    color: context.colorPrimaryDark,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                   textAlign: TextAlign.center,
@@ -442,7 +475,7 @@ class CourseCardComponent {
                     CourseCardConstants.addCoursesHint,
                     style: TextStyle(
                       fontSize: 14,
-                      color: kHintColor,
+                      color: context.colorTextHint,
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.5,
                     ),
@@ -462,7 +495,7 @@ class CourseCardComponent {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: context.colorPrimary,
                       foregroundColor: Colors.white,
                       padding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 12),

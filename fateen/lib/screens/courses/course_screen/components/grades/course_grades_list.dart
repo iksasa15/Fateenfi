@@ -4,15 +4,19 @@ import 'package:flutter/material.dart';
 import '../../../../../models/course.dart';
 import '../../constants/grades/course_grades_colors.dart';
 import '../../controllers/course_grades_controller.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesList extends StatelessWidget {
   final Course course;
   final CourseGradesController controller;
   final Function(String, double, double) onEditGrade;
   final Function(String) onDeleteGrade;
+  final BuildContext context;
 
   const CourseGradesList({
     Key? key,
+    required this.context,
     required this.course,
     required this.controller,
     required this.onEditGrade,
@@ -106,14 +110,16 @@ class CourseGradesList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: CourseGradesColors.borderColor,
+          color: context.isDarkMode
+              ? Colors.grey.shade700.withOpacity(0.5)
+              : Colors.grey.shade200,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: context.colorShadowColor,
             blurRadius: 4,
             spreadRadius: 0,
             offset: const Offset(0, 2),
@@ -127,17 +133,19 @@ class CourseGradesList extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: CourseGradesColors.lightPurple,
+              color: context.colorPrimaryLight,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: CourseGradesColors.borderLightPurple,
+                color: context.isDarkMode
+                    ? context.colorPrimary.withOpacity(0.3)
+                    : context.colorPrimaryLight.withOpacity(0.7),
               ),
             ),
             child: Center(
               child: Icon(
                 assignmentIcon,
                 size: 22,
-                color: CourseGradesColors.darkPurple,
+                color: context.colorPrimaryDark,
               ),
             ),
           ),
@@ -152,10 +160,11 @@ class CourseGradesList extends StatelessWidget {
                 Text(
                   assignment,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'SYMBIOAR+LT',
+                    color: context.colorTextPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -167,7 +176,7 @@ class CourseGradesList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
-                        color: CourseGradesColors.textLightColor,
+                        color: context.colorTextSecondary,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -178,7 +187,9 @@ class CourseGradesList extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: percentage / 100,
-                          backgroundColor: Colors.grey.shade200,
+                          backgroundColor: context.isDarkMode
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade200,
                           valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
                           minHeight: 4,
                         ),
@@ -213,9 +224,9 @@ class CourseGradesList extends StatelessWidget {
                 child: IconButton(
                   onPressed: () =>
                       onEditGrade(assignment, actualGrade, maxGrade),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.edit_outlined,
-                    color: CourseGradesColors.darkPurple,
+                    color: context.colorPrimaryDark,
                     size: 20,
                   ),
                   padding: EdgeInsets.zero,
@@ -224,7 +235,7 @@ class CourseGradesList extends StatelessWidget {
                     minHeight: 36,
                   ),
                   tooltip: 'تعديل',
-                  splashColor: CourseGradesColors.lightPurple,
+                  splashColor: context.colorPrimaryLight,
                 ),
               ),
 
@@ -235,9 +246,9 @@ class CourseGradesList extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: IconButton(
                   onPressed: () => onDeleteGrade(assignment),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.delete_outline,
-                    color: CourseGradesColors.accentColor,
+                    color: context.colorError,
                     size: 20,
                   ),
                   padding: EdgeInsets.zero,
@@ -246,7 +257,7 @@ class CourseGradesList extends StatelessWidget {
                     minHeight: 36,
                   ),
                   tooltip: 'حذف',
-                  splashColor: CourseGradesColors.accentColor.withOpacity(0.1),
+                  splashColor: context.colorError.withOpacity(0.1),
                 ),
               ),
             ],

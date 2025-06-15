@@ -24,6 +24,10 @@ import '../../../../models/course.dart';
 // استدعاء شاشة خيارات المقرر الجديدة
 import 'screens/course_options_screen.dart';
 
+// استدعاء ملفات الألوان والأبعاد
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
+
 class CourseScreen extends StatefulWidget {
   const CourseScreen({Key? key}) : super(key: key);
 
@@ -131,7 +135,7 @@ class _CourseScreenState extends State<CourseScreen> {
               CourseCardConstants.deleteSuccess,
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -148,7 +152,7 @@ class _CourseScreenState extends State<CourseScreen> {
               CourseCardConstants.deleteError,
               style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -180,11 +184,11 @@ class _CourseScreenState extends State<CourseScreen> {
                   maxHeight: MediaQuery.of(context).size.height * 0.75,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colorSurface,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: context.colorShadowColor,
                       blurRadius: 15,
                       spreadRadius: 0,
                       offset: const Offset(0, 4),
@@ -206,12 +210,14 @@ class _CourseScreenState extends State<CourseScreen> {
                       children: [
                         // استدعاء بناء شريط الأدوات مع العنوان
                         CourseAddComponents.buildToolbar(
+                          context: context, // إضافة السياق
                           title: courseAddConstants.addCourseTitle,
                           onBackPressed: () => Navigator.pop(ctx),
                         ),
 
                         // استدعاء بناء حقول الاسم والساعات
                         CourseAddComponents.buildRowFields(
+                          context: context, // إضافة السياق
                           mainController: _nameController,
                           mainLabel: courseAddConstants.courseNameLabel,
                           mainError: _nameError,
@@ -225,6 +231,7 @@ class _CourseScreenState extends State<CourseScreen> {
 
                         // استدعاء بناء حقل القاعة
                         CourseAddComponents.buildTextField(
+                          context: context, // إضافة السياق
                           controller: _classroomController,
                           labelText: courseAddConstants.classroomLabel,
                           errorText: _classroomError,
@@ -237,6 +244,7 @@ class _CourseScreenState extends State<CourseScreen> {
                           children: [
                             // قسم أيام المحاضرة
                             CourseAddComponents.buildDaysSection(
+                              context: context, // إضافة السياق
                               selectedDays: _selectedDays,
                               onDaySelected: (day, selected) {
                                 setModalState(() {
@@ -263,8 +271,9 @@ class _CourseScreenState extends State<CourseScreen> {
                                     top: 4, right: 4, bottom: 8),
                                 child: Text(
                                   _daysError!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFEC4899), // kAccentColor
+                                  style: TextStyle(
+                                    color: context
+                                        .colorError, // استخدام لون الخطأ الديناميكي
                                     fontSize: 12,
                                     fontFamily: 'SYMBIOAR+LT',
                                   ),
@@ -280,6 +289,7 @@ class _CourseScreenState extends State<CourseScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CourseAddComponents.buildTimePicker(
+                              context: context, // إضافة السياق
                               selectedTime: _selectedTimeString,
                               onTap: () async {
                                 // استدعاء عرض منتقي الوقت
@@ -289,31 +299,43 @@ class _CourseScreenState extends State<CourseScreen> {
                                   builder: (context, child) {
                                     return Theme(
                                       data: Theme.of(context).copyWith(
-                                        colorScheme: const ColorScheme.light(
-                                          primary: Color(0xFF4338CA),
+                                        colorScheme: ColorScheme.light(
+                                          primary: context.colorPrimaryDark,
                                           onPrimary: Colors.white,
-                                          onSurface: Color(0xFF374151),
-                                          surface: Colors.white,
+                                          onSurface: context.colorTextPrimary,
+                                          surface: context.colorSurface,
+                                        ).copyWith(
+                                          // تخصيص الألوان للوضع الداكن
+                                          brightness: context.isDarkMode
+                                              ? Brightness.dark
+                                              : Brightness.light,
                                         ),
                                         timePickerTheme: TimePickerThemeData(
                                           hourMinuteTextColor: Colors.white,
-                                          hourMinuteColor: Color(0xFF4338CA),
-                                          dayPeriodTextColor: Color(0xFF374151),
-                                          dayPeriodColor: Color(0xFFF5F3FF),
-                                          dialBackgroundColor: Colors.white,
-                                          dialHandColor: Color(0xFF4338CA),
-                                          dialTextColor: Color(0xFF374151),
-                                          entryModeIconColor: Color(0xFF4338CA),
+                                          hourMinuteColor:
+                                              context.colorPrimaryDark,
+                                          dayPeriodTextColor:
+                                              context.colorTextPrimary,
+                                          dayPeriodColor:
+                                              context.colorPrimaryPale,
+                                          dialBackgroundColor:
+                                              context.colorSurface,
+                                          dialHandColor:
+                                              context.colorPrimaryDark,
+                                          dialTextColor:
+                                              context.colorTextPrimary,
+                                          entryModeIconColor:
+                                              context.colorPrimaryDark,
                                           cancelButtonStyle: ButtonStyle(
                                             foregroundColor:
                                                 MaterialStateProperty.all(
-                                              Color(0xFF4338CA),
+                                              context.colorPrimaryDark,
                                             ),
                                           ),
                                           confirmButtonStyle: ButtonStyle(
                                             foregroundColor:
                                                 MaterialStateProperty.all(
-                                              Color(0xFF4338CA),
+                                              context.colorPrimaryDark,
                                             ),
                                           ),
                                         ),
@@ -321,7 +343,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                           style: ButtonStyle(
                                             foregroundColor:
                                                 MaterialStateProperty.all(
-                                                    Color(0xFF4338CA)),
+                                                    context.colorPrimaryDark),
                                           ),
                                         ),
                                       ),
@@ -353,8 +375,9 @@ class _CourseScreenState extends State<CourseScreen> {
                                     top: 4, right: 4, bottom: 8),
                                 child: Text(
                                   _timeError!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFEC4899), // kAccentColor
+                                  style: TextStyle(
+                                    color: context
+                                        .colorError, // استخدام لون الخطأ الديناميكي
                                     fontSize: 12,
                                     fontFamily: 'SYMBIOAR+LT',
                                   ),
@@ -367,6 +390,7 @@ class _CourseScreenState extends State<CourseScreen> {
 
                         // استدعاء بناء زر الإضافة
                         CourseAddComponents.buildPrimaryButton(
+                          context: context, // إضافة السياق
                           text: courseAddConstants.addButton,
                           icon: Icons.add_circle,
                           isLoading: _addController.isLoading,
@@ -449,7 +473,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                       style: const TextStyle(
                                           fontFamily: 'SYMBIOAR+LT'),
                                     ),
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: context.colorSuccess,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -466,7 +490,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                     style: const TextStyle(
                                         fontFamily: 'SYMBIOAR+LT'),
                                   ),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: context.colorError,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -515,11 +539,11 @@ class _CourseScreenState extends State<CourseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFF),
+      backgroundColor: context.colorBackground,
       // استدعاء إنشاء زر عائم
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddCourseSheet,
-        backgroundColor: const Color(0xFF4338CA),
+        backgroundColor: context.colorPrimaryDark,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -541,7 +565,7 @@ class _CourseScreenState extends State<CourseScreen> {
                     CourseHeaderComponent.buildHeader(
                         context, _headerController),
                     // استدعاء بناء الفاصل
-                    CourseHeaderComponent.buildDivider(),
+                    CourseHeaderComponent.buildDivider(context),
                   ],
                 );
               },
@@ -554,9 +578,9 @@ class _CourseScreenState extends State<CourseScreen> {
                 builder: (context, child) {
                   // استدعاء عرض مؤشر التحميل
                   if (_courseCardController.isLoading) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF4338CA),
+                        color: context.colorPrimaryDark,
                       ),
                     );
                   }

@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import '../constants/course_header_constants.dart';
 import '../controllers/course_header_controller.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseHeaderComponent {
   /// بناء هيدر المقررات مع وضع مساحة مخصصة تحاكي وجود أيقونة الجدول
@@ -15,7 +17,7 @@ class CourseHeaderComponent {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(padding),
-      color: Colors.white,
+      color: context.colorSurface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -27,7 +29,7 @@ class CourseHeaderComponent {
             style: TextStyle(
               fontSize: titleSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF374151),
+              color: context.colorTextPrimary,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -47,12 +49,12 @@ class CourseHeaderComponent {
   }
 
   /// بناء خط فاصل بعد الهيدر
-  static Widget buildDivider() {
+  static Widget buildDivider(BuildContext context) {
     // استخدام نفس خصائص الخط في صفحة الجدول
     return Container(
       height: 1,
       width: double.infinity,
-      color: Colors.grey.shade200,
+      color: context.colorDivider,
       margin: EdgeInsets.zero,
       padding: EdgeInsets.zero,
     );

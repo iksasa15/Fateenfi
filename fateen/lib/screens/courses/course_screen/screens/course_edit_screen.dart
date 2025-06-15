@@ -5,6 +5,9 @@ import '../../../../models/course.dart';
 import '../components/course_edit_components.dart';
 import '../controllers/course_edit_controller.dart';
 import '../constants/course_edit_constants.dart';
+// استيراد نظام الألوان
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseEditScreen extends StatefulWidget {
   final Course course;
@@ -67,11 +70,11 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
           maxHeight: MediaQuery.of(context).size.height * 0.75,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.colorSurface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: context.colorShadowColor,
               blurRadius: 15,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -96,12 +99,14 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                   children: [
                     // استدعاء بناء شريط الأدوات مع العنوان
                     CourseEditComponents.buildToolbar(
+                      context: context, // إضافة السياق
                       title: CourseEditConstants.editCourseTitle,
                       onBackPressed: () => Navigator.pop(context),
                     ),
 
                     // استدعاء بناء حقول الاسم والساعات
                     CourseEditComponents.buildRowFields(
+                      context: context, // إضافة السياق
                       mainController: _nameController,
                       mainLabel: CourseEditConstants.courseNameLabel,
                       mainError: _nameError,
@@ -115,6 +120,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
 
                     // استدعاء بناء حقل القاعة
                     CourseEditComponents.buildTextField(
+                      context: context, // إضافة السياق
                       controller: _classroomController,
                       labelText: CourseEditConstants.classroomLabel,
                       icon: Icons.location_on_outlined,
@@ -126,6 +132,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                       children: [
                         // قسم أيام المحاضرة
                         CourseEditComponents.buildDaysSection(
+                          context: context, // إضافة السياق
                           selectedDays: _selectedDays,
                           onDaySelected: (day, selected) {
                             setState(() {
@@ -151,8 +158,8 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                 top: 4, right: 4, bottom: 8),
                             child: Text(
                               _daysError!,
-                              style: const TextStyle(
-                                color: CourseEditConstants.kAccentColor,
+                              style: TextStyle(
+                                color: context.colorError,
                                 fontSize: 12,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
@@ -168,6 +175,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CourseEditComponents.buildTimePicker(
+                          context: context, // إضافة السياق
                           selectedTime: _selectedTimeString,
                           onTap: () async {
                             // استدعاء عرض منتقي الوقت
@@ -184,32 +192,43 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                               builder: (context, child) {
                                 return Theme(
                                   data: Theme.of(context).copyWith(
-                                    colorScheme: const ColorScheme.light(
-                                      primary: CourseEditConstants.kDarkPurple,
+                                    colorScheme: ColorScheme.light(
+                                      primary: context.colorPrimaryDark,
                                       onPrimary: Colors.white,
-                                      onSurface: Color(0xFF374151),
-                                      surface: Colors.white,
+                                      onSurface: context.colorTextPrimary,
+                                      surface: context.colorSurface,
+                                    ).copyWith(
+                                      brightness: context.isDarkMode
+                                          ? Brightness.dark
+                                          : Brightness.light,
                                     ),
                                     timePickerTheme: TimePickerThemeData(
                                       hourMinuteTextColor: Colors.white,
-                                      hourMinuteColor:
-                                          CourseEditConstants.kDarkPurple,
-                                      dayPeriodTextColor: Color(0xFF374151),
-                                      dayPeriodColor:
-                                          CourseEditConstants.kLightPurple,
-                                      dialBackgroundColor: Colors.white,
-                                      dialHandColor:
-                                          CourseEditConstants.kDarkPurple,
-                                      dialTextColor: Color(0xFF374151),
+                                      hourMinuteColor: context.colorPrimaryDark,
+                                      dayPeriodTextColor:
+                                          context.colorTextPrimary,
+                                      dayPeriodColor: context.colorPrimaryLight,
+                                      dialBackgroundColor: context.colorSurface,
+                                      dialHandColor: context.colorPrimaryDark,
+                                      dialTextColor: context.colorTextPrimary,
                                       entryModeIconColor:
-                                          CourseEditConstants.kDarkPurple,
+                                          context.colorPrimaryDark,
+                                      cancelButtonStyle: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                context.colorPrimaryDark),
+                                      ),
+                                      confirmButtonStyle: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                context.colorPrimaryDark),
+                                      ),
                                     ),
                                     textButtonTheme: TextButtonThemeData(
                                       style: ButtonStyle(
                                         foregroundColor:
                                             MaterialStateProperty.all(
-                                                CourseEditConstants
-                                                    .kDarkPurple),
+                                                context.colorPrimaryDark),
                                       ),
                                     ),
                                   ),
@@ -238,8 +257,8 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                 top: 4, right: 4, bottom: 8),
                             child: Text(
                               _timeError!,
-                              style: const TextStyle(
-                                color: CourseEditConstants.kAccentColor,
+                              style: TextStyle(
+                                color: context.colorError,
                                 fontSize: 12,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
@@ -252,6 +271,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
 
                     // زر حفظ التغييرات
                     CourseEditComponents.buildPrimaryButton(
+                      context: context, // إضافة السياق
                       text: CourseEditConstants.saveButton,
                       icon: Icons.save,
                       isLoading: _controller.isLoading,
@@ -331,7 +351,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
             'تم تحديث المقرر بنجاح',
             style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: context.colorSuccess,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -349,7 +369,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
             'حدث خطأ أثناء تحديث المقرر',
             style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: context.colorError,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

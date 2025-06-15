@@ -14,6 +14,9 @@ import '../constants/grades/course_grades_constants.dart';
 import '../constants/grades/course_grades_colors.dart';
 import '../controllers/course_grades_controller.dart';
 import '../services/course_grades_helpers.dart';
+// استيراد نظام الألوان
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesScreen extends StatefulWidget {
   final Course course;
@@ -148,6 +151,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(builder: (context, setDialogState) {
         return CourseGradesDeleteDialog(
+          context: context, // إضافة السياق
           assignment: assignment,
           isLoading: _isDeleteLoading,
           onConfirm: () async {
@@ -211,6 +215,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
         elevation: 0,
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: CourseGradesDialog(
+          context: context, // إضافة السياق
           title: isEdit
               ? CourseGradesConstants.editGradeTitle
               : CourseGradesConstants.addGradeTitle,
@@ -253,11 +258,11 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                   maxHeight: MediaQuery.of(context).size.height * 0.75,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colorSurface,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
+                      color: context.colorShadowColor,
                       blurRadius: 16,
                       spreadRadius: 0,
                       offset: const Offset(0, 6),
@@ -273,10 +278,10 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.only(top: 12, bottom: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colorSurface,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: context.colorShadowColor.withOpacity(0.3),
                               blurRadius: 4,
                               offset: const Offset(0, 1),
                             ),
@@ -287,7 +292,9 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                             width: 40,
                             height: 5,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
+                              color: context.isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
@@ -303,6 +310,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                             children: [
                               // شريط العنوان المحسن (تم إزالة زر إظهار/إخفاء الملخص)
                               CourseGradesToolbar(
+                                context: context, // إضافة السياق
                                 title: CourseGradesConstants.gradesTabTitle,
                                 subtitle: "قم بإدارة درجات ${_courseName}",
                                 onBackPressed: () => Navigator.pop(context),
@@ -315,6 +323,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                                   height: 120,
                                   margin: const EdgeInsets.only(top: 12),
                                   child: CourseGradesSummary(
+                                    context: context, // إضافة السياق
                                     course: widget.course,
                                     controller: _controller,
                                   ),
@@ -325,8 +334,11 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                                 child: AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 300),
                                   child: widget.course.grades.isEmpty
-                                      ? const CourseGradesEmptyView()
+                                      ? CourseGradesEmptyView(
+                                          context: context, // إضافة السياق
+                                        )
                                       : CourseGradesList(
+                                          context: context, // إضافة السياق
                                           course: widget.course,
                                           controller: _controller,
                                           onEditGrade: _editGrade,
@@ -338,6 +350,7 @@ class _CourseGradesScreenState extends State<CourseGradesScreen>
                               // زر إضافة درجة جديدة
                               const SizedBox(height: 16),
                               CourseGradesAddButton(
+                                context: context, // إضافة السياق
                                 text: CourseGradesConstants.addGradeButton,
                                 onPressed: () {
                                   _resetForm();

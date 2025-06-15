@@ -4,17 +4,19 @@ import '../../../../models/app_file.dart';
 import '../../../../models/course.dart';
 import '../../../editors/pdf_editor_screen/pdf_editor_screen.dart';
 import '../../../editors/image_editor_screen/image_editor_screen.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseFilesComponents {
   // عرض القائمة الفارغة للملفات
-  static Widget buildEmptyFilesView() {
+  static Widget buildEmptyFilesView(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 32),
         Icon(
           Icons.folder_outlined,
           size: 60,
-          color: CourseFilesConstants.kLightPurple,
+          color: context.colorPrimaryLight,
         ),
         const SizedBox(height: 16),
         Text(
@@ -22,7 +24,7 @@ class CourseFilesComponents {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: CourseFilesConstants.kDarkPurple,
+            color: context.colorPrimaryDark,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -31,7 +33,7 @@ class CourseFilesComponents {
           CourseFilesConstants.addFilesHint,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey,
+            color: context.colorTextSecondary,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -42,6 +44,7 @@ class CourseFilesComponents {
 
   // بناء بطاقة ملف
   static Widget buildFileCard(
+    BuildContext context,
     AppFile file,
     VoidCallback onView,
     VoidCallback? onEdit,
@@ -71,7 +74,7 @@ class CourseFilesComponents {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: CourseFilesConstants.kLightPurple,
+        color: context.colorPrimaryPale,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -80,17 +83,19 @@ class CourseFilesComponents {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.colorSurface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: const Color(0xFFD8D2FF),
+                color: context.isDarkMode
+                    ? context.colorPrimaryLight.withOpacity(0.3)
+                    : const Color(0xFFD8D2FF),
               ),
             ),
             child: Center(
               child: Icon(
                 fileIcon,
                 size: 20,
-                color: CourseFilesConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
               ),
             ),
           ),
@@ -101,17 +106,18 @@ class CourseFilesComponents {
               children: [
                 Text(
                   file.fileName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'SYMBIOAR+LT',
+                    color: context.colorTextPrimary,
                   ),
                 ),
                 Text(
                   '${file.fileType} · ${file.fileSize} KB',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade700,
+                    color: context.colorTextSecondary,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -123,7 +129,7 @@ class CourseFilesComponents {
             onPressed: onView,
             icon: Icon(
               Icons.visibility_outlined,
-              color: CourseFilesConstants.kDarkPurple,
+              color: context.colorPrimaryDark,
               size: 20,
             ),
             padding: EdgeInsets.zero,
@@ -134,8 +140,10 @@ class CourseFilesComponents {
             icon: Icon(
               Icons.edit_note,
               color: isEditable
-                  ? CourseFilesConstants.kDarkPurple
-                  : Colors.grey.shade400,
+                  ? context.colorPrimaryDark
+                  : context.isDarkMode
+                      ? Colors.grey.shade600
+                      : Colors.grey.shade400,
               size: 20,
             ),
             tooltip: 'الكتابة على المستند',
@@ -146,7 +154,7 @@ class CourseFilesComponents {
             onPressed: onDelete,
             icon: Icon(
               Icons.delete_outline,
-              color: CourseFilesConstants.kAccentColor,
+              color: context.colorAccent,
               size: 20,
             ),
             padding: EdgeInsets.zero,
@@ -158,6 +166,7 @@ class CourseFilesComponents {
 
   // بناء شريط أدوات مخصص
   static Widget buildToolbar({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required VoidCallback onBackPressed,
@@ -165,7 +174,7 @@ class CourseFilesComponents {
     return Row(
       children: [
         // زر الرجوع
-        buildBackButton(onBackPressed),
+        buildBackButton(context, onBackPressed),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +184,7 @@ class CourseFilesComponents {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: CourseFilesConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -183,7 +192,7 @@ class CourseFilesComponents {
               subtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade700,
+                color: context.colorTextSecondary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -194,19 +203,19 @@ class CourseFilesComponents {
   }
 
   // بناء زر الرجوع
-  static Widget buildBackButton(VoidCallback onPressed) {
+  static Widget buildBackButton(BuildContext context, VoidCallback onPressed) {
     return Container(
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: CourseFilesConstants.kLightPurple,
+        color: context.colorPrimaryPale,
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(
           Icons.arrow_back_ios,
-          color: CourseFilesConstants.kDarkPurple,
+          color: context.colorPrimaryDark,
           size: 18,
         ),
         padding: EdgeInsets.zero,
@@ -215,13 +224,14 @@ class CourseFilesComponents {
   }
 
   // بناء علامة السحب
-  static Widget buildDragHandle() {
+  static Widget buildDragHandle(BuildContext context) {
     return Center(
       child: Container(
         width: 40,
         height: 5,
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color:
+              context.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -230,6 +240,7 @@ class CourseFilesComponents {
 
   // بناء زر رئيسي
   static Widget buildPrimaryButton({
+    required BuildContext context,
     required String text,
     required VoidCallback onPressed,
     IconData? icon,
@@ -239,7 +250,7 @@ class CourseFilesComponents {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: CourseFilesConstants.kDarkPurple,
+          backgroundColor: context.colorPrimaryDark,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -9,6 +9,9 @@ import '../constants/course_files_constants.dart';
 import '../controllers/course_files_controller.dart';
 import '../../../editors/pdf_editor_screen/pdf_editor_screen.dart';
 import '../../../editors/image_editor_screen/image_editor_screen.dart';
+// استيراد نظام الألوان
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class CourseFilesScreen extends StatefulWidget {
   final Course course;
@@ -27,16 +30,6 @@ class CourseFilesScreen extends StatefulWidget {
 class _CourseFilesScreenState extends State<CourseFilesScreen> {
   late CourseFilesController _controller;
   bool _isLoading = false;
-
-  // ألوان التطبيق الموحدة
-  final Color kDarkPurple = const Color(0xFF4338CA);
-  final Color kMediumPurple = const Color(0xFF6366F1);
-  final Color kLightPurple = const Color(0xFFF5F3FF);
-  final Color kAccentColor = const Color(0xFFEC4899);
-  final Color kBackgroundColor = const Color(0xFFFDFDFF);
-  final Color kShadowColor = const Color(0x0D221291);
-  final Color kTextColor = const Color(0xFF374151);
-  final Color kHintColor = const Color(0xFF9CA3AF);
 
   @override
   void initState() {
@@ -176,7 +169,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             child: Text(
               'إلغاء',
               style: TextStyle(
-                color: kHintColor,
+                color: context.colorTextSecondary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -205,7 +198,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             child: Text(
               'حذف',
               style: TextStyle(
-                color: kAccentColor,
+                color: context.colorError,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'SYMBIOAR+LT',
               ),
@@ -215,7 +208,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: context.colorSurface,
         elevation: 2,
       ),
     );
@@ -288,7 +281,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
       iconColor = Colors.purple;
     } else {
       fileIcon = Icons.insert_drive_file_outlined;
-      iconColor = Colors.grey;
+      iconColor = context.colorTextSecondary;
     }
 
     // اختصار اسم الملف إذا كان طويلاً
@@ -315,11 +308,11 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8), // تقليل المساحة
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius: BorderRadius.circular(14), // تقليل نصف القطر
         boxShadow: [
           BoxShadow(
-            color: kShadowColor,
+            color: context.colorShadowColor,
             blurRadius: 6, // تقليل التأثير
             offset: const Offset(0, 2),
           ),
@@ -340,7 +333,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                   width: 40, // تصغير الحجم
                   height: 40, // تصغير الحجم
                   decoration: BoxDecoration(
-                    color: kLightPurple,
+                    color: context.colorPrimaryLight,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -365,7 +358,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                         style: TextStyle(
                           fontSize: 14, // تصغير حجم الخط
                           fontWeight: FontWeight.bold,
-                          color: kTextColor,
+                          color: context.colorTextPrimary,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                         maxLines: 1,
@@ -381,7 +374,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2), // تقليل المساحة
                             decoration: BoxDecoration(
-                              color: kLightPurple,
+                              color: context.colorPrimaryLight,
                               borderRadius:
                                   BorderRadius.circular(4), // تقليل نصف القطر
                             ),
@@ -390,7 +383,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                               style: TextStyle(
                                 fontSize: 10, // تصغير حجم الخط
                                 fontWeight: FontWeight.bold,
-                                color: kDarkPurple,
+                                color: context.colorPrimaryDark,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -402,7 +395,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                             "${file.fileSize} KB",
                             style: TextStyle(
                               fontSize: 10, // تصغير حجم الخط
-                              color: kHintColor,
+                              color: context.colorTextSecondary,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -425,7 +418,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                     // زر الحذف
                     _buildCircularActionButton(
                       icon: Icons.delete_outline,
-                      color: kAccentColor,
+                      color: context.colorError,
                       onTap: () => _deleteFile(file),
                     ),
                   ],
@@ -456,7 +449,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         child: Center(
           child: Icon(
             icon,
-            color: color ?? kDarkPurple,
+            color: color ?? context.colorPrimaryDark,
             size: 18, // تصغير حجم الأيقونة
           ),
         ),
@@ -481,10 +474,12 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 6), // تقليل المساحة
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSurface,
                 borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
                 border: Border.all(
-                  color: Colors.grey.shade200,
+                  color: context.isDarkMode
+                      ? Colors.grey.shade700
+                      : Colors.grey.shade200,
                   width: 1.0,
                 ),
               ),
@@ -493,7 +488,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                 style: TextStyle(
                   fontSize: 14, // تصغير حجم الخط
                   fontWeight: FontWeight.bold,
-                  color: kDarkPurple,
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -511,14 +506,14 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           padding: const EdgeInsets.symmetric(
               horizontal: 12, vertical: 10), // تقليل المساحة
           decoration: BoxDecoration(
-            color: kLightPurple,
+            color: context.colorPrimaryLight,
             borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
           ),
           child: Row(
             children: [
               Icon(
                 Icons.info_outline,
-                color: kDarkPurple,
+                color: context.colorPrimaryDark,
                 size: 16, // تصغير حجم الأيقونة
               ),
               const SizedBox(width: 8), // تقليل المساحة
@@ -528,7 +523,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                   style: TextStyle(
                     fontSize: 12, // تصغير حجم الخط
                     fontWeight: FontWeight.w500,
-                    color: kTextColor,
+                    color: context.colorTextPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -550,17 +545,19 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         width: 34, // تصغير الحجم
         height: 34, // تصغير الحجم
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.colorSurface,
           borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: context.isDarkMode
+                ? Colors.grey.shade700
+                : Colors.grey.shade200,
             width: 1.0,
           ),
         ),
         child: Center(
           child: Icon(
             Icons.close,
-            color: kDarkPurple,
+            color: context.colorPrimaryDark,
             size: 18, // تصغير حجم الأيقونة
           ),
         ),
@@ -577,7 +574,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
         boxShadow: [
           BoxShadow(
-            color: kDarkPurple.withOpacity(0.2), // تقليل الظل
+            color: context.colorPrimaryDark.withOpacity(0.2), // تقليل الظل
             blurRadius: 6, // تقليل التأثير
             offset: const Offset(0, 2), // تقليل الإزاحة
           ),
@@ -588,9 +585,11 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
         child: ElevatedButton(
           onPressed: _isLoading ? null : _addNewFile,
           style: ElevatedButton.styleFrom(
-            backgroundColor: kDarkPurple,
+            backgroundColor: context.colorPrimaryDark,
             foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.grey.shade300,
+            disabledBackgroundColor: context.isDarkMode
+                ? Colors.grey.shade700
+                : Colors.grey.shade300,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
@@ -645,13 +644,13 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             width: 100, // تصغير الحجم
             height: 100, // تصغير الحجم
             decoration: BoxDecoration(
-              color: kLightPurple,
+              color: context.colorPrimaryLight,
               borderRadius: BorderRadius.circular(16), // تقليل نصف القطر
             ),
             child: Icon(
               Icons.folder_outlined,
               size: 48, // تصغير حجم الأيقونة
-              color: kMediumPurple,
+              color: context.colorPrimary,
             ),
           ),
           const SizedBox(height: 16), // تقليل المساحة
@@ -660,7 +659,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
             style: TextStyle(
               fontSize: 16, // تصغير حجم الخط
               fontWeight: FontWeight.bold,
-              color: kDarkPurple,
+              color: context.colorPrimaryDark,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -672,7 +671,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
               "قم بإضافة ملفات للمقرر من خلال الزر أدناه",
               style: TextStyle(
                 fontSize: 13, // تصغير حجم الخط
-                color: kHintColor,
+                color: context.colorTextSecondary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
               textAlign: TextAlign.center,
@@ -691,7 +690,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           message,
           style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
         ),
-        backgroundColor: kAccentColor,
+        backgroundColor: context.colorError,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
@@ -708,7 +707,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           message,
           style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: context.colorSuccess,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
@@ -725,7 +724,7 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
           message,
           style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
         ),
-        backgroundColor: kMediumPurple,
+        backgroundColor: context.colorPrimary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), // تقليل نصف القطر
@@ -756,11 +755,11 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
               0.65, // تقليل الارتفاع الأقصى من 0.75 إلى 0.65
         ),
         decoration: BoxDecoration(
-          color: kBackgroundColor,
+          color: context.colorBackground,
           borderRadius: BorderRadius.circular(16), // تقليل نصف القطر
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08), // تقليل شفافية الظل
+              color: context.colorShadowColor,
               blurRadius: 12, // تقليل التأثير
               spreadRadius: 0,
               offset: const Offset(0, 3), // تقليل الإزاحة
@@ -779,7 +778,9 @@ class _CourseFilesScreenState extends State<CourseFilesScreen> {
                     width: 40,
                     height: 4, // تقليل سمك علامة السحب
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: context.isDarkMode
+                          ? Colors.grey.shade700
+                          : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(2), // تقليل نصف القطر
                     ),
                   ),

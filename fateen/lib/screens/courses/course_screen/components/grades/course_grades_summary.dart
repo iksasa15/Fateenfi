@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../../../../../models/course.dart';
 import '../../constants/grades/course_grades_colors.dart';
 import '../../controllers/course_grades_controller.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesSummary extends StatelessWidget {
   final Course course;
@@ -11,9 +13,12 @@ class CourseGradesSummary extends StatelessWidget {
 
   const CourseGradesSummary({
     Key? key,
+    required this.context,
     required this.course,
     required this.controller,
   }) : super(key: key);
+
+  final BuildContext context;
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +33,20 @@ class CourseGradesSummary extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: context.colorShadowColor,
             blurRadius: 10,
             offset: const Offset(0, 3),
             spreadRadius: 1,
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: context.isDarkMode
+              ? Colors.grey.shade700.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -61,7 +68,9 @@ class CourseGradesSummary extends StatelessWidget {
                   CircularProgressIndicator(
                     value: averagePercentage / 100,
                     strokeWidth: 5,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade200,
                     valueColor: AlwaysStoppedAnimation<Color>(gradeColor),
                   ),
                   // الدائرة الداخلية
@@ -69,17 +78,19 @@ class CourseGradesSummary extends StatelessWidget {
                     height: 54,
                     width: 54,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colorSurface,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.05),
+                          color: context.colorShadowColor,
                           blurRadius: 4,
                           spreadRadius: 1,
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.grey.shade100,
+                        color: context.isDarkMode
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade100,
                         width: 1,
                       ),
                     ),
@@ -112,7 +123,7 @@ class CourseGradesSummary extends StatelessWidget {
                   Text(
                     'متوسط الدرجات',
                     style: TextStyle(
-                      color: CourseGradesColors.textColor,
+                      color: context.colorTextPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       fontFamily: 'SYMBIOAR+LT',
@@ -127,12 +138,12 @@ class CourseGradesSummary extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: CourseGradesColors.lightPurple,
+                          color: context.colorPrimaryLight,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.assignment_outlined,
-                          color: CourseGradesColors.darkPurple,
+                          color: context.colorPrimaryDark,
                           size: 14,
                         ),
                       ),
@@ -140,7 +151,7 @@ class CourseGradesSummary extends StatelessWidget {
                       Text(
                         'عدد التقييمات: $totalAssignments',
                         style: TextStyle(
-                          color: Colors.grey.shade700,
+                          color: context.colorTextSecondary,
                           fontSize: 13,
                           fontFamily: 'SYMBIOAR+LT',
                         ),

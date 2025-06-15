@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../constants/grades/course_grades_colors.dart';
+import '../../../../../core/constants/appColor.dart';
+import '../../../../../core/constants/app_dimensions.dart';
 
 class CourseGradesToolbar extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onBackPressed;
+  final BuildContext context;
 
   const CourseGradesToolbar({
     Key? key,
+    required this.context,
     required this.title,
     required this.subtitle,
     required this.onBackPressed,
@@ -29,16 +33,18 @@ class CourseGradesToolbar extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colorSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: CourseGradesColors.borderColor,
+                    color: context.isDarkMode
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade200,
                     width: 1.0,
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.close,
-                  color: CourseGradesColors.darkPurple,
+                  color: context.colorPrimaryDark,
                   size: 18,
                 ),
               ),
@@ -47,19 +53,21 @@ class CourseGradesToolbar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSurface,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: CourseGradesColors.borderColor,
+                  color: context.isDarkMode
+                      ? Colors.grey.shade700
+                      : Colors.grey.shade200,
                   width: 1.0,
                 ),
               ),
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: CourseGradesColors.darkPurple,
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -74,18 +82,18 @@ class CourseGradesToolbar extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.colorSurface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: CourseGradesColors.darkPurple.withOpacity(0.1),
+              color: context.colorPrimaryDark.withOpacity(0.1),
               width: 1.0,
             ),
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.info_outline,
-                color: CourseGradesColors.darkPurple,
+                color: context.colorPrimaryDark,
                 size: 18,
               ),
               const SizedBox(width: 8),
@@ -97,7 +105,7 @@ class CourseGradesToolbar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: CourseGradesColors.textColor,
+                    color: context.colorTextPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
