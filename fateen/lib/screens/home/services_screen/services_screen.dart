@@ -4,6 +4,8 @@ import 'controllers/service_card_controller.dart';
 import 'constants/services_constants.dart';
 import 'components/services_header_component_new.dart';
 import 'components/services_grid_component.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({Key? key}) : super(key: key);
@@ -37,7 +39,7 @@ class _ServicesScreenState extends State<ServicesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.colorBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -45,14 +47,13 @@ class _ServicesScreenState extends State<ServicesScreen>
             ServicesHeaderComponent.buildHeader(context),
 
             // خط فاصل
-            ServicesHeaderComponent.buildDivider(),
 
             // محتوى الصفحة
             Expanded(
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(AppDimensions.sectionPadding),
                   child: ServicesGridComponent(
                     servicesController: _servicesController,
                     cardController: _cardController,

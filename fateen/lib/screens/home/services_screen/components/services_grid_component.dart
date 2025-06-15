@@ -3,7 +3,8 @@ import '../controllers/services_controller.dart';
 import '../controllers/service_card_controller.dart';
 import '../constants/services_constants.dart';
 import '../components/service_card_component.dart';
-
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 class ServicesGridComponent extends StatelessWidget {
   final ServicesController servicesController;
   final ServiceCardController cardController;
@@ -19,12 +20,12 @@ class ServicesGridComponent extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(top: 16),
+      padding: EdgeInsets.only(top: AppDimensions.defaultSpacing),
       itemCount: ServicesConstants.services.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: AppDimensions.smallSpacing + 4,
+        mainAxisSpacing: AppDimensions.smallSpacing + 4,
         childAspectRatio: 1.0,
       ),
       itemBuilder: (context, index) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fateen/main.dart'; // استيراد AuthChecker و ThemeProvider
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -31,22 +33,22 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: context.colorBackground,
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(AppDimensions.sectionPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'الإعدادات',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: AppDimensions.titleFontSize,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: context.colorPrimary,
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: AppDimensions.extraLargeSpacing - 2),
 
                 // خيار تواصل معنا
                 _buildSettingItem(
@@ -78,8 +80,8 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text('تسجيل الخروج',
-                                style: TextStyle(color: Colors.red)),
+                            child: Text('تسجيل الخروج',
+                                style: TextStyle(color: context.colorError)),
                           ),
                         ],
                       ),
@@ -91,18 +93,21 @@ class SettingsScreen extends StatelessWidget {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    padding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.defaultSpacing - 1),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.shade300),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
+                      border: Border.all(
+                          color: context.colorError.withOpacity(0.6)),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         'تسجيل الخروج',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: AppDimensions.bodyFontSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                          color: context.colorError,
                         ),
                       ),
                     ),
@@ -127,24 +132,25 @@ class SettingsScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.smallSpacing + 4),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(AppDimensions.smallSpacing + 2),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+                color: context.colorPrimary.withOpacity(0.1),
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.smallRadius + 2),
               ),
               child: Icon(
                 icon,
-                color: Theme.of(context).primaryColor,
-                size: 24,
+                color: context.colorPrimary,
+                size: AppDimensions.iconSize,
               ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: AppDimensions.defaultSpacing - 1),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,20 +158,16 @@ class SettingsScreen extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppDimensions.bodyFontSize,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                      color: context.colorTextPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withOpacity(0.7),
+                      fontSize: AppDimensions.smallBodyFontSize,
+                      color: context.colorTextSecondary,
                     ),
                   ),
                 ],
@@ -175,8 +177,8 @@ class SettingsScreen extends StatelessWidget {
             trailing ??
                 Icon(
                   Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                  size: AppDimensions.extraSmallIconSize - 2,
+                  color: context.colorTextHint,
                 ),
           ],
         ),

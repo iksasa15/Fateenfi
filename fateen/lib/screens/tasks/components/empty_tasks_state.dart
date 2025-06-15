@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import '../constants/tasks_strings.dart';
 import '../constants/tasks_icons.dart';
- import '../../../core/constants/appColor.dart';
+import '../../../core/constants/appColor.dart';
 import '../../../core/constants/app_dimensions.dart';
 class EmptyTasksState extends StatelessWidget {
   final bool isFiltering;
