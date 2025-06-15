@@ -1,8 +1,11 @@
 // daily_schedule_view.dart
+import 'package:fateen/screens/courses/Schedule_screen/components/daily_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import '../controllers/daily_schedule_controller.dart';
 import '../components/daily_schedule_components.dart';
 import '../../../../models/course.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class DailyScheduleView extends StatefulWidget {
   final Function(Course course)? onCourseSelected;
@@ -58,7 +61,7 @@ class _DailyScheduleViewState extends State<DailyScheduleView>
       animation: _controller,
       builder: (context, _) {
         if (_controller.isLoading) {
-          return DailyScheduleComponents.buildShimmerLoading();
+          return DailyScheduleComponents.buildShimmerLoading(context);
         }
 
         return TabBarView(
@@ -68,23 +71,35 @@ class _DailyScheduleViewState extends State<DailyScheduleView>
             final courses = _controller.getCoursesForDaySorted(day);
 
             if (courses.isEmpty) {
-              return DailyScheduleComponents.buildEmptyDayView(day);
+              return DailyScheduleComponents.buildEmptyDayView(context, day);
             }
 
             return Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+              padding: EdgeInsets.symmetric(
+                horizontal:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                        2,
+              ),
               child: ListView.builder(
                 itemCount: courses.length,
-                padding: const EdgeInsets.only(bottom: 15.0),
+                padding: EdgeInsets.only(
+                    bottom: AppDimensions.getSpacing(context,
+                        size: SpacingSize.small)),
                 itemBuilder: (context, index) {
                   final course = courses[index];
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 15.0),
+                    padding: EdgeInsets.only(
+                        bottom: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small)),
                     child: DailyScheduleComponents.buildCourseCard(
+                      context,
                       course,
-                      _controller.courseColors[course.id] ?? Colors.grey[100]!,
-                      _controller.courseBorderColors[course.id] ?? Colors.grey,
+                      _controller.courseColors[course.id] ??
+                          context.colorPrimaryPale,
+                      _controller.courseBorderColors[course.id] ??
+                          context.colorPrimaryLight,
                       () {
                         if (widget.onCourseSelected != null) {
                           widget.onCourseSelected!(course);

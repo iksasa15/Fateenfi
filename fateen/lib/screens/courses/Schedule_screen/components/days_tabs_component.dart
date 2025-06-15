@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../constants/days_tabs_constants.dart';
 import '../controllers/days_tabs_controller.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class DaysTabsComponent {
   /// بناء تابات الأيام
   static Widget buildDaysTabs(BuildContext context,
       DaysTabsController controller, TabController tabController) {
     // ضبط الحجم ليكون متجاوبًا
-    final tabHeight =
-        DaysTabsConstants.getResponsiveSize(context, 35.0, 40.0, 45.0);
-    final fontSize =
-        DaysTabsConstants.getResponsiveSize(context, 12.0, 14.0, 16.0);
+    final tabHeight = AppDimensions.getButtonHeight(context,
+        size: ButtonSize.small, small: true);
+    final fontSize = AppDimensions.getLabelFontSize(context);
 
     // حساب عرض كل تاب بناءً على عرض الشاشة
     final screenWidth = MediaQuery.of(context).size.width;
     final horizontalPadding =
-        DaysTabsConstants.getResponsiveSize(context, 12.0, 16.0, 20.0);
+        AppDimensions.getSpacing(context, size: SpacingSize.small);
     final availableWidth = screenWidth - (horizontalPadding * 2);
     final tabWidth = availableWidth / controller.allDays.length;
 
@@ -25,26 +26,25 @@ class DaysTabsComponent {
       margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       height: tabHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         boxShadow: [
           BoxShadow(
-            color: DaysTabsConstants.kShadowColor,
+            color: context.colorShadow,
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         child: TabBar(
           controller: tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: DaysTabsConstants.kDarkPurple,
+          labelColor: context.colorSurface,
+          unselectedLabelColor: context.colorPrimaryDark,
           indicator: BoxDecoration(
-            color: DaysTabsConstants.kDarkPurple,
-            borderRadius:
-                BorderRadius.circular(DaysTabsConstants.tabBorderRadius),
+            color: context.colorPrimaryDark,
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
           tabs: controller.allDays.asMap().entries.map((entry) {
             final index = entry.key;
@@ -59,13 +59,18 @@ class DaysTabsComponent {
                 duration: DaysTabsConstants.tabAnimationDuration,
                 width: tabWidth - 1, // ترك مساحة صغيرة للتباعد
                 alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                padding: EdgeInsets.symmetric(
+                    vertical: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        4,
+                    horizontal: AppDimensions.getSpacing(context,
+                            size: SpacingSize.small) /
+                        4),
                 decoration: isToday && index != controller.selectedDayIndex
                     ? BoxDecoration(
-                        border:
-                            Border.all(color: DaysTabsConstants.kDarkPurple),
-                        borderRadius: BorderRadius.circular(
-                            DaysTabsConstants.tabBorderRadius),
+                        border: Border.all(color: context.colorPrimaryDark),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                       )
                     : null,
                 child: FittedBox(
@@ -93,35 +98,18 @@ class DaysTabsComponent {
   static Widget buildDaySummary(
       BuildContext context, DaysTabsController controller) {
     // استخدام دالة قياس حجم الشاشة
-    final titleSize = DaysTabsConstants.getResponsiveSize(
-      context,
-      14.0, // للشاشات الصغيرة
-      16.0, // للشاشات المتوسطة
-      18.0, // للشاشات الكبيرة
-    );
-
-    final countSize = DaysTabsConstants.getResponsiveSize(
-      context,
-      10.0, // للشاشات الصغيرة
-      12.0, // للشاشات المتوسطة
-      14.0, // للشاشات الكبيرة
-    );
-
-    final padding = DaysTabsConstants.getResponsiveSize(
-      context,
-      12.0, // للشاشات الصغيرة
-      15.0, // للشاشات المتوسطة
-      20.0, // للشاشات الكبيرة
-    );
+    final titleSize = AppDimensions.getSubtitleFontSize(context);
+    final countSize = AppDimensions.getLabelFontSize(context, small: true);
+    final padding = AppDimensions.getSpacing(context, size: SpacingSize.small);
 
     return AnimatedContainer(
       duration: DaysTabsConstants.animationDuration,
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSurface,
         boxShadow: [
           BoxShadow(
-            color: DaysTabsConstants.kShadowColor,
+            color: context.colorShadow,
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -137,7 +125,7 @@ class DaysTabsComponent {
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
-                color: DaysTabsConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: DaysTabsConstants.fontFamily,
               ),
               overflow: TextOverflow.ellipsis,
@@ -147,17 +135,17 @@ class DaysTabsComponent {
           Container(
             padding: EdgeInsets.symmetric(
               horizontal:
-                  DaysTabsConstants.getResponsiveSize(context, 8.0, 10.0, 12.0),
+                  AppDimensions.getSpacing(context, size: SpacingSize.small),
               vertical:
-                  DaysTabsConstants.getResponsiveSize(context, 4.0, 5.0, 6.0),
+                  AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                      2,
             ),
             decoration: BoxDecoration(
-              color: DaysTabsConstants.kLightPurple,
-              borderRadius:
-                  BorderRadius.circular(DaysTabsConstants.counterBorderRadius),
+              color: context.colorPrimaryPale,
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               boxShadow: [
                 BoxShadow(
-                  color: DaysTabsConstants.kShadowColor,
+                  color: context.colorShadow,
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
@@ -167,7 +155,7 @@ class DaysTabsComponent {
               '${controller.getCoursesCountForDay(controller.allDays[controller.selectedDayIndex])} ${DaysTabsConstants.lectureCountSuffix}',
               style: TextStyle(
                 fontSize: countSize,
-                color: DaysTabsConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontWeight: FontWeight.w500,
                 fontFamily: DaysTabsConstants.fontFamily,
               ),

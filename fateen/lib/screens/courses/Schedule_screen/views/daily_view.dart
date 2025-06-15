@@ -1,7 +1,10 @@
+import 'package:fateen/screens/courses/Schedule_screen/components/daily_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import '../controllers/daily_schedule_controller.dart';
 import '../components/daily_schedule_components.dart';
 import '../../../../models/course.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// عرض الجدول اليومي
 class DailyView extends StatelessWidget {
@@ -34,24 +37,32 @@ class DailyView extends StatelessWidget {
 
     // عرض رسالة في حال عدم وجود محاضرات
     if (courses.isEmpty) {
-      return DailyScheduleComponents.buildEmptyDayView(day);
+      return DailyScheduleComponents.buildEmptyDayView(context, day);
     }
 
     // عرض قائمة المحاضرات
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimensions.getSpacing(context, size: SpacingSize.small),
+        vertical:
+            AppDimensions.getSpacing(context, size: SpacingSize.small) / 2,
+      ),
       child: ListView.builder(
         itemCount: courses.length,
-        padding: const EdgeInsets.only(bottom: 15),
+        padding: EdgeInsets.only(
+            bottom: AppDimensions.getSpacing(context, size: SpacingSize.small)),
         itemBuilder: (context, index) {
           final course = courses[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 15),
+            padding: EdgeInsets.only(
+                bottom:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             child: DailyScheduleComponents.buildCourseCard(
+              context,
               course,
-              controller.courseColors[course.id] ?? const Color(0xFFF5F3FF),
+              controller.courseColors[course.id] ?? context.colorPrimaryPale,
               controller.courseBorderColors[course.id] ??
-                  const Color(0xFF6366F1),
+                  context.colorPrimaryLight,
               () => onCourseSelected?.call(course),
             ),
           );
@@ -78,7 +89,7 @@ class DailyView extends StatelessWidget {
   }
 
   /// إنشاء واجهة التحميل
-  static Widget buildLoadingView() {
-    return DailyScheduleComponents.buildShimmerLoading();
+  static Widget buildLoadingView(BuildContext context) {
+    return DailyScheduleComponents.buildShimmerLoading(context);
   }
 }

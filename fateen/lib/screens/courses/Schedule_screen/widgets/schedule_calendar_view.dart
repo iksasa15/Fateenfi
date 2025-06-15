@@ -5,6 +5,8 @@ import '../../../../models/course.dart';
 import '../constants/schedule_calendar_constants.dart';
 import '../components/schedule_calendar_components.dart';
 import '../controllers/schedule_calendar_view_controller.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class ScheduleCalendarView extends StatefulWidget {
   final Function(Course course, BuildContext context)? onCourseSelected;
@@ -34,7 +36,7 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
       animation: _controller,
       builder: (context, _) {
         if (_controller.isLoading) {
-          return ScheduleCalendarComponents.buildShimmerLoading();
+          return ScheduleCalendarComponents.buildShimmerLoading(context);
         }
 
         return _buildCalendarView(context);
@@ -46,22 +48,20 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
   Widget _buildCalendarView(BuildContext context) {
     // إذا لم تكن هناك محاضرات، أظهر رسالة
     if (_controller.allCourses.isEmpty) {
-      return ScheduleCalendarComponents.buildEmptyCoursesView();
+      return ScheduleCalendarComponents.buildEmptyCoursesView(context);
     }
 
     // إذا لم تكن هناك أوقات محاضرات، عرض رسالة للمستخدم
     if (_controller.timeSlots.isEmpty) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(ScheduleCalendarConstants.getResponsiveSize(
-              context, 20.0, 30.0, 40.0)),
+          padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
           child: Text(
             ScheduleCalendarConstants.noTimesMessage,
             style: TextStyle(
-              fontSize: ScheduleCalendarConstants.getResponsiveSize(
-                  context, 14.0, 16.0, 18.0),
-              color: Colors.grey.shade600,
-              fontFamily: 'SYMBIOAR+LT',
+              fontSize: AppDimensions.getBodyFontSize(context),
+              color: context.colorTextSecondary,
+              fontFamily: ScheduleCalendarConstants.fontFamily,
             ),
             textAlign: TextAlign.center,
           ),
@@ -69,31 +69,25 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
       );
     }
 
-    // تحسين تجاوب الجدول مع أحجام الشاشة المختلفة
-    final fontSize =
-        ScheduleCalendarConstants.getResponsiveSize(context, 16.0, 18.0, 20.0);
-    final paddingHorizontal =
-        ScheduleCalendarConstants.getResponsiveSize(context, 5.0, 10.0, 15.0);
-    final paddingVertical =
-        ScheduleCalendarConstants.getResponsiveSize(context, 10.0, 15.0, 20.0);
-
     return ListView(
       padding: EdgeInsets.symmetric(
-          vertical: paddingVertical, horizontal: paddingHorizontal),
+        vertical: AppDimensions.getSpacing(context, size: SpacingSize.small),
+        horizontal:
+            AppDimensions.getSpacing(context, size: SpacingSize.small) / 2,
+      ),
       children: [
         // عنوان الجدول
         Padding(
           padding: EdgeInsets.only(
-            bottom: ScheduleCalendarConstants.getResponsiveSize(
-                context, 15.0, 20.0, 25.0),
+            bottom: AppDimensions.getSpacing(context, size: SpacingSize.small),
           ),
           child: Text(
             ScheduleCalendarConstants.weeklyScheduleTitle,
             style: TextStyle(
-              fontSize: fontSize,
+              fontSize: AppDimensions.getSubtitleFontSize(context),
               fontWeight: FontWeight.bold,
-              color: ScheduleCalendarConstants.kDarkPurple,
-              fontFamily: 'SYMBIOAR+LT',
+              color: context.colorPrimaryDark,
+              fontFamily: ScheduleCalendarConstants.fontFamily,
             ),
             textAlign: TextAlign.center,
           ),
@@ -119,12 +113,13 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
           // تحديد عرض ثابت للجدول على الشاشات الصغيرة
           width: minRequiredWidth,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade200,
-                blurRadius: 6,
+                color: context.colorShadow,
+                blurRadius: 4,
+                spreadRadius: 0,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -133,7 +128,7 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
             children: [
               // صف عناوين الأيام
               ScheduleCalendarComponents.buildHeaderRow(
-                  _controller.allDays, _controller.englishDays),
+                  context, _controller.allDays, _controller.englishDays),
 
               // صفوف الأوقات
               ..._buildTimeRows(context),
@@ -145,12 +140,13 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
       // للشاشات الكبيرة نعرض الجدول عاديًا
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 6,
+              color: context.colorShadow,
+              blurRadius: 4,
+              spreadRadius: 0,
               offset: const Offset(0, 2),
             ),
           ],
@@ -159,7 +155,7 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
           children: [
             // صف عناوين الأيام
             ScheduleCalendarComponents.buildHeaderRow(
-                _controller.allDays, _controller.englishDays),
+                context, _controller.allDays, _controller.englishDays),
 
             // صفوف الأوقات
             ..._buildTimeRows(context),
@@ -172,8 +168,7 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
   /// بناء صفوف الجدول الزمني
   List<Widget> _buildTimeRows(BuildContext context) {
     // قياس ارتفاع الخلية حسب حجم الشاشة
-    final cellHeight =
-        ScheduleCalendarConstants.getResponsiveSize(context, 70.0, 80.0, 90.0);
+    final cellHeight = ScheduleCalendarConstants.rowHeight;
 
     return _controller.timeSlots.map((timeSlot) {
       final isCurrentTime = _controller.isCurrentTime(timeSlot);
@@ -181,17 +176,17 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
       return Container(
         height: cellHeight,
         decoration: BoxDecoration(
-          color: isCurrentTime
-              ? ScheduleCalendarConstants.kLightPurple.withOpacity(0.3)
-              : null,
-          border: const Border(
-            top: BorderSide(color: Color(0xFFEFEFEF)),
+          color:
+              isCurrentTime ? context.colorPrimaryPale.withOpacity(0.3) : null,
+          border: Border(
+            top: BorderSide(color: context.colorDivider),
           ),
         ),
         child: Row(
           children: [
             // خلية الوقت
-            ScheduleCalendarComponents.buildTimeCell(timeSlot, isCurrentTime),
+            ScheduleCalendarComponents.buildTimeCell(
+                context, timeSlot, isCurrentTime),
 
             // خلايا الأيام
             ..._controller.allDays.map((day) {
@@ -200,6 +195,7 @@ class _ScheduleCalendarViewState extends State<ScheduleCalendarView> {
 
               return Expanded(
                 child: ScheduleCalendarComponents.buildDayCell(
+                  context,
                   course,
                   isToday && isCurrentTime,
                   course != null ? _controller.courseColors[course.id] : null,

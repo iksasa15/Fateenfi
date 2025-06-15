@@ -1,23 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class DailyScheduleConstants {
-  // ألوان التطبيق الموحدة
-  static const Color kDarkPurple = Color(0xFF4338CA);
-  static const Color kMediumPurple = Color(0xFF6366F1);
-  static const Color kLightPurple = Color(0xFFF5F3FF);
-  static const Color kAccentColor = Color(0xFFEC4899);
-  static const Color kBackgroundColor = Color(0xFFFDFDFF);
-  static const Color kTextColor = Color(0xFF374151);
-  static const Color kHintColor = Color(0xFF9CA3AF);
-  static const Color kBorderColor = Color(0xFFE5E7EB);
-  static const Color kShadowColor = Color(0x0F000000);
-
-  // ثوابت الزوايا
-  static const double cardBorderRadius = 16.0;
-  static const double tabBorderRadius = 12.0;
-  static const double badgeBorderRadius = 30.0;
-  static const double detailIconBorderRadius = 8.0;
-
   // ثابت خط التطبيق
   static const String fontFamily = 'SYMBIOAR+LT';
 
@@ -29,7 +14,7 @@ class DailyScheduleConstants {
     Color(0xFFFFF3E0), // برتقالي فاتح
     Color(0xFFFFEBEE), // أحمر فاتح
     Color(0xFFE0F7FA), // سماوي فاتح
-    Color(0xFFFFF8E1), // أصفر فاتح
+    Color(0xFFF8E1), // أصفر فاتح
     Color(0xFFF1F8E9), // أخضر ليموني فاتح
     Color(0xFFE1F5FE), // أزرق فاتح آخر
     Color(0xFFFCE4EC), // وردي فاتح
@@ -58,7 +43,6 @@ class DailyScheduleConstants {
   static const String roomPrefix = 'القاعة:';
   static const String undefinedRoom = 'غير محدد';
   static const String undefinedTime = 'وقت غير محدد';
-  static const String emptyScheduleTitle = 'الجدول فارغ';
   static const String emptyScheduleMessage = 'لم تقم بإضافة أي محاضرات بعد';
 
   // أسماء عناصر واجهة التفاصيل
@@ -89,40 +73,4 @@ class DailyScheduleConstants {
     'Wednesday',
     'Thursday',
   ];
-
-  // ثوابت الأحجام المتجاوبة
-  static double getResponsiveSize(
-      BuildContext context, double small, double medium, double large) {
-    final width = MediaQuery.of(context).size.width;
-
-    if (width < 360) {
-      return small;
-    } else if (width < 600) {
-      return medium;
-    } else {
-      return large;
-    }
-  }
-
-  // دالة للحصول على ظل موحد
-  static List<BoxShadow> getUnifiedShadow() {
-    return [
-      BoxShadow(
-        color: kShadowColor,
-        blurRadius: 10,
-        offset: const Offset(0, 2),
-        spreadRadius: 0,
-      ),
-    ];
-  }
-
-  // دالة لحساب التباعد العمودي النسبي
-  static double getVerticalPadding(BuildContext context, double percentage) {
-    return MediaQuery.of(context).size.height * percentage / 100;
-  }
-
-  // دالة لحساب التباعد الأفقي النسبي
-  static double getHorizontalPadding(BuildContext context, double percentage) {
-    return MediaQuery.of(context).size.width * percentage / 100;
-  }
 }

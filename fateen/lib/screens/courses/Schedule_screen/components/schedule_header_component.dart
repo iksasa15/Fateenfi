@@ -1,44 +1,24 @@
 import 'package:flutter/material.dart';
 import '../constants/schedule_header_constants.dart';
 import '../controllers/schedule_view_controller.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// مكونات الهيدر الخاص بالجدول الدراسي
 class ScheduleHeaderComponent {
   /// بناء هيدر الجدول الدراسي
   static Widget buildHeader(BuildContext context,
       ScheduleViewController controller, VoidCallback? onRefresh) {
-    // استخدام دالة قياس حجم الشاشة
-    final titleSize = ScheduleHeaderConstants.getResponsiveSize(
-      context,
-      22.0, // للشاشات الصغيرة
-      26.0, // للشاشات المتوسطة
-      30.0, // للشاشات الكبيرة
-    );
-
-    final iconSize = ScheduleHeaderConstants.getResponsiveSize(
-      context,
-      18.0, // للشاشات الصغيرة
-      22.0, // للشاشات المتوسطة
-      26.0, // للشاشات الكبيرة
-    );
-
-    final buttonSize = ScheduleHeaderConstants.getResponsiveSize(
-      context,
-      40.0, // للشاشات الصغيرة
-      45.0, // للشاشات المتوسطة
-      50.0, // للشاشات الكبيرة
-    );
-
-    final padding = ScheduleHeaderConstants.getResponsiveSize(
-      context,
-      15.0, // للشاشات الصغيرة
-      20.0, // للشاشات المتوسطة
-      25.0, // للشاشات الكبيرة
-    );
+    final titleSize = AppDimensions.getTitleFontSize(context, small: true);
+    final iconSize =
+        AppDimensions.getIconSize(context, size: IconSize.small, small: false);
+    final buttonSize = AppDimensions.getButtonHeight(context,
+        size: ButtonSize.small, small: true);
+    final padding = AppDimensions.getSpacing(context);
 
     return Container(
       padding: EdgeInsets.all(padding),
-      color: Colors.white,
+      color: context.colorSurface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -48,7 +28,7 @@ class ScheduleHeaderComponent {
             style: TextStyle(
               fontSize: titleSize,
               fontWeight: FontWeight.bold,
-              color: ScheduleHeaderConstants.kTextColor,
+              color: context.colorTextPrimary,
               fontFamily: ScheduleHeaderConstants.fontFamily,
             ),
           ),
@@ -65,7 +45,7 @@ class ScheduleHeaderComponent {
             onPressed: () => controller.toggleViewMode(),
             size: buttonSize,
             iconSize: iconSize,
-            color: ScheduleHeaderConstants.kDarkPurple,
+            color: context.colorPrimaryDark,
             margin: EdgeInsets.zero,
           ),
         ],
@@ -89,13 +69,12 @@ class ScheduleHeaderComponent {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
-        border: Border.all(color: ScheduleHeaderConstants.kBorderColor),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
+        border: Border.all(color: context.colorBorder),
         boxShadow: [
           BoxShadow(
-            color: ScheduleHeaderConstants.kShadowColor,
+            color: context.colorShadow,
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -103,11 +82,9 @@ class ScheduleHeaderComponent {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius:
-            BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         child: InkWell(
-          borderRadius:
-              BorderRadius.circular(ScheduleHeaderConstants.buttonBorderRadius),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           onTap: onPressed,
           child: Tooltip(
             message: tooltip,
@@ -126,24 +103,18 @@ class ScheduleHeaderComponent {
 
   /// بناء عنوان عرض الجدول الأسبوعي
   static Widget buildWeeklyScheduleTitle(BuildContext context) {
-    final fontSize = ScheduleHeaderConstants.getResponsiveSize(
-      context,
-      16.0, // للشاشات الصغيرة
-      18.0, // للشاشات المتوسطة
-      20.0, // للشاشات الكبيرة
-    );
+    final fontSize = AppDimensions.getSubtitleFontSize(context);
 
     return Padding(
       padding: EdgeInsets.only(
-        bottom: ScheduleHeaderConstants.getResponsiveSize(
-            context, 15.0, 20.0, 25.0),
+        bottom: AppDimensions.getSpacing(context),
       ),
       child: Text(
         ScheduleHeaderConstants.weeklyScheduleTitle,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,
-          color: ScheduleHeaderConstants.kDarkPurple,
+          color: context.colorPrimaryDark,
           fontFamily: ScheduleHeaderConstants.fontFamily,
         ),
         textAlign: TextAlign.center,

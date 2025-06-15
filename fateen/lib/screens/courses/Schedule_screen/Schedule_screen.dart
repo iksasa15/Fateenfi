@@ -1,3 +1,4 @@
+import 'package:fateen/screens/courses/Schedule_screen/components/daily_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -21,6 +22,10 @@ import 'package:fateen/models/course.dart';
 // استيراد الثوابت
 import 'package:fateen/screens/courses/Schedule_screen/constants/schedule_calendar_constants.dart';
 import 'package:fateen/screens/courses/Schedule_screen/constants/daily_schedule_constants.dart';
+
+// استيراد نظام التصميم الموحد
+import '../../../core/constants/appColor.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 /// شاشة الجدول الدراسي
 ///
@@ -172,7 +177,7 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ScheduleCalendarConstants.kBackgroundColor,
+      backgroundColor: context.colorBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -210,7 +215,7 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   /// بناء شريط تبويبات الأيام
   Widget _buildDaysTabs() {
     return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
+      duration: AppDimensions.animationDuration,
       curve: Curves.easeInOut,
       child: ListenableBuilder(
         listenable: _viewController,
@@ -218,8 +223,11 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           // نعرض شريط الأيام فقط في عرض القائمة اليومية
           if (!_viewController.showCalendarView) {
             return Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              color: context.colorSurface,
+              padding: EdgeInsets.symmetric(
+                vertical:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small),
+              ),
               child: Column(
                 children: [
                   // شريط الأيام
@@ -263,23 +271,23 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   /// بناء عرض الجدول الأسبوعي
   Widget _buildCalendarView(BuildContext context) {
     if (!_isCalendarDataLoaded) {
-      return ScheduleCalendarComponents.buildShimmerLoading();
+      return ScheduleCalendarComponents.buildShimmerLoading(context);
     }
 
     // إذا تم تحميل البيانات، عرض المحتوى بناءً على حالة البيانات
     if (_calendarController.allCourses.isEmpty) {
-      return ScheduleCalendarComponents.buildEmptyCoursesView();
+      return ScheduleCalendarComponents.buildEmptyCoursesView(context);
     }
 
     if (_calendarController.timeSlots.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
           child: Text(
             ScheduleCalendarConstants.noTimesMessage,
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
+              fontSize: AppDimensions.getBodyFontSize(context),
+              color: context.colorTextSecondary,
               fontFamily: ScheduleCalendarConstants.fontFamily,
             ),
             textAlign: TextAlign.center,
@@ -288,28 +296,28 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
       );
     }
 
-    // تحسين تجاوب الجدول مع أحجام الشاشة المختلفة
-    final fontSize = 18.0;
-    final paddingHorizontal = 10.0;
-    final paddingVertical = 10.0;
-
     return RefreshIndicator(
       onRefresh: _refreshScheduleData,
-      color: ScheduleCalendarConstants.kDarkPurple,
-      backgroundColor: Colors.white,
+      color: context.colorPrimaryDark,
+      backgroundColor: context.colorSurface,
       child: ListView(
         padding: EdgeInsets.symmetric(
-            vertical: paddingVertical, horizontal: paddingHorizontal),
+          vertical: AppDimensions.getSpacing(context, size: SpacingSize.small),
+          horizontal:
+              AppDimensions.getSpacing(context, size: SpacingSize.small),
+        ),
         children: [
           // عنوان الجدول
           Padding(
-            padding: const EdgeInsets.only(bottom: 15),
+            padding: EdgeInsets.only(
+                bottom:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             child: Text(
               ScheduleCalendarConstants.weeklyScheduleTitle,
               style: TextStyle(
-                fontSize: fontSize,
+                fontSize: AppDimensions.getSubtitleFontSize(context),
                 fontWeight: FontWeight.bold,
-                color: ScheduleCalendarConstants.kDarkPurple,
+                color: context.colorPrimaryDark,
                 fontFamily: ScheduleCalendarConstants.fontFamily,
               ),
               textAlign: TextAlign.center,
@@ -337,15 +345,21 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           // تحديد عرض ثابت للجدول على الشاشات الصغيرة
           width: minRequiredWidth,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(
-                ScheduleCalendarConstants.cardBorderRadius),
-            boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+            boxShadow: [
+              BoxShadow(
+                color: context.colorShadow,
+                blurRadius: 4,
+                spreadRadius: 0,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             children: [
               // صف عناوين الأيام
-              ScheduleCalendarComponents.buildHeaderRow(
+              ScheduleCalendarComponents.buildHeaderRow(context,
                   _calendarController.allDays, _calendarController.englishDays),
 
               // صفوف الأوقات
@@ -358,15 +372,21 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
       // للشاشات الكبيرة نعرض الجدول عاديًا
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(ScheduleCalendarConstants.cardBorderRadius),
-          boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+          boxShadow: [
+            BoxShadow(
+              color: context.colorShadow,
+              blurRadius: 4,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           children: [
             // صف عناوين الأيام
-            ScheduleCalendarComponents.buildHeaderRow(
+            ScheduleCalendarComponents.buildHeaderRow(context,
                 _calendarController.allDays, _calendarController.englishDays),
 
             // صفوف الأوقات
@@ -385,17 +405,17 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
       return Container(
         height: ScheduleCalendarConstants.rowHeight,
         decoration: BoxDecoration(
-          color: isCurrentTime
-              ? ScheduleCalendarConstants.kLightPurple.withOpacity(0.3)
-              : null,
-          border: const Border(
-            top: BorderSide(color: Color(0xFFEFEFEF)),
+          color:
+              isCurrentTime ? context.colorPrimaryPale.withOpacity(0.3) : null,
+          border: Border(
+            top: BorderSide(color: context.colorDivider),
           ),
         ),
         child: Row(
           children: [
             // خلية الوقت
-            ScheduleCalendarComponents.buildTimeCell(timeSlot, isCurrentTime),
+            ScheduleCalendarComponents.buildTimeCell(
+                context, timeSlot, isCurrentTime),
 
             // خلايا الأيام
             ..._calendarController.allDays.map((day) {
@@ -405,6 +425,7 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
 
               return Expanded(
                 child: ScheduleCalendarComponents.buildDayCell(
+                  context,
                   course,
                   isToday && isCurrentTime,
                   course != null
@@ -447,14 +468,14 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
   /// بناء عرض القائمة اليومية
   Widget _buildDailyView(BuildContext context) {
     if (!_isDailyDataLoaded) {
-      return DailyScheduleComponents.buildShimmerLoading();
+      return DailyScheduleComponents.buildShimmerLoading(context);
     }
 
     // عرض القائمة اليومية باستخدام مكونات DailyScheduleComponents
     return RefreshIndicator(
       onRefresh: _refreshScheduleData,
-      color: DailyScheduleConstants.kDarkPurple,
-      backgroundColor: Colors.white,
+      color: context.colorPrimaryDark,
+      backgroundColor: context.colorSurface,
       child: TabBarView(
         controller: _tabController,
         physics: const BouncingScrollPhysics(), // للتمرير السلس
@@ -462,24 +483,35 @@ class _MyScheduleScreenState extends State<MyScheduleScreen>
           final courses = _dailyController.getCoursesForDaySorted(day);
 
           if (courses.isEmpty) {
-            return DailyScheduleComponents.buildEmptyDayView(day);
+            return DailyScheduleComponents.buildEmptyDayView(context, day);
           }
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            padding: EdgeInsets.symmetric(
+              horizontal:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small),
+              vertical:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small) /
+                      2,
+            ),
             child: ListView.builder(
               itemCount: courses.length,
-              padding: const EdgeInsets.only(bottom: 15),
+              padding: EdgeInsets.only(
+                  bottom: AppDimensions.getSpacing(context,
+                      size: SpacingSize.small)),
               itemBuilder: (context, index) {
                 final course = courses[index];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
+                  padding: EdgeInsets.only(
+                      bottom: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small)),
                   child: DailyScheduleComponents.buildCourseCard(
+                    context,
                     course,
                     _dailyController.courseColors[course.id] ??
-                        DailyScheduleConstants.kLightPurple,
+                        context.colorPrimaryPale,
                     _dailyController.courseBorderColors[course.id] ??
-                        DailyScheduleConstants.kMediumPurple,
+                        context.colorPrimaryLight,
                     () => _showDailyCourseDetails(course, context),
                   ),
                 );

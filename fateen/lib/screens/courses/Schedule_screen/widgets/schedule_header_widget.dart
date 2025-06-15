@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../constants/schedule_header_constants.dart';
 import '../controllers/schedule_view_controller.dart';
 import '../components/schedule_header_component.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// واجهة متكاملة للهيدر الخاص بالجدول الدراسي
 class ScheduleHeaderWidget extends StatelessWidget {
@@ -35,9 +37,9 @@ class ScheduleHeaderWidget extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.grey.shade300,
-                Colors.grey.shade100,
-                Colors.grey.shade300,
+                context.colorDivider,
+                context.colorDivider.withOpacity(0.5),
+                context.colorDivider,
               ],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,

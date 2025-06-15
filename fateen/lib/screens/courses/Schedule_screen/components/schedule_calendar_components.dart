@@ -3,21 +3,23 @@ import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 import '../../../../models/course.dart';
 import '../constants/schedule_calendar_constants.dart';
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 class ScheduleCalendarComponents {
   /// بناء واجهة Shimmer للتحميل
-  static Widget buildShimmerLoading() {
+  static Widget buildShimmerLoading(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: _buildCalendarViewShimmer(),
+      baseColor: context.colorShimmerBase,
+      highlightColor: context.colorShimmerHighlight,
+      child: _buildCalendarViewShimmer(context),
     );
   }
 
   /// Shimmer لعرض الجدول
-  static Widget _buildCalendarViewShimmer() {
+  static Widget _buildCalendarViewShimmer(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -26,19 +28,28 @@ class ScheduleCalendarComponents {
             width: 180,
             height: 25,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
             ),
-            margin: const EdgeInsets.only(bottom: 20, top: 10),
+            margin: EdgeInsets.only(
+                bottom: AppDimensions.getSpacing(context),
+                top:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
           ),
 
           // جدول وهمي
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(
-                  ScheduleCalendarConstants.cardBorderRadius),
-              boxShadow: ScheduleCalendarConstants.getUnifiedShadow(),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: context.colorShadow,
+                  blurRadius: 4,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -46,12 +57,10 @@ class ScheduleCalendarComponents {
                 Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(
-                          ScheduleCalendarConstants.cardBorderRadius),
-                      topRight: Radius.circular(
-                          ScheduleCalendarConstants.cardBorderRadius),
+                    color: context.colorSurface,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(AppDimensions.mediumRadius),
+                      topRight: Radius.circular(AppDimensions.mediumRadius),
                     ),
                   ),
                 ),
@@ -62,9 +71,9 @@ class ScheduleCalendarComponents {
                   (index) => Container(
                     height: ScheduleCalendarConstants.rowHeight,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colorSurface,
                       border: Border(
-                        top: BorderSide(color: Colors.grey[200]!),
+                        top: BorderSide(color: context.colorDivider),
                       ),
                     ),
                   ),
@@ -78,7 +87,7 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء عرض المقررات الفارغة (لا توجد محاضرات مضافة)
-  static Widget buildEmptyCoursesView() {
+  static Widget buildEmptyCoursesView(BuildContext context) {
     return Center(
       child: AnimatedOpacity(
         opacity: 1.0,
@@ -88,27 +97,32 @@ class ScheduleCalendarComponents {
           children: [
             Icon(
               Icons.event_busy,
-              size: 70,
-              color: Colors.grey.shade300,
+              size: AppDimensions.getIconSize(context,
+                  size: IconSize.large, small: true),
+              color: context.colorTextHint,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: AppDimensions.getSpacing(context)),
             Text(
               ScheduleCalendarConstants.noCoursesMessage,
               style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
+                fontSize: AppDimensions.getSubtitleFontSize(context),
+                color: context.colorTextSecondary,
                 fontWeight: FontWeight.bold,
                 fontFamily: ScheduleCalendarConstants.fontFamily,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(
+                height:
+                    AppDimensions.getSpacing(context, size: SpacingSize.small)),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.getSpacing(context,
+                      size: SpacingSize.large)),
               child: Text(
                 ScheduleCalendarConstants.addCoursesHint,
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade500,
+                  fontSize: AppDimensions.getLabelFontSize(context),
+                  color: context.colorTextHint,
                   fontFamily: ScheduleCalendarConstants.fontFamily,
                 ),
                 textAlign: TextAlign.center,
@@ -121,14 +135,13 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء فقاعة المحاضرة في الجدول
-  static Widget buildCourseBubble(
-      Course course, Color bgColor, Color borderColor, VoidCallback onTap) {
+  static Widget buildCourseBubble(BuildContext context, Course course,
+      Color bgColor, Color borderColor, VoidCallback onTap) {
     return AnimatedContainer(
       duration: ScheduleCalendarConstants.animationDuration,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius:
-            BorderRadius.circular(ScheduleCalendarConstants.itemBorderRadius),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         border: Border.all(color: borderColor, width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -142,10 +155,10 @@ class ScheduleCalendarComponents {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius:
-              BorderRadius.circular(ScheduleCalendarConstants.itemBorderRadius),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           child: Padding(
-            padding: const EdgeInsets.all(4),
+            padding: EdgeInsets.all(
+                AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -153,9 +166,10 @@ class ScheduleCalendarComponents {
                 Text(
                   course.courseName,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize:
+                        AppDimensions.getLabelFontSize(context, small: true),
                     fontWeight: FontWeight.bold,
-                    color: ScheduleCalendarConstants.kDarkPurple,
+                    color: context.colorPrimaryDark,
                     height: 1.2,
                     fontFamily: ScheduleCalendarConstants.fontFamily,
                   ),
@@ -165,12 +179,17 @@ class ScheduleCalendarComponents {
                 ),
                 if (course.classroom != null && course.classroom!.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(top: 3),
+                    padding: EdgeInsets.only(
+                        top: AppDimensions.getSpacing(context,
+                                size: SpacingSize.small) /
+                            2),
                     child: Text(
                       course.classroom!,
                       style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade700,
+                        fontSize: AppDimensions.getLabelFontSize(context,
+                                small: true) -
+                            1,
+                        color: context.colorTextSecondary,
                         fontFamily: ScheduleCalendarConstants.fontFamily,
                       ),
                       textAlign: TextAlign.center,
@@ -186,45 +205,57 @@ class ScheduleCalendarComponents {
 
   /// بناء عنصر تفاصيل المادة
   static Widget buildDetailItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String value,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: EdgeInsets.only(
+          bottom: AppDimensions.getSpacing(context, size: SpacingSize.small)),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: AppDimensions.getIconSize(context,
+                size: IconSize.medium, small: false),
+            height: AppDimensions.getIconSize(context,
+                size: IconSize.medium, small: false),
             decoration: BoxDecoration(
-              color: ScheduleCalendarConstants.kLightPurple,
-              borderRadius: BorderRadius.circular(8),
+              color: context.colorPrimaryPale,
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
             ),
             child: Icon(
               icon,
-              color: ScheduleCalendarConstants.kDarkPurple,
-              size: 20,
+              color: context.colorPrimaryDark,
+              size: AppDimensions.getIconSize(context,
+                  size: IconSize.small, small: true),
             ),
           ),
-          const SizedBox(width: 15),
+          SizedBox(
+              width:
+                  AppDimensions.getSpacing(context, size: SpacingSize.small)),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
+                  fontSize:
+                      AppDimensions.getLabelFontSize(context, small: true),
+                  color: context.colorTextSecondary,
                   fontFamily: ScheduleCalendarConstants.fontFamily,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(
+                  height: AppDimensions.getSpacing(context,
+                          size: SpacingSize.small) /
+                      4),
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: AppDimensions.getBodyFontSize(context),
                   fontWeight: FontWeight.w500,
+                  color: context.colorTextPrimary,
                   fontFamily: ScheduleCalendarConstants.fontFamily,
                 ),
               ),
@@ -236,24 +267,26 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء صف عناوين الجدول
-  static Widget buildHeaderRow(List<String> days, List<String> englishDays) {
+  static Widget buildHeaderRow(
+      BuildContext context, List<String> days, List<String> englishDays) {
     return Container(
       decoration: BoxDecoration(
-        color: ScheduleCalendarConstants.kDarkPurple,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(ScheduleCalendarConstants.cardBorderRadius),
-          topRight: Radius.circular(ScheduleCalendarConstants.cardBorderRadius),
+        color: context.colorPrimaryDark,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(AppDimensions.mediumRadius),
+          topRight: Radius.circular(AppDimensions.mediumRadius),
         ),
       ),
       child: Row(
         children: [
           // عنوان الوقت/اليوم
           buildHeaderCell(
-              ScheduleCalendarConstants.timeHeaderLabel, true, true),
+              context, ScheduleCalendarConstants.timeHeaderLabel, true, true),
 
           // عناوين الأيام
           ...days.map((day) => Expanded(
                 child: buildHeaderCell(
+                    context,
                     day,
                     false,
                     englishDays[days.indexOf(day)] ==
@@ -265,25 +298,27 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء خلية عنوان الجدول
-  static Widget buildHeaderCell(
-      String text, bool isFirstColumn, bool isCurrentDay) {
+  static Widget buildHeaderCell(BuildContext context, String text,
+      bool isFirstColumn, bool isCurrentDay) {
     return Container(
       width: isFirstColumn ? ScheduleCalendarConstants.timeColumnWidth : null,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.getSpacing(context, size: SpacingSize.small),
+          horizontal:
+              AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
       decoration: BoxDecoration(
-        color: isCurrentDay && !isFirstColumn
-            ? ScheduleCalendarConstants.kMediumPurple
-            : null,
+        color:
+            isCurrentDay && !isFirstColumn ? context.colorPrimaryLight : null,
         border: Border(
           right: isFirstColumn
-              ? const BorderSide(color: Colors.white38)
+              ? BorderSide(color: Colors.white38)
               : BorderSide.none,
         ),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 13,
+          fontSize: AppDimensions.getLabelFontSize(context),
           fontWeight: FontWeight.bold,
           color: Colors.white,
           fontFamily: ScheduleCalendarConstants.fontFamily,
@@ -294,24 +329,25 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء خلية الوقت
-  static Widget buildTimeCell(String timeSlot, bool isCurrentTime) {
+  static Widget buildTimeCell(
+      BuildContext context, String timeSlot, bool isCurrentTime) {
     return Container(
       width: ScheduleCalendarConstants.timeColumnWidth,
       height: ScheduleCalendarConstants.rowHeight,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          right: BorderSide(color: Color(0xFFEFEFEF)),
+          right: BorderSide(color: context.colorDivider),
         ),
       ),
       child: Center(
         child: Text(
           timeSlot,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppDimensions.getLabelFontSize(context),
             fontWeight: isCurrentTime ? FontWeight.bold : FontWeight.normal,
             color: isCurrentTime
-                ? ScheduleCalendarConstants.kDarkPurple
-                : Colors.grey.shade600,
+                ? context.colorPrimaryDark
+                : context.colorTextSecondary,
             fontFamily: ScheduleCalendarConstants.fontFamily,
           ),
           textAlign: TextAlign.center,
@@ -321,25 +357,25 @@ class ScheduleCalendarComponents {
   }
 
   /// بناء خلية اليوم
-  static Widget buildDayCell(Course? course, bool highlight, Color? bgColor,
-      Color? borderColor, VoidCallback? onTap) {
+  static Widget buildDayCell(BuildContext context, Course? course,
+      bool highlight, Color? bgColor, Color? borderColor, VoidCallback? onTap) {
     return Container(
       height: ScheduleCalendarConstants.rowHeight,
       decoration: BoxDecoration(
         border: Border(
-          right: const BorderSide(color: Color(0xFFEFEFEF)),
+          right: BorderSide(color: context.colorDivider),
           left: highlight
-              ? BorderSide(
-                  color: ScheduleCalendarConstants.kDarkPurple, width: 2)
+              ? BorderSide(color: context.colorPrimaryDark, width: 2)
               : BorderSide.none,
         ),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(
+          AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
       child: course != null &&
               onTap != null &&
               bgColor != null &&
               borderColor != null
-          ? buildCourseBubble(course, bgColor, borderColor, onTap)
+          ? buildCourseBubble(context, course, bgColor, borderColor, onTap)
           : null,
     );
   }
