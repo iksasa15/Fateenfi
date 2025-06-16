@@ -36,8 +36,9 @@ class ColorfulNavBar extends StatelessWidget {
           ),
         ],
       ),
+      // زيادة ارتفاع شريط التنقل ليناسب العناصر الأكبر
       child: SizedBox(
-        height: AppDimensions.extraSmallButtonHeight,
+        height: 60, // زيادة من AppDimensions.extraSmallButtonHeight إلى 60
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -61,10 +62,9 @@ class ColorfulNavBar extends StatelessWidget {
     // لون النص والأيقونة
     final Color textIconColor = isSelected ? itemColor : context.colorTextHint;
 
-    // حجم الأيقونة معدل ليناسب المساحة المتاحة
-    final double iconSize = isSelected
-        ? AppDimensions.getIconSize(context, size: IconSize.small, small: false)
-        : AppDimensions.getIconSize(context, size: IconSize.small, small: true);
+    // زيادة حجم الأيقونة
+    final double iconSize =
+        isSelected ? 24.0 : 22.0; // زيادة حجم الأيقونة بشكل ثابت
 
     return GestureDetector(
       onTap: () => onItemTapped(index),
@@ -73,46 +73,35 @@ class ColorfulNavBar extends StatelessWidget {
         width: MediaQuery.of(context).size.width /
             BottomNavConstants.navigationLabels.length,
         padding: EdgeInsets.symmetric(
-            horizontal:
-                AppDimensions.getSpacing(context, size: SpacingSize.small) / 2),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            // استخدام LayoutBuilder للتأكد من أن العناصر تناسب الارتفاع المتاح
-            return IntrinsicHeight(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // الأيقونة
-                  Icon(
-                    BottomNavConstants.navigationIcons[index],
-                    color: textIconColor,
-                    size: iconSize,
-                  ),
+            horizontal: 4.0), // تقليل الهوامش للسماح بمساحة أكبر للمحتوى
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // الأيقونة
+            Icon(
+              BottomNavConstants.navigationIcons[index],
+              color: textIconColor,
+              size: iconSize,
+            ),
 
-                  // مسافة صغيرة للغاية
-                  SizedBox(height: constraints.maxHeight * 0.05),
+            // زيادة المساحة بين الأيقونة والنص
+            const SizedBox(height: 4),
 
-                  // النص - باستخدام FittedBox لضمان ملاءمته للمساحة
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      BottomNavConstants.navigationLabels[index],
-                      style: TextStyle(
-                        color: textIconColor,
-                        fontSize: AppDimensions.getLabelFontSize(context,
-                            small: true),
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        fontFamily: 'SYMBIOAR+LT',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+            // النص - مع زيادة حجم الخط
+            Text(
+              BottomNavConstants.navigationLabels[index],
+              style: TextStyle(
+                color: textIconColor,
+                fontSize: 12.0, // زيادة حجم الخط بشكل ثابت
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontFamily: 'SYMBIOAR+LT',
               ),
-            );
-          },
+              textAlign: TextAlign.center,
+              overflow:
+                  TextOverflow.ellipsis, // منع النص من الانتشار لأكثر من سطر
+            ),
+          ],
         ),
       ),
     );

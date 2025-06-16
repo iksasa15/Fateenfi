@@ -1,66 +1,70 @@
 import 'package:flutter/material.dart';
 
 class AppDimensions {
-  // قيم الزوايا
-  static const double smallRadius = 8.0;
-  static const double mediumRadius = 12.0;
-  static const double largeRadius = 16.0;
-  static const double extraLargeRadius = 24.0;
-  static const double cardBorderRadius = 12.0;
-  static const double inputBorderRadius = 16.0;
-  static const double toggleBarBorderRadius = 12.0;
-  static const double toggleButtonBorderRadius = 8.0;
+  // قيم الزوايا - تعديل القيم لتكون أكثر تناسقًا
+  static const double smallRadius = 8.0; // للعناصر الصغيرة
+  static const double mediumRadius = 12.0; // للبطاقات والأزرار
+  static const double largeRadius = 16.0; // للعناصر الكبيرة
+  static const double extraLargeRadius = 24.0; // للنوافذ المنبثقة
+  static const double cardBorderRadius = 12.0; // لزوايا البطاقات
+  static const double inputBorderRadius = 12.0; // لحقول الإدخال
+  static const double toggleBarBorderRadius = 12.0; // لشريط التبديل
+  static const double toggleButtonBorderRadius = 8.0; // لأزرار التبديل
 
-  // ارتفاعات الأزرار
-  static const double buttonHeight = 56.0;
-  static const double smallButtonHeight = 50.0;
-  static const double extraSmallButtonHeight = 48.0;
-  static const double mediumButtonHeight = 52.0;
-  static const double socialButtonSize = 54.0;
-  static const double smallSocialButtonSize = 46.0;
+  // ارتفاعات الأزرار - تعديل القيم لتناسب معايير التصميم الحديثة
+  static const double buttonHeight = 52.0; // الارتفاع القياسي للأزرار
+  static const double smallButtonHeight = 44.0; // ارتفاع الأزرار الصغيرة
+  static const double extraSmallButtonHeight =
+      40.0; // ارتفاع الأزرار الصغيرة جدًا
+  static const double mediumButtonHeight = 48.0; // ارتفاع الأزرار المتوسطة
+  static const double socialButtonSize = 48.0; // حجم أزرار التواصل الاجتماعي
+  static const double smallSocialButtonSize = 40.0; // حجم أزرار التواصل الصغيرة
 
-  // أبعاد حقول الإدخال
-  static const double inputFieldHeight = 60.0;
-  static const double smallInputFieldHeight = 56.0;
-  static const double inputFieldPadding = 20.0;
-  static const double smallInputFieldPadding = 16.0;
+  // أبعاد حقول الإدخال - تعديل للراحة البصرية
+  static const double inputFieldHeight = 52.0; // ارتفاع حقول الإدخال
+  static const double smallInputFieldHeight =
+      44.0; // ارتفاع حقول الإدخال الصغيرة
+  static const double inputFieldPadding = 16.0; // حشو حقول الإدخال
+  static const double smallInputFieldPadding = 12.0; // حشو حقول الإدخال الصغيرة
 
-  // أحجام الأيقونات
-  static const double iconSize = 24.0;
-  static const double smallIconSize = 20.0;
-  static const double extraSmallIconSize = 18.0;
-  static const double mediumIconSize = 22.0;
-  static const double largeIconSize = 100.0;
+  // أحجام الأيقونات - محسنة لتكون متناسقة
+  static const double iconSize = 24.0; // الحجم القياسي للأيقونات
+  static const double smallIconSize = 20.0; // حجم الأيقونات الصغيرة
+  static const double extraSmallIconSize = 16.0; // حجم الأيقونات الصغيرة جدًا
+  static const double mediumIconSize = 22.0; // حجم الأيقونات المتوسطة
+  static const double largeIconSize = 96.0; // حجم الأيقونات الكبيرة
 
-  // قيم التباعد
-  static const double defaultSpacing = 16.0;
-  static const double smallSpacing = 8.0;
-  static const double largeSpacing = 24.0;
-  static const double extraLargeSpacing = 32.0;
-  static const double sectionPadding = 20.0;
+  // قيم التباعد - مضبوطة لتحقيق تناسق أفضل
+  static const double defaultSpacing = 16.0; // المسافة القياسية
+  static const double smallSpacing = 8.0; // المسافة الصغيرة
+  static const double largeSpacing = 24.0; // المسافة الكبيرة
+  static const double extraLargeSpacing = 32.0; // المسافة الكبيرة جدًا
+  static const double sectionPadding = 20.0; // حشو الأقسام
 
-  // أحجام الخطوط
-  static const double titleFontSize = 28.0;
-  static const double smallTitleFontSize = 24.0;
-  static const double subtitleFontSize = 16.0;
-  static const double smallSubtitleFontSize = 14.0;
-  static const double bodyFontSize = 15.0;
-  static const double smallBodyFontSize = 14.0;
-  static const double buttonFontSize = 16.0;
-  static const double smallButtonFontSize = 15.0;
-  static const double labelFontSize = 14.0;
-  static const double smallLabelFontSize = 13.0;
+  // أحجام الخطوط - محسنة للوضوح وسهولة القراءة
+  static const double titleFontSize = 24.0; // حجم العناوين
+  static const double smallTitleFontSize = 20.0; // حجم العناوين الصغيرة
+  static const double subtitleFontSize = 18.0; // حجم العناوين الفرعية
+  static const double smallSubtitleFontSize =
+      16.0; // حجم العناوين الفرعية الصغيرة
+  static const double bodyFontSize = 16.0; // حجم النص الأساسي
+  static const double smallBodyFontSize = 14.0; // حجم النص الصغير
+  static const double buttonFontSize = 16.0; // حجم نص الأزرار
+  static const double smallButtonFontSize = 14.0; // حجم نص الأزرار الصغيرة
+  static const double labelFontSize = 14.0; // حجم التسميات
+  static const double smallLabelFontSize = 12.0; // حجم التسميات الصغيرة
 
-  // قيم الارتفاع
-  static const double defaultElevation = 2.0;
-  static const double cardElevation = 4.0;
+  // قيم الارتفاع - محسنة للظلال
+  static const double defaultElevation = 2.0; // الارتفاع الافتراضي
+  static const double cardElevation = 3.0; // ارتفاع البطاقات
 
-  // مدة الحركات
-  static const Duration animationDuration = Duration(milliseconds: 300);
+  // مدة الحركات - محسنة للسلاسة
+  static const Duration animationDuration =
+      Duration(milliseconds: 250); // مدة الحركة القياسية
 
   static var cardHeightMedium;
 
-  // طرق الأبعاد المتجاوبة
+  // طرق الأبعاد المتجاوبة - تم الحفاظ عليها كما هي
 
   // طرق الزوايا
   static double getSmallRadius(BuildContext context) {
@@ -193,7 +197,10 @@ class AppDimensions {
     return small ? screenWidth * 0.035 : screenWidth * 0.037;
   }
 
-  static getWidth(BuildContext context, {required double percentage}) {}
+  static getWidth(BuildContext context, {required double percentage}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * (percentage / 100);
+  }
 }
 
 // تعدادات لتسهيل اختيار الأحجام

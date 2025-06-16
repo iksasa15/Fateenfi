@@ -162,12 +162,12 @@ class ScheduleCalendarComponents {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // اسم المادة بالكامل
+                // اسم المادة بالكامل - زيادة حجم الخط
                 Text(
                   course.courseName,
                   style: TextStyle(
-                    fontSize:
-                        AppDimensions.getLabelFontSize(context, small: true),
+                    // زيادة حجم الخط لاسم المادة
+                    fontSize: 13.0, // حجم ثابت بدلاً من القيمة الديناميكية
                     fontWeight: FontWeight.bold,
                     color: context.colorPrimaryDark,
                     height: 1.2,
@@ -186,9 +186,8 @@ class ScheduleCalendarComponents {
                     child: Text(
                       course.classroom!,
                       style: TextStyle(
-                        fontSize: AppDimensions.getLabelFontSize(context,
-                                small: true) -
-                            1,
+                        // زيادة حجم الخط للقاعة
+                        fontSize: 11.0, // حجم ثابت أكبر
                         color: context.colorTextSecondary,
                         fontFamily: ScheduleCalendarConstants.fontFamily,
                       ),
@@ -318,7 +317,8 @@ class ScheduleCalendarComponents {
       child: Text(
         text,
         style: TextStyle(
-          fontSize: AppDimensions.getLabelFontSize(context),
+          // زيادة حجم خط العناوين
+          fontSize: 14.0, // قيمة ثابتة أكبر
           fontWeight: FontWeight.bold,
           color: Colors.white,
           fontFamily: ScheduleCalendarConstants.fontFamily,
@@ -343,7 +343,8 @@ class ScheduleCalendarComponents {
         child: Text(
           timeSlot,
           style: TextStyle(
-            fontSize: AppDimensions.getLabelFontSize(context),
+            // زيادة حجم خط الوقت
+            fontSize: 13.0, // قيمة ثابتة أكبر
             fontWeight: isCurrentTime ? FontWeight.bold : FontWeight.normal,
             color: isCurrentTime
                 ? context.colorPrimaryDark
