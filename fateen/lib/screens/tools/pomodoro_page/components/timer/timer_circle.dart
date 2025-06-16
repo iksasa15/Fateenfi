@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../../constants/pomodoro_strings.dart';
 import '../../controllers/pomodoro_controller.dart';
 
@@ -18,17 +19,32 @@ class TimerCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // اللون حسب الوضع الحالي
-    final progressColor = PomodoroColors.getTimerColor(
-      isBreakTime: controller.isBreakTime,
-      isLongBreak: controller.isLongBreak,
-    );
+    // اللون حسب الوضع الحالي (نستخدم ألوان محددة من AppColors)
+    final progressColor = controller.isBreakTime
+        ? (controller.isLongBreak
+            ? AppColors.getThemeColor(
+                AppColors.success, AppColors.darkSuccess, isDarkMode)
+            : AppColors.getThemeColor(
+                AppColors.primary, AppColors.darkPrimary, isDarkMode))
+        : AppColors.getThemeColor(
+            AppColors.accent, AppColors.darkAccent, isDarkMode);
 
     // ألوان متغيرة حسب الوضع
-    final bgColor = PomodoroColors.getCardBackgroundColor(isDarkMode);
-    final textColor =
-        PomodoroColors.kDarkPurple; // تعديل للتوافق مع صفحة المعدل
-    final subTextColor = Colors.grey[600]; // تعديل للتوافق مع صفحة المعدل
+    final bgColor = AppColors.getThemeColor(
+      AppColors.surface,
+      AppColors.darkSurface,
+      isDarkMode,
+    );
+    final textColor = AppColors.getThemeColor(
+      AppColors.textPrimary,
+      AppColors.darkTextPrimary,
+      isDarkMode,
+    );
+    final subTextColor = AppColors.getThemeColor(
+      AppColors.textSecondary,
+      AppColors.darkTextSecondary,
+      isDarkMode,
+    );
 
     return AnimatedBuilder(
       animation: Listenable.merge(
@@ -63,8 +79,8 @@ class TimerCircle extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isDarkMode
-                            ? Colors.grey[850]
-                            : PomodoroColors.kLightPurple.withOpacity(0.2),
+                            ? AppColors.darkSurfaceLight
+                            : AppColors.primaryPale,
                       ),
                     ),
 
@@ -100,14 +116,20 @@ class TimerCircle extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: bgColor,
                         border: Border.all(
-                          color: isDarkMode
-                              ? Colors.grey[800]!
-                              : Colors.grey[200]!,
+                          color: AppColors.getThemeColor(
+                            AppColors.border,
+                            AppColors.darkBorder,
+                            isDarkMode,
+                          ),
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: AppColors.getThemeColor(
+                              AppColors.shadow,
+                              AppColors.darkShadow,
+                              isDarkMode,
+                            ),
                             spreadRadius: 1,
                             blurRadius: 5,
                             offset: const Offset(0, 1),
@@ -128,26 +150,34 @@ class TimerCircle extends StatelessWidget {
               Text(
                 controller.formatTime(controller.secondsRemaining),
                 style: TextStyle(
-                  fontSize: 52,
+                  fontSize: AppDimensions.titleFontSize *
+                      1.8, // تكبير للتناسب مع الحجم السابق
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.smallSpacing),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.defaultSpacing,
+                  vertical: AppDimensions.smallSpacing / 1.5,
+                ),
                 decoration: BoxDecoration(
-                  color: PomodoroColors.kLightPurple,
-                  borderRadius: BorderRadius.circular(30),
+                  color: AppColors.getThemeColor(
+                    AppColors.primaryPale,
+                    AppColors.darkPrimaryPale,
+                    isDarkMode,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.extraLargeRadius),
                 ),
                 child: Text(
                   controller.isTimerRunning
                       ? PomodoroStrings.remainingTime
                       : PomodoroStrings.readyStatus,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: AppDimensions.bodyFontSize,
                     fontWeight: FontWeight.w500,
                     color: subTextColor,
                     fontFamily: 'SYMBIOAR+LT',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart';
 import '../../constants/pomodoro_strings.dart';
 import '../../controllers/pomodoro_controller.dart';
 
@@ -34,17 +35,26 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.defaultSpacing,
+          vertical: AppDimensions.largeSpacing),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.getThemeColor(
+              AppColors.surface, AppColors.darkSurface, isDarkMode),
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: AppColors.getThemeColor(
+                AppColors.shadowColor,
+                AppColors.darkShadowColor,
+                isDarkMode,
+              ),
               blurRadius: 15,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -56,47 +66,75 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             // عنوان الحوار
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+              padding: EdgeInsets.fromLTRB(
+                AppDimensions.defaultSpacing,
+                AppDimensions.defaultSpacing,
+                AppDimensions.defaultSpacing,
+                AppDimensions.smallSpacing,
+              ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(AppDimensions.smallSpacing),
                     decoration: BoxDecoration(
-                      color: PomodoroColors.kLightPurple,
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryPale,
+                        AppColors.darkPrimaryPale,
+                        isDarkMode,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.settings,
-                      color: PomodoroColors.kDarkPurple,
-                      size: 20,
+                      color: AppColors.getThemeColor(
+                        AppColors.primary,
+                        AppColors.darkPrimary,
+                        isDarkMode,
+                      ),
+                      size: AppDimensions.smallIconSize,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.smallSpacing),
                   Text(
                     PomodoroStrings.settingsTitle,
-                    style: const TextStyle(
-                      color: PomodoroColors.kDarkPurple,
+                    style: TextStyle(
+                      color: AppColors.getThemeColor(
+                        AppColors.textPrimary,
+                        AppColors.darkTextPrimary,
+                        isDarkMode,
+                      ),
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: AppDimensions.subtitleFontSize,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
-                      color: Colors.grey,
+                      color: AppColors.getThemeColor(
+                        AppColors.textSecondary,
+                        AppColors.darkTextSecondary,
+                        isDarkMode,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const Divider(),
+            Divider(
+              color: AppColors.getThemeColor(
+                AppColors.divider,
+                AppColors.darkDivider,
+                isDarkMode,
+              ),
+            ),
 
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: Column(
                 children: [
                   _buildSettingsSwitchTile(
@@ -144,10 +182,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: AppDimensions.buttonHeight,
                 child: ElevatedButton(
                   onPressed: () {
                     // تحديث الإعدادات
@@ -161,17 +199,22 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: PomodoroColors.kMediumPurple,
+                    backgroundColor: AppColors.getThemeColor(
+                      AppColors.primary,
+                      AppColors.darkPrimary,
+                      isDarkMode,
+                    ),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
                     ),
                     elevation: 0,
                   ),
                   child: Text(
                     PomodoroStrings.settingsSaveButton,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: AppDimensions.buttonFontSize,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
@@ -192,8 +235,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
     required bool value,
     required Function(bool) onChanged,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.smallSpacing),
       child: Row(
         children: [
           Expanded(
@@ -202,19 +247,27 @@ class _SettingsDialogState extends State<SettingsDialog> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: PomodoroColors.kDarkPurple,
+                    fontSize: AppDimensions.bodyFontSize,
+                    color: AppColors.getThemeColor(
+                      AppColors.textPrimary,
+                      AppColors.darkTextPrimary,
+                      isDarkMode,
+                    ),
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: AppDimensions.smallSpacing / 2),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
+                    color: AppColors.getThemeColor(
+                      AppColors.textSecondary,
+                      AppColors.darkTextSecondary,
+                      isDarkMode,
+                    ),
+                    fontSize: AppDimensions.smallLabelFontSize,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -224,7 +277,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: PomodoroColors.kMediumPurple,
+            activeColor: AppColors.getThemeColor(
+              AppColors.primary,
+              AppColors.darkPrimary,
+              isDarkMode,
+            ),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import 'constants/pomodoro_strings.dart';
 import 'controllers/pomodoro_controller.dart';
 import 'components/timer/timer_circle.dart';
@@ -39,11 +40,16 @@ class _PomodoroScreenState extends State<PomodoroScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl, // تعيين اتجاه النص للصفحة بالكامل
       child: Scaffold(
-        backgroundColor:
-            const Color(0xFFFDFDFF), // لون خلفية متوافق مع صفحة المقررات
+        backgroundColor: AppColors.getThemeColor(
+          AppColors.background,
+          AppColors.darkBackground,
+          isDarkMode,
+        ),
         body: SafeArea(
           child: AnimatedBuilder(
             animation: _controller,
@@ -60,32 +66,31 @@ class _PomodoroScreenState extends State<PomodoroScreen>
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10), // تقليل الحشو أكثر لمنع تجاوز الحدود
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.smallSpacing,
+                        vertical: AppDimensions.smallSpacing,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // قسم المؤقت
                           _buildTimerSection(),
-                          const SizedBox(height: 14), // تقليل المسافة
+                          SizedBox(height: AppDimensions.defaultSpacing - 2),
 
                           // قسم الإعدادات
                           TimeSettings(
                             controller: _controller,
-                            isDarkMode: false,
+                            isDarkMode: isDarkMode,
                             onCustomTimeRequested: _showCustomTimeDialog,
                           ),
-                          const SizedBox(height: 14), // تقليل المسافة
+                          SizedBox(height: AppDimensions.defaultSpacing - 2),
 
                           // قسم الإحصائيات
                           StatsCard(
                             controller: _controller,
-                            isDarkMode: false,
+                            isDarkMode: isDarkMode,
                           ),
-                          const SizedBox(
-                              height:
-                                  14), // تقليل المسافة لمنع تجاوز الحدود السفلية
+                          SizedBox(height: AppDimensions.defaultSpacing - 2),
                         ],
                       ),
                     ),
@@ -95,43 +100,56 @@ class _PomodoroScreenState extends State<PomodoroScreen>
             },
           ),
         ),
-        // تمت إزالة الزر العائم (FloatingActionButton) تمامًا
       ),
     );
   }
 
   // بناء قسم المؤقت مع تحسينات لتجنب تجاوز الحدود
   Widget _buildTimerSection() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14), // تقليل الحشو أكثر
+      padding: EdgeInsets.all(AppDimensions.defaultSpacing - 2),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          isDarkMode,
+        ),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppColors.getThemeColor(
+              AppColors.shadow,
+              AppColors.darkShadow,
+              isDarkMode,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: const Color(0xFFF5F3FF), // لون حدود متوافق مع صفحة المقررات
-          width: 1, // تقليل سمك الحدود
+          color: AppColors.getThemeColor(
+            AppColors.primaryPale,
+            AppColors.darkPrimaryPale,
+            isDarkMode,
+          ),
+          width: 1,
         ),
       ),
       child: Column(
         children: [
           // مؤشرات الدورة
           SessionIndicators(controller: _controller),
-          const SizedBox(height: 6), // تقليل المسافة أكثر
+          SizedBox(height: AppDimensions.smallSpacing - 2),
 
           // حالة المؤقت
           StatusLabel(
             controller: _controller,
-            isDarkMode: false,
+            isDarkMode: isDarkMode,
           ),
-          const SizedBox(height: 12), // تقليل المسافة أكثر
+          SizedBox(height: AppDimensions.smallSpacing),
 
           // المؤقت الدائري - يحتاج تعديل لكي لا يتأثر باتجاه النص
           Directionality(
@@ -143,12 +161,12 @@ class _PomodoroScreenState extends State<PomodoroScreen>
               width: MediaQuery.of(context).size.width * 0.5,
               child: TimerCircle(
                 controller: _controller,
-                isDarkMode: false,
+                isDarkMode: isDarkMode,
                 pulseAnimation: _controller.pulseAnimation,
               ),
             ),
           ),
-          const SizedBox(height: 16), // تقليل المسافة أكثر
+          SizedBox(height: AppDimensions.defaultSpacing),
 
           // أزرار التحكم - ضمان أن تظهر بشكل صحيح مع اتجاه النص
           Directionality(
@@ -156,15 +174,13 @@ class _PomodoroScreenState extends State<PomodoroScreen>
             child: ControlButtons(
               controller: _controller,
               onResetPressed: _showResetConfirmation,
-              isDarkMode: false,
+              isDarkMode: isDarkMode,
             ),
           ),
 
-          // تمت إزالة زر التشغيل/الإيقاف الإضافي
-
           // عدد الجلسات المكتملة - تعديل لتناسب مع الشاشة
           if (_controller.completedSessions > 0) ...[
-            const SizedBox(height: 14), // تقليل المسافة أكثر
+            SizedBox(height: AppDimensions.defaultSpacing - 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -172,20 +188,24 @@ class _PomodoroScreenState extends State<PomodoroScreen>
                   icon: Icons.check_circle_outline,
                   title: PomodoroStrings.statsSessionsLabel.split(' ')[0],
                   value: _controller.completedSessions.toString(),
-                  color: PomodoroColors.kGreenColor,
+                  color: AppColors.success,
                 ),
                 Container(
-                  height: 16, // تقليل ارتفاع الخط الفاصل أكثر
+                  height: AppDimensions.extraSmallIconSize - 2,
                   width: 1,
-                  color: Colors.grey[300],
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 6), // تقليل الهوامش أكثر
+                  color: AppColors.getThemeColor(
+                    AppColors.border,
+                    AppColors.darkBorder,
+                    isDarkMode,
+                  ),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.smallSpacing - 2),
                 ),
                 _buildCompletionInfo(
                   icon: Icons.repeat,
                   title: PomodoroStrings.statsFromLabel.split(' ')[1],
                   value: _controller.currentCycle.toString(),
-                  color: PomodoroColors.kMediumPurple,
+                  color: AppColors.primary,
                 ),
               ],
             ),
@@ -202,6 +222,8 @@ class _PomodoroScreenState extends State<PomodoroScreen>
     required String value,
     required Color color,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         Row(
@@ -210,26 +232,34 @@ class _PomodoroScreenState extends State<PomodoroScreen>
             Icon(
               icon,
               color: color,
-              size: 14, // تصغير حجم الأيقونة أكثر
+              size: AppDimensions.extraSmallIconSize - 4,
             ),
-            const SizedBox(width: 3), // تقليل المسافة أكثر
+            SizedBox(width: AppDimensions.smallSpacing / 3),
             Text(
               title,
               style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 11, // تصغير حجم الخط أكثر
+                color: AppColors.getThemeColor(
+                  AppColors.textSecondary,
+                  AppColors.darkTextSecondary,
+                  isDarkMode,
+                ),
+                fontSize: AppDimensions.smallLabelFontSize - 2,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
           ],
         ),
-        const SizedBox(height: 2), // تقليل المسافة أكثر
+        SizedBox(height: AppDimensions.smallSpacing / 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Color(0xFF221291), // لون متوافق مع صفحة المقررات
+          style: TextStyle(
+            color: AppColors.getThemeColor(
+              AppColors.primary,
+              AppColors.darkPrimary,
+              isDarkMode,
+            ),
             fontWeight: FontWeight.bold,
-            fontSize: 13, // تصغير حجم الخط أكثر
+            fontSize: AppDimensions.smallLabelFontSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -265,29 +295,40 @@ class _PomodoroScreenState extends State<PomodoroScreen>
 
   // عرض حوار تأكيد إعادة الضبط - تم تعديله لدعم RTL
   void _showResetConfirmation() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl, // ضمان اتجاه النص في الحوار
         child: AlertDialog(
-          title: const Text(
+          title: Text(
             PomodoroStrings.resetTimerTitle,
             style: TextStyle(
               fontFamily: 'SYMBIOAR+LT',
               fontWeight: FontWeight.bold,
-              color: Color(0xFF221291), // لون متوافق مع صفحة المقررات
-              fontSize: 14, // تصغير حجم الخط
+              color: AppColors.getThemeColor(
+                AppColors.primary,
+                AppColors.darkPrimary,
+                isDarkMode,
+              ),
+              fontSize: AppDimensions.smallBodyFontSize,
             ),
           ),
-          content: const Text(
+          content: Text(
             PomodoroStrings.resetTimerContent,
             style: TextStyle(
               fontFamily: 'SYMBIOAR+LT',
-              fontSize: 12, // تصغير حجم الخط
+              fontSize: AppDimensions.smallLabelFontSize,
             ),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+          ),
+          backgroundColor: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
           ),
           actions: [
             TextButton(
@@ -295,9 +336,13 @@ class _PomodoroScreenState extends State<PomodoroScreen>
               child: Text(
                 PomodoroStrings.resetTimerCancel,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: AppColors.getThemeColor(
+                    AppColors.textSecondary,
+                    AppColors.darkTextSecondary,
+                    isDarkMode,
+                  ),
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: 12, // تصغير حجم الخط
+                  fontSize: AppDimensions.smallLabelFontSize,
                 ),
               ),
             ),
@@ -308,18 +353,22 @@ class _PomodoroScreenState extends State<PomodoroScreen>
                 _showSuccessSnackBar(PomodoroStrings.resetTimerSuccess);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    const Color(0xFF4338CA), // لون متوافق مع صفحة المقررات
+                backgroundColor: AppColors.getThemeColor(
+                  AppColors.primaryDark,
+                  AppColors.darkPrimaryDark,
+                  isDarkMode,
+                ),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 PomodoroStrings.resetTimerConfirm,
                 style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: 12, // تصغير حجم الخط
+                  fontSize: AppDimensions.smallLabelFontSize,
                 ),
               ),
             ),
@@ -331,25 +380,33 @@ class _PomodoroScreenState extends State<PomodoroScreen>
 
   // عرض رسالة نجاح - تم تعديلها لدعم RTL
   void _showSuccessSnackBar(String message) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Directionality(
           textDirection: TextDirection.rtl, // ضمان اتجاه النص في الإشعار
           child: Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'SYMBIOAR+LT',
-              fontSize: 12, // تصغير حجم الخط
+              fontSize: AppDimensions.smallLabelFontSize,
             ),
           ),
         ),
-        backgroundColor: const Color(0xFF4338CA), // لون متوافق مع صفحة المقررات
+        backgroundColor: AppColors.getThemeColor(
+          AppColors.primaryDark,
+          AppColors.darkPrimaryDark,
+          isDarkMode,
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         ),
-        margin: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 6), // تقليل الهوامش أكثر
+        margin: EdgeInsets.symmetric(
+          horizontal: AppDimensions.smallSpacing,
+          vertical: AppDimensions.smallSpacing / 1.5,
+        ),
       ),
     );
   }
@@ -358,10 +415,13 @@ class _PomodoroScreenState extends State<PomodoroScreen>
   void showCompletionSnackBar() {
     if (!_controller.showNotifications) return;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final message = _controller.getCompletionMessage();
     final backgroundColor = _controller.isBreakTime
-        ? const Color(0xFF221291) // لون متوافق مع صفحة المقررات
-        : PomodoroColors.kAccentColor;
+        ? AppColors.getThemeColor(
+            AppColors.primary, AppColors.darkPrimary, isDarkMode)
+        : AppColors.getThemeColor(
+            AppColors.accent, AppColors.darkAccent, isDarkMode);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -372,15 +432,15 @@ class _PomodoroScreenState extends State<PomodoroScreen>
               Icon(
                 _controller.isBreakTime ? Icons.free_breakfast : Icons.work,
                 color: Colors.white,
-                size: 14, // تصغير حجم الأيقونة أكثر
+                size: AppDimensions.extraSmallIconSize - 4,
               ),
-              const SizedBox(width: 6), // تقليل المسافة أكثر
+              SizedBox(width: AppDimensions.smallSpacing - 2),
               Expanded(
                 child: Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 11, // تصغير حجم الخط أكثر
+                    fontSize: AppDimensions.smallLabelFontSize - 2,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -391,10 +451,12 @@ class _PomodoroScreenState extends State<PomodoroScreen>
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         ),
-        margin: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 6), // تقليل الهوامش أكثر
+        margin: EdgeInsets.symmetric(
+          horizontal: AppDimensions.smallSpacing,
+          vertical: AppDimensions.smallSpacing / 1.5,
+        ),
         duration: const Duration(seconds: 4),
         action: _controller.isBreakTime && !_controller.autoStartBreaks
             ? SnackBarAction(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../../constants/pomodoro_strings.dart';
 import '../../controllers/pomodoro_controller.dart';
 
@@ -17,12 +18,6 @@ class ControlButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // اللون حسب الوضع الحالي
-    final progressColor = PomodoroColors.getTimerColor(
-      isBreakTime: controller.isBreakTime,
-      isLongBreak: controller.isLongBreak,
-    );
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -35,17 +30,13 @@ class ControlButtons extends StatelessWidget {
               ? PomodoroStrings.pauseButton
               : PomodoroStrings.startButton,
           isPrimary: true,
-          bgColor:
-              PomodoroColors.kMediumPurple, // تعديل للتوافق مع الألوان الموحدة
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: AppDimensions.defaultSpacing),
         _buildControlButton(
           onPressed: onResetPressed,
           icon: Icons.refresh,
           text: PomodoroStrings.resetButton,
           isPrimary: false,
-          bgColor:
-              PomodoroColors.kMediumPurple, // تعديل للتوافق مع الألوان الموحدة
         ),
       ],
     );
@@ -56,22 +47,45 @@ class ControlButtons extends StatelessWidget {
     required IconData icon,
     required String text,
     required bool isPrimary,
-    required Color bgColor,
   }) {
-    final Color buttonBgColor =
-        isPrimary ? bgColor : (isDarkMode ? Colors.grey[850]! : Colors.white);
-    final Color textColor =
-        isPrimary ? Colors.white : (isDarkMode ? Colors.white : bgColor);
-    final Color borderColor = bgColor;
+    final Color buttonBgColor = isPrimary
+        ? AppColors.getThemeColor(
+            AppColors.primary,
+            AppColors.darkPrimary,
+            isDarkMode,
+          )
+        : AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          );
+
+    final Color textColor = isPrimary
+        ? Colors.white
+        : AppColors.getThemeColor(
+            AppColors.primary,
+            AppColors.darkPrimary,
+            isDarkMode,
+          );
+
+    final Color borderColor = AppColors.getThemeColor(
+      AppColors.primary,
+      AppColors.darkPrimary,
+      isDarkMode,
+    );
 
     return Expanded(
       child: Container(
-        height: 56,
+        height: AppDimensions.buttonHeight,
         decoration: BoxDecoration(
           boxShadow: isPrimary
               ? [
                   BoxShadow(
-                    color: bgColor.withOpacity(0.3),
+                    color: AppColors.getThemeColor(
+                      AppColors.shadow,
+                      AppColors.darkShadow,
+                      isDarkMode,
+                    ),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -83,21 +97,24 @@ class ControlButtons extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonBgColor,
             foregroundColor: textColor,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            elevation: isPrimary ? 0 : 0, // تعديل الارتفاع
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.defaultSpacing,
+              vertical: AppDimensions.smallSpacing + 4,
+            ),
+            elevation: isPrimary ? 0 : 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               side: BorderSide(
                 color: isPrimary ? Colors.transparent : borderColor,
                 width: 1.5,
               ),
             ),
           ),
-          icon: Icon(icon, size: 24),
+          icon: Icon(icon, size: AppDimensions.iconSize),
           label: Text(
             text,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: AppDimensions.buttonFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'SYMBIOAR+LT',
             ),

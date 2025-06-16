@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../../controllers/pomodoro_controller.dart';
 
 class StatusLabel extends StatelessWidget {
@@ -15,10 +16,14 @@ class StatusLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // اللون حسب الوضع الحالي
-    final progressColor = PomodoroColors.getTimerColor(
-      isBreakTime: controller.isBreakTime,
-      isLongBreak: controller.isLongBreak,
-    );
+    final progressColor = controller.isBreakTime
+        ? (controller.isLongBreak
+            ? AppColors.getThemeColor(
+                AppColors.success, AppColors.darkSuccess, isDarkMode)
+            : AppColors.getThemeColor(
+                AppColors.primary, AppColors.darkPrimary, isDarkMode))
+        : AppColors.getThemeColor(
+            AppColors.accent, AppColors.darkAccent, isDarkMode);
 
     // الأيقونة حسب نوع المؤقت
     IconData icon;
@@ -31,13 +36,20 @@ class StatusLabel extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.defaultSpacing,
+            vertical: AppDimensions.smallSpacing,
+          ),
           decoration: BoxDecoration(
             color: _getStatusBackgroundColor(isDarkMode, progressColor),
-            borderRadius: BorderRadius.circular(16), // تغيير نصف القطر للتوافق
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.getThemeColor(
+                  AppColors.shadow,
+                  AppColors.darkShadow,
+                  isDarkMode,
+                ),
                 spreadRadius: 1,
                 blurRadius: 5,
                 offset: const Offset(0, 1),
@@ -50,35 +62,46 @@ class StatusLabel extends StatelessWidget {
               Icon(
                 icon,
                 color: progressColor,
-                size: 20,
+                size: AppDimensions.smallIconSize,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: AppDimensions.smallSpacing),
               Text(
                 controller.statusMessage,
                 style: TextStyle(
                   color: progressColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 15, // تعديل حجم الخط
+                  fontSize: AppDimensions.bodyFontSize,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12), // زيادة المسافة
+        SizedBox(height: AppDimensions.smallSpacing + 4),
 
         // معلومات الجلسة القادمة
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.defaultSpacing,
+            vertical: AppDimensions.smallSpacing,
+          ),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.getThemeColor(
+              AppColors.surfaceLight,
+              AppColors.darkSurfaceLight,
+              isDarkMode,
+            ),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
           child: Text(
             controller.nextSessionInfo,
             style: TextStyle(
-              fontSize: 14,
-              color: PomodoroColors.getSubTextColor(isDarkMode),
+              fontSize: AppDimensions.smallBodyFontSize,
+              color: AppColors.getThemeColor(
+                AppColors.textSecondary,
+                AppColors.darkTextSecondary,
+                isDarkMode,
+              ),
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -94,10 +117,10 @@ class StatusLabel extends StatelessWidget {
     } else {
       if (controller.isBreakTime) {
         return controller.isLongBreak
-            ? PomodoroColors.kGreenColor.withOpacity(0.1)
-            : PomodoroColors.kLightPurple;
+            ? AppColors.success.withOpacity(0.1)
+            : AppColors.primaryPale;
       } else {
-        return PomodoroColors.kAccentColor.withOpacity(0.1);
+        return AppColors.accent.withOpacity(0.1);
       }
     }
   }

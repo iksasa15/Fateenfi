@@ -1,7 +1,8 @@
 // components/stats/stats_card.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart'; // Updated import
 import '../../constants/pomodoro_strings.dart';
 import '../../controllers/pomodoro_controller.dart';
 import 'stat_block.dart';
@@ -19,8 +20,17 @@ class StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = PomodoroColors.kDarkPurple;
-    final subTextColor = Colors.grey[600];
+    final textColor = AppColors.getThemeColor(
+      AppColors.textPrimary,
+      AppColors.darkTextPrimary,
+      isDarkMode,
+    );
+
+    final subTextColor = AppColors.getThemeColor(
+      AppColors.textSecondary,
+      AppColors.darkTextSecondary,
+      isDarkMode,
+    );
 
     // حساب الإحصائيات
     final totalSessionMinutes =
@@ -31,21 +41,36 @@ class StatsCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 14), // تقليل الحشو الداخلي أكثر
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimensions.smallSpacing,
+        vertical: AppDimensions.smallSpacing +
+            6, // تعديل طفيف للتناسب مع التصميم السابق
+      ),
       decoration: BoxDecoration(
-        color: PomodoroColors.getCardBackgroundColor(isDarkMode),
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          isDarkMode,
+        ),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.06),
+            color: AppColors.getThemeColor(
+              AppColors.shadowColor,
+              AppColors.darkShadowColor,
+              isDarkMode,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: PomodoroColors.kLightPurple,
-          width: 1, // تقليل عرض الحدود
+          color: AppColors.getThemeColor(
+            AppColors.primaryLight,
+            AppColors.darkPrimaryLight,
+            isDarkMode,
+          ),
+          width: 1,
         ),
       ),
       child: Column(
@@ -55,22 +80,27 @@ class StatsCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(AppDimensions.smallSpacing),
                 decoration: BoxDecoration(
-                  color: PomodoroColors.kLightPurple,
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.getThemeColor(
+                    AppColors.primaryPale,
+                    AppColors.darkPrimaryPale,
+                    isDarkMode,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
                 child: Icon(
                   Icons.bar_chart,
                   color: textColor,
-                  size: 16, // تصغير الأيقونة أكثر
+                  size: AppDimensions.extraSmallIconSize,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: AppDimensions.smallSpacing),
               Text(
                 PomodoroStrings.statsTitle,
                 style: TextStyle(
-                  fontSize: 14, // تقليل حجم الخط أكثر
+                  fontSize: AppDimensions.smallBodyFontSize,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   fontFamily: 'SYMBIOAR+LT',
@@ -78,7 +108,7 @@ class StatsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.smallSpacing),
 
           // استخدام Row مع عرض مدروس واستخدام mainAxisAlignment
           Row(
@@ -88,23 +118,23 @@ class StatsCard extends StatelessWidget {
                 title: PomodoroStrings.statsLongBreaks,
                 value: '$longBreaks',
                 icon: Icons.weekend,
-                color: PomodoroColors.kGreenColor,
+                color: AppColors.success,
                 isDarkMode: isDarkMode,
               ),
-              SizedBox(width: 5), // مسافة صغيرة محددة
+              SizedBox(width: AppDimensions.smallSpacing / 2),
               StatBlock(
                 title: PomodoroStrings.statsShortBreaks,
                 value: '$shortBreaks',
                 icon: Icons.coffee,
-                color: PomodoroColors.kDarkPurple,
+                color: AppColors.primary,
                 isDarkMode: isDarkMode,
               ),
-              SizedBox(width: 5), // مسافة صغيرة محددة
+              SizedBox(width: AppDimensions.smallSpacing / 2),
               StatBlock(
                 title: PomodoroStrings.statsFocusTime,
                 value: '$totalSessionMinutes د',
                 icon: Icons.timer,
-                color: PomodoroColors.kAccentColor,
+                color: AppColors.accent,
                 isDarkMode: isDarkMode,
               ),
             ],
@@ -112,14 +142,23 @@ class StatsCard extends StatelessWidget {
 
           // تقدم الدورة الحالية
           if (controller.completedSessions > 0) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: AppDimensions.smallSpacing + 6),
             Container(
-              padding: const EdgeInsets.all(10), // تقليل الحشو أكثر
+              padding: EdgeInsets.all(AppDimensions.smallSpacing),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.getThemeColor(
+                  AppColors.surfaceLight,
+                  AppColors.darkSurfaceLight,
+                  isDarkMode,
+                ),
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.smallRadius + 2),
                 border: Border.all(
-                  color: Colors.grey[200]!,
+                  color: AppColors.getThemeColor(
+                    AppColors.border,
+                    AppColors.darkBorder,
+                    isDarkMode,
+                  ),
                   width: 1,
                 ),
               ),
@@ -129,14 +168,14 @@ class StatsCard extends StatelessWidget {
                   Text(
                     PomodoroStrings.statsCurrentProgress,
                     style: TextStyle(
-                      fontSize: 12, // تقليل حجم الخط أكثر
+                      fontSize: AppDimensions.smallLabelFontSize,
                       fontWeight: FontWeight.w500,
                       color: textColor,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-                  const SizedBox(height: 6), // تقليل المسافة أكثر
+                  SizedBox(height: AppDimensions.smallSpacing / 2),
 
                   // شريط التقدم
                   ProgressBar(
@@ -146,16 +185,16 @@ class StatsCard extends StatelessWidget {
                     isDarkMode: isDarkMode,
                   ),
 
-                  const SizedBox(height: 4), // تقليل المسافة أكثر
+                  SizedBox(height: AppDimensions.smallSpacing / 2),
                   FittedBox(
-                    // استخدام FittedBox للتأكد من تناسب النص
                     fit: BoxFit.scaleDown,
                     child: Directionality(
                       textDirection: TextDirection.rtl,
                       child: Text(
                         '${PomodoroStrings.statsCompletedLabel} ${controller.completedSessions % controller.sessionsUntilLongBreak} ${PomodoroStrings.statsFromLabel} ${controller.sessionsUntilLongBreak} ${PomodoroStrings.statsSessionsLabel}',
                         style: TextStyle(
-                          fontSize: 10, // تقليل حجم الخط أكثر
+                          fontSize: AppDimensions.smallLabelFontSize -
+                              3, // خفض حجم الخط قليلاً للتناسب
                           color: subTextColor,
                           fontFamily: 'SYMBIOAR+LT',
                         ),

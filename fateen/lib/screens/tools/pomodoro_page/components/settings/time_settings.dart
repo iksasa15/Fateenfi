@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart'; // Added import
 import '../../constants/pomodoro_strings.dart';
 import '../../constants/pomodoro_durations.dart';
 import '../../controllers/pomodoro_controller.dart';
@@ -19,23 +20,39 @@ class TimeSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ألوان متغيرة حسب الوضع
-    final textColor = PomodoroColors.kDarkPurple;
+    final textColor = AppColors.getThemeColor(
+      AppColors.textPrimary,
+      AppColors.darkTextPrimary,
+      isDarkMode,
+    );
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(AppDimensions.sectionPadding),
       decoration: BoxDecoration(
-        color: PomodoroColors.getCardBackgroundColor(isDarkMode),
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          isDarkMode,
+        ),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.08),
+            color: AppColors.getThemeColor(
+              AppColors.shadow,
+              AppColors.darkShadow,
+              isDarkMode,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: PomodoroColors.kLightPurple,
+          color: AppColors.getThemeColor(
+            AppColors.primaryLight,
+            AppColors.darkPrimaryLight,
+            isDarkMode,
+          ),
           width: 2,
         ),
       ),
@@ -46,22 +63,27 @@ class TimeSettings extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(AppDimensions.smallSpacing),
                 decoration: BoxDecoration(
-                  color: PomodoroColors.kLightPurple,
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.getThemeColor(
+                    AppColors.primaryPale,
+                    AppColors.darkPrimaryPale,
+                    isDarkMode,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
                 child: Icon(
                   Icons.timer_outlined,
                   color: textColor,
-                  size: 24,
+                  size: AppDimensions.iconSize,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.smallSpacing),
               Text(
                 PomodoroStrings.settingsTitle,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.subtitleFontSize,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                   fontFamily: 'SYMBIOAR+LT',
@@ -69,7 +91,7 @@ class TimeSettings extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.largeSpacing),
 
           // مدة جلسة التركيز
           _buildSessionSetting(
@@ -78,7 +100,7 @@ class TimeSettings extends StatelessWidget {
             options: PomodoroDurations.sessionDurations,
             onCustomSelected: () => onCustomTimeRequested(true),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.defaultSpacing),
 
           // مدة الاستراحة القصيرة
           _buildSessionSetting(
@@ -87,7 +109,7 @@ class TimeSettings extends StatelessWidget {
             options: PomodoroDurations.breakDurations,
             onCustomSelected: () => onCustomTimeRequested(false),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.defaultSpacing),
 
           // مدة الاستراحة الطويلة
           _buildSessionSetting(
@@ -97,7 +119,7 @@ class TimeSettings extends StatelessWidget {
             onCustomSelected: () =>
                 onCustomTimeRequested(false, isLongBreak: true),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.defaultSpacing),
 
           // عدد الجلسات قبل الاستراحة الطويلة
           _buildTimeSetting(
@@ -122,7 +144,11 @@ class TimeSettings extends StatelessWidget {
     required List<int> options,
     required VoidCallback onCustomSelected,
   }) {
-    final textColor = PomodoroColors.getTextColor(isDarkMode);
+    final textColor = AppColors.getThemeColor(
+      AppColors.textPrimary,
+      AppColors.darkTextPrimary,
+      isDarkMode,
+    );
     final stringOptions = options.map((e) => e.toString()).toList();
 
     // التحقق مما إذا كانت القيمة الحالية موجودة ضمن الخيارات المتاحة
@@ -146,21 +172,31 @@ class TimeSettings extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppDimensions.bodyFontSize,
             color: textColor,
             fontWeight: FontWeight.w500,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: AppDimensions.smallSpacing),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: AppColors.getThemeColor(
+              AppColors.surface,
+              AppColors.darkSurface,
+              isDarkMode,
+            ),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.inputBorderRadius),
             border: Border.all(
-              color: Colors.grey[300]!,
+              color: AppColors.getThemeColor(
+                AppColors.border,
+                AppColors.darkBorder,
+                isDarkMode,
+              ),
               width: 1,
             ),
           ),
@@ -172,10 +208,14 @@ class TimeSettings extends StatelessWidget {
                 Icons.keyboard_arrow_down,
                 color: textColor,
               ),
-              dropdownColor: isDarkMode ? Colors.grey[850] : Colors.white,
+              dropdownColor: AppColors.getThemeColor(
+                AppColors.surface,
+                AppColors.darkSurface,
+                isDarkMode,
+              ),
               style: TextStyle(
                 color: textColor,
-                fontSize: 16,
+                fontSize: AppDimensions.bodyFontSize,
                 fontFamily: 'SYMBIOAR+LT',
               ),
               onChanged: (String? newValue) {
@@ -226,7 +266,11 @@ class TimeSettings extends StatelessWidget {
     required List<String> options,
     required Function(String) onChange,
   }) {
-    final textColor = PomodoroColors.getTextColor(isDarkMode);
+    final textColor = AppColors.getThemeColor(
+      AppColors.textPrimary,
+      AppColors.darkTextPrimary,
+      isDarkMode,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,21 +278,31 @@ class TimeSettings extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppDimensions.bodyFontSize,
             color: textColor,
             fontWeight: FontWeight.w500,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: AppDimensions.smallSpacing),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: AppColors.getThemeColor(
+              AppColors.surface,
+              AppColors.darkSurface,
+              isDarkMode,
+            ),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.inputBorderRadius),
             border: Border.all(
-              color: Colors.grey[300]!,
+              color: AppColors.getThemeColor(
+                AppColors.border,
+                AppColors.darkBorder,
+                isDarkMode,
+              ),
               width: 1,
             ),
           ),
@@ -260,10 +314,14 @@ class TimeSettings extends StatelessWidget {
                 Icons.keyboard_arrow_down,
                 color: textColor,
               ),
-              dropdownColor: isDarkMode ? Colors.grey[850] : Colors.white,
+              dropdownColor: AppColors.getThemeColor(
+                AppColors.surface,
+                AppColors.darkSurface,
+                isDarkMode,
+              ),
               style: TextStyle(
                 color: textColor,
-                fontSize: 16,
+                fontSize: AppDimensions.bodyFontSize,
                 fontFamily: 'SYMBIOAR+LT',
               ),
               onChanged: (String? newValue) {

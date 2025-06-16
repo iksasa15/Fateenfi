@@ -1,5 +1,8 @@
+// components/stats/progress_bar.dart
+
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart'; // Updated import
 
 class ProgressBar extends StatelessWidget {
   final double value;
@@ -14,24 +17,34 @@ class ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 10,
+      height: AppDimensions.smallSpacing,
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: isDarkMode
-            ? Colors.grey[800]
-            : PomodoroColors.kLightPurple.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius / 2),
+        color: AppColors.getThemeColor(
+          AppColors.primaryPale,
+          AppColors.darkPrimaryPale,
+          isDarkMode,
+        ),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: value,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: PomodoroColors.kMediumPurple,
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius / 2),
+            color: AppColors.getThemeColor(
+              AppColors.primary,
+              AppColors.darkPrimary,
+              isDarkMode,
+            ),
             boxShadow: [
               BoxShadow(
-                color: PomodoroColors.kMediumPurple.withOpacity(0.5),
+                color: AppColors.getThemeColor(
+                  AppColors.primary,
+                  AppColors.darkPrimary,
+                  isDarkMode,
+                ).withOpacity(0.5),
                 blurRadius: 4,
               ),
             ],

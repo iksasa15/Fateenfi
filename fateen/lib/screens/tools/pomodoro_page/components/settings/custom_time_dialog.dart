@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart';
 import '../../constants/pomodoro_strings.dart';
 import '../../constants/pomodoro_durations.dart';
 import '../../controllers/pomodoro_controller.dart';
@@ -19,6 +20,7 @@ class CustomTimeDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController textController = TextEditingController();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     // تحديد العنوان حسب نوع الإعداد
     final String title = isSession
@@ -30,14 +32,24 @@ class CustomTimeDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.defaultSpacing,
+          vertical: AppDimensions.largeSpacing),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          ),
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: AppColors.getThemeColor(
+                AppColors.shadowColor,
+                AppColors.darkShadowColor,
+                isDarkMode,
+              ),
               blurRadius: 15,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -49,103 +61,158 @@ class CustomTimeDialog extends StatelessWidget {
           children: [
             // عنوان الحوار
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+              padding: EdgeInsets.fromLTRB(
+                AppDimensions.defaultSpacing,
+                AppDimensions.defaultSpacing,
+                AppDimensions.defaultSpacing,
+                AppDimensions.smallSpacing,
+              ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(AppDimensions.smallSpacing),
                     decoration: BoxDecoration(
-                      color: PomodoroColors.kLightPurple,
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryPale,
+                        AppColors.darkPrimaryPale,
+                        isDarkMode,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.access_time,
-                      color: PomodoroColors.kDarkPurple,
-                      size: 20,
+                      color: AppColors.getThemeColor(
+                        AppColors.primary,
+                        AppColors.darkPrimary,
+                        isDarkMode,
+                      ),
+                      size: AppDimensions.smallIconSize,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.smallSpacing),
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: PomodoroColors.kDarkPurple,
+                    style: TextStyle(
+                      color: AppColors.getThemeColor(
+                        AppColors.textPrimary,
+                        AppColors.darkTextPrimary,
+                        isDarkMode,
+                      ),
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: AppDimensions.subtitleFontSize,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
-                      color: Colors.grey,
+                      color: AppColors.getThemeColor(
+                        AppColors.textSecondary,
+                        AppColors.darkTextSecondary,
+                        isDarkMode,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const Divider(),
+            Divider(
+              color: AppColors.getThemeColor(
+                AppColors.divider,
+                AppColors.darkDivider,
+                isDarkMode,
+              ),
+            ),
 
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     PomodoroStrings.customTimeInstructions,
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: AppColors.getThemeColor(
+                        AppColors.textSecondary,
+                        AppColors.darkTextSecondary,
+                        isDarkMode,
+                      ),
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.defaultSpacing),
                   TextField(
                     controller: textController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: PomodoroStrings.customTimeHint,
-                      fillColor: Colors.white,
+                      fillColor: AppColors.getThemeColor(
+                        AppColors.surface,
+                        AppColors.darkSurface,
+                        isDarkMode,
+                      ),
                       filled: true,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         borderSide: BorderSide(
-                          color: Colors.grey[300]!,
+                          color: AppColors.getThemeColor(
+                            AppColors.border,
+                            AppColors.darkBorder,
+                            isDarkMode,
+                          ),
                           width: 1,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         borderSide: BorderSide(
-                          color: Colors.grey[300]!,
+                          color: AppColors.getThemeColor(
+                            AppColors.border,
+                            AppColors.darkBorder,
+                            isDarkMode,
+                          ),
                           width: 1,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: PomodoroColors.kMediumPurple,
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
+                        borderSide: BorderSide(
+                          color: AppColors.getThemeColor(
+                            AppColors.primary,
+                            AppColors.darkPrimary,
+                            isDarkMode,
+                          ),
                           width: 1,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.inputFieldPadding,
+                        vertical: AppDimensions.smallSpacing,
                       ),
                     ),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: AppDimensions.bodyFontSize,
                       fontWeight: FontWeight.bold,
-                      color: PomodoroColors.kDarkPurple,
+                      color: AppColors.getThemeColor(
+                        AppColors.textPrimary,
+                        AppColors.darkTextPrimary,
+                        isDarkMode,
+                      ),
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: AppDimensions.defaultSpacing),
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: AppDimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: () {
                         if (textController.text.isNotEmpty) {
@@ -210,17 +277,22 @@ class CustomTimeDialog extends StatelessWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: PomodoroColors.kMediumPurple,
+                        backgroundColor: AppColors.getThemeColor(
+                          AppColors.primary,
+                          AppColors.darkPrimary,
+                          isDarkMode,
+                        ),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                         ),
                         elevation: 0,
                       ),
                       child: Text(
                         PomodoroStrings.customTimeConfirm,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: AppDimensions.buttonFontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
@@ -238,6 +310,8 @@ class CustomTimeDialog extends StatelessWidget {
 
   // عرض رسالة خطأ
   void _showErrorSnackBar(BuildContext context, String message) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -246,10 +320,14 @@ class CustomTimeDialog extends StatelessWidget {
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
-        backgroundColor: PomodoroColors.kAccentColor,
+        backgroundColor: AppColors.getThemeColor(
+          AppColors.error,
+          AppColors.darkError,
+          isDarkMode,
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         ),
       ),
     );

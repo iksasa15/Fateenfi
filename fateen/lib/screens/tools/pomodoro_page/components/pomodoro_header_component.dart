@@ -1,6 +1,8 @@
 // components/pomodoro_header_component.dart
 
 import 'package:flutter/material.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/pomodoro_strings.dart';
 
 class PomodoroHeaderComponent extends StatelessWidget {
@@ -13,17 +15,18 @@ class PomodoroHeaderComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // استخدام نفس قياسات هيدر السبورة بالضبط
-    final titleSize = 20.0; // تصغير حجم الخط ليناسب المركز
-    final padding = 20.0;
-    final buttonSize = 45.0; // حجم زر التبديل في هيدر الجدول
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(padding),
-          color: Colors.white,
+          padding: EdgeInsets.all(AppDimensions.sectionPadding),
+          color: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          ),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -33,16 +36,25 @@ class PomodoroHeaderComponent extends StatelessWidget {
                 child: GestureDetector(
                   onTap: onSettingsPressed,
                   child: Container(
-                    width: buttonSize,
-                    height: buttonSize,
+                    width: AppDimensions.socialButtonSize,
+                    height: AppDimensions.socialButtonSize,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F3FF),
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryPale,
+                        AppColors.darkPrimaryPale,
+                        isDarkMode,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.settings_outlined,
-                      color: Color(0xFF4338CA),
-                      size: 20,
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ),
+                      size: AppDimensions.smallIconSize,
                     ),
                   ),
                 ),
@@ -54,16 +66,25 @@ class PomodoroHeaderComponent extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
-                    width: buttonSize,
-                    height: buttonSize,
+                    width: AppDimensions.socialButtonSize,
+                    height: AppDimensions.socialButtonSize,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F3FF),
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryPale,
+                        AppColors.darkPrimaryPale,
+                        isDarkMode,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.mediumRadius),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back,
-                      color: Color(0xFF4338CA),
-                      size: 20,
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ),
+                      size: AppDimensions.smallIconSize,
                     ),
                   ),
                 ),
@@ -73,9 +94,13 @@ class PomodoroHeaderComponent extends StatelessWidget {
               Text(
                 PomodoroStrings.appTitle,
                 style: TextStyle(
-                  fontSize: titleSize,
+                  fontSize: AppDimensions.subtitleFontSize,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF374151),
+                  color: AppColors.getThemeColor(
+                    AppColors.textPrimary,
+                    AppColors.darkTextPrimary,
+                    isDarkMode,
+                  ),
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -87,7 +112,11 @@ class PomodoroHeaderComponent extends StatelessWidget {
         Container(
           height: 1,
           width: double.infinity,
-          color: Colors.grey.shade200,
+          color: AppColors.getThemeColor(
+            AppColors.divider,
+            AppColors.darkDivider,
+            isDarkMode,
+          ),
           margin: EdgeInsets.zero,
           padding: EdgeInsets.zero,
         ),

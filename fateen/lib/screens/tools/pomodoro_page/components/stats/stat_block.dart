@@ -1,7 +1,8 @@
 // components/stats/stat_block.dart
 
 import 'package:flutter/material.dart';
-import '../../constants/pomodoro_colors.dart';
+import '../../../../../core/constants/app_dimensions.dart'; // Updated import
+import '../../../../../core/constants/appColor.dart'; // Updated import
 
 class StatBlock extends StatelessWidget {
   final String title;
@@ -23,9 +24,9 @@ class StatBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     // تقليل الهوامش والحشو بصورة أكبر لتجنب أي تجاوز للحدود
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardPadding = 16.0 * 2;
-    final edgePadding = 14.0 * 2;
-    final internalSpacing = 10.0; // المسافة بين البلوكات
+    final cardPadding = AppDimensions.defaultSpacing * 2;
+    final edgePadding = AppDimensions.smallSpacing * 2;
+    final internalSpacing = AppDimensions.smallSpacing; // المسافة بين البلوكات
 
     // إعادة حساب عرض البلوك مع هامش أمان أكبر
     final availableWidth =
@@ -34,64 +35,89 @@ class StatBlock extends StatelessWidget {
 
     return Container(
       width: width,
-      height: 80, // تقليل الارتفاع أكثر
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+      height: 80, // حفظ الارتفاع للتناسب مع التصميم
+      padding: EdgeInsets.symmetric(
+        vertical: AppDimensions.smallSpacing / 2,
+        horizontal: AppDimensions.smallSpacing / 4,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          isDarkMode,
+        ),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius + 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: AppColors.getThemeColor(
+              AppColors.shadow,
+              AppColors.darkShadow,
+              isDarkMode,
+            ),
             spreadRadius: 0,
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
         ],
         border: Border.all(
-          color: Colors.grey[200]!,
+          color: AppColors.getThemeColor(
+            AppColors.border,
+            AppColors.darkBorder,
+            isDarkMode,
+          ),
           width: 1,
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // أيقونة البلوك - تقليل الحجم أكثر
+          // أيقونة البلوك
           Container(
-            width: 28,
-            height: 28,
+            width: AppDimensions.iconSize + 4,
+            height: AppDimensions.iconSize + 4,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
             ),
-            child: Icon(icon, color: color, size: 16),
+            child: Icon(
+              icon,
+              color: color,
+              size: AppDimensions.extraSmallIconSize,
+            ),
           ),
-          const SizedBox(height: 3),
+          SizedBox(height: AppDimensions.smallSpacing / 3),
 
           // قيمة الإحصائية
           FittedBox(
-            // استخدام FittedBox لتقليص النص إذا كان كبيرًا جدًا
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppDimensions.smallBodyFontSize,
                 fontWeight: FontWeight.bold,
-                color: PomodoroColors.kDarkPurple,
+                color: AppColors.getThemeColor(
+                  AppColors.textPrimary,
+                  AppColors.darkTextPrimary,
+                  isDarkMode,
+                ),
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: AppDimensions.smallSpacing / 4),
 
           // عنوان الإحصائية
           FittedBox(
-            // استخدام FittedBox لتقليص النص إذا كان كبيرًا جدًا
             fit: BoxFit.scaleDown,
             child: Text(
               title,
               style: TextStyle(
-                fontSize: 10,
-                color: Colors.grey[600],
+                fontSize: AppDimensions.smallLabelFontSize,
+                color: AppColors.getThemeColor(
+                  AppColors.textSecondary,
+                  AppColors.darkTextSecondary,
+                  isDarkMode,
+                ),
                 fontFamily: 'SYMBIOAR+LT',
               ),
               textAlign: TextAlign.center,
