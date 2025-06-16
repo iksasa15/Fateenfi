@@ -1,6 +1,8 @@
 // components/gpa_system_toggle.dart
 
 import 'package:flutter/material.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/gpa_calculator_strings.dart';
 import '../controllers/gpa_calculator_controller.dart';
 
@@ -14,17 +16,31 @@ class GPASystemToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          isDarkMode,
+        ),
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         border: Border.all(
-          color: const Color(0xFFE3E0F8),
+          color: AppColors.getThemeColor(
+            AppColors.divider,
+            AppColors.darkDivider,
+            isDarkMode,
+          ),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
+            color: AppColors.getThemeColor(
+              AppColors.shadow,
+              AppColors.darkShadow,
+              isDarkMode,
+            ),
             spreadRadius: 1,
             blurRadius: 2,
             offset: const Offset(0, 1),
@@ -35,7 +51,7 @@ class GPASystemToggle extends StatelessWidget {
         children: [
           // رأس القسم
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Row(
               children: [
                 // أيقونة
@@ -43,26 +59,43 @@ class GPASystemToggle extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.getThemeColor(
+                      AppColors.surface,
+                      AppColors.darkSurface,
+                      isDarkMode,
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ).withOpacity(0.1),
                       width: 1.0,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.calculate_outlined,
-                    color: Color(0xFF6366F1),
-                    size: 16,
+                    color: AppColors.getThemeColor(
+                      AppColors.primaryLight,
+                      AppColors.darkPrimaryLight,
+                      isDarkMode,
+                    ),
+                    size: AppDimensions.extraSmallIconSize,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: AppDimensions.smallSpacing),
                 Text(
                   GPACalculatorStrings.gpaSystem,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: AppDimensions.smallBodyFontSize,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF374151),
+                    color: AppColors.getThemeColor(
+                      AppColors.textPrimary,
+                      AppColors.darkTextPrimary,
+                      isDarkMode,
+                    ),
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -74,24 +107,30 @@ class GPASystemToggle extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: const Color(0xFFE3E0F8),
+            color: AppColors.getThemeColor(
+              AppColors.divider,
+              AppColors.darkDivider,
+              isDarkMode,
+            ),
           ),
 
           // أزرار التبديل بين الأنظمة
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Row(
               children: [
                 Expanded(
                   child: _buildSystemButton(
+                    context: context, // Corregido: usando argumento con nombre
                     label: GPACalculatorStrings.gpaSystem5,
                     isSelected: controller.isSystem5,
                     onTap: () => controller.toggleGPASystem(true),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: AppDimensions.defaultSpacing),
                 Expanded(
                   child: _buildSystemButton(
+                    context: context, // Corregido: usando argumento con nombre
                     label: GPACalculatorStrings.gpaSystem4,
                     isSelected: !controller.isSystem5,
                     onTap: () => controller.toggleGPASystem(false),
@@ -106,27 +145,52 @@ class GPASystemToggle extends StatelessWidget {
   }
 
   Widget _buildSystemButton({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.smallSpacing + 4),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4338CA) : Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          color: isSelected
+              ? AppColors.getThemeColor(
+                  AppColors.primaryDark,
+                  AppColors.darkPrimaryDark,
+                  isDarkMode,
+                )
+              : AppColors.getThemeColor(
+                  AppColors.surface,
+                  AppColors.darkSurface,
+                  isDarkMode,
+                ),
+          borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF4338CA)
-                : const Color(0xFFE3E0F8),
+                ? AppColors.getThemeColor(
+                    AppColors.primaryDark,
+                    AppColors.darkPrimaryDark,
+                    isDarkMode,
+                  )
+                : AppColors.getThemeColor(
+                    AppColors.divider,
+                    AppColors.darkDivider,
+                    isDarkMode,
+                  ),
             width: 1.0,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF4338CA).withOpacity(0.2),
+                    color: AppColors.getThemeColor(
+                      AppColors.primaryDark,
+                      AppColors.darkPrimaryDark,
+                      isDarkMode,
+                    ).withOpacity(0.2),
                     blurRadius: 4,
                     spreadRadius: 0,
                     offset: const Offset(0, 2),
@@ -138,9 +202,15 @@ class GPASystemToggle extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.smallBodyFontSize,
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : const Color(0xFF374151),
+            color: isSelected
+                ? Colors.white
+                : AppColors.getThemeColor(
+                    AppColors.textPrimary,
+                    AppColors.darkTextPrimary,
+                    isDarkMode,
+                  ),
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),

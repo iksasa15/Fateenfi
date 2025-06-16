@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:animate_do/animate_do.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import 'controllers/gpa_calculator_controller.dart';
 import 'constants/gpa_calculator_constants.dart';
 import 'constants/gpa_calculator_strings.dart';
@@ -56,6 +58,8 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
       // تحميل المقررات في حاسبة المعدل
       _controller.loadCoursesFromData(courses);
     } catch (e) {
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
       // عرض رسالة خطأ
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -63,12 +67,16 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
             'حدث خطأ أثناء تحميل المقررات: ${e.toString()}',
             style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
-          backgroundColor: const Color(0xFFEC4899),
+          backgroundColor: AppColors.getThemeColor(
+            AppColors.accent,
+            AppColors.darkAccent,
+            isDarkMode,
+          ),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
-          margin: const EdgeInsets.all(10),
+          margin: EdgeInsets.all(AppDimensions.smallSpacing),
         ),
       );
     } finally {
@@ -100,10 +108,16 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Directionality(
       textDirection: TextDirection.rtl, // ضبط اتجاه النص من اليمين إلى اليسار
       child: Scaffold(
-        backgroundColor: const Color(0xFFFDFDFF),
+        backgroundColor: AppColors.getThemeColor(
+          AppColors.background,
+          AppColors.darkBackground,
+          isDarkMode,
+        ),
         body: SafeArea(
           child: FadeTransition(
             opacity: _controller.fadeAnimation!,
@@ -117,10 +131,19 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
 
                   // عرض مؤشر التحميل أثناء استيراد المقررات
                   if (_isLoading)
-                    const LinearProgressIndicator(
-                      backgroundColor: Color(0xFFE0E7FF),
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Color(0xFF4338CA)),
+                    LinearProgressIndicator(
+                      backgroundColor: AppColors.getThemeColor(
+                        AppColors.primaryPale,
+                        AppColors.darkPrimaryPale,
+                        isDarkMode,
+                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.getThemeColor(
+                          AppColors.primaryDark,
+                          AppColors.darkPrimaryDark,
+                          isDarkMode,
+                        ),
+                      ),
                     ),
 
                   // المحتوى الرئيسي
@@ -130,14 +153,15 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
                         // المحتوى الرئيسي
                         ListView(
                           physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultSpacing),
                           children: [
-                            const SizedBox(height: 16),
+                            SizedBox(height: AppDimensions.defaultSpacing),
 
                             // مكون تبديل نظام المعدل
                             GPASystemToggle(controller: _controller),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: AppDimensions.defaultSpacing),
 
                             // قسم المعدل السابق (اختياري)
                             PreviousGPAComponent(
@@ -147,7 +171,7 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
                                   _controller.completedHoursController,
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: AppDimensions.defaultSpacing),
 
                             // قسم إضافة المقررات
                             CourseSectionComponent(
@@ -165,12 +189,18 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
                                         style: const TextStyle(
                                             fontFamily: 'SYMBIOAR+LT'),
                                       ),
-                                      backgroundColor: const Color(0xFFEC4899),
+                                      backgroundColor: AppColors.getThemeColor(
+                                        AppColors.accent,
+                                        AppColors.darkAccent,
+                                        isDarkMode,
+                                      ),
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(
+                                            AppDimensions.smallRadius),
                                       ),
-                                      margin: const EdgeInsets.all(10),
+                                      margin: EdgeInsets.all(
+                                          AppDimensions.smallSpacing),
                                     ),
                                   );
                                 }
@@ -186,17 +216,21 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
                                   _loadCoursesFromFirestore,
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: AppDimensions.defaultSpacing),
 
                             // زر حساب المعدل
                             Container(
-                              height: 48,
+                              height: AppDimensions.buttonHeight,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.inputBorderRadius),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF4338CA)
-                                        .withOpacity(0.25),
+                                    color: AppColors.getThemeColor(
+                                      AppColors.primaryDark,
+                                      AppColors.darkPrimaryDark,
+                                      isDarkMode,
+                                    ).withOpacity(0.25),
                                     blurRadius: 8,
                                     offset: const Offset(0, 3),
                                   ),
@@ -211,41 +245,56 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen>
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4338CA),
+                                  backgroundColor: AppColors.getThemeColor(
+                                    AppColors.primaryDark,
+                                    AppColors.darkPrimaryDark,
+                                    isDarkMode,
+                                  ),
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(
+                                        AppDimensions.inputBorderRadius),
                                   ),
                                 ),
                                 icon: const Icon(Icons.calculate_outlined),
                                 label: Text(
                                   GPACalculatorStrings.calculateGPA,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                    fontSize: AppDimensions.bodyFontSize,
                                     fontFamily: 'SYMBIOAR+LT',
                                   ),
                                 ),
                               ),
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: AppDimensions.defaultSpacing),
 
                             // جدول توضيحي للتقديرات
                             GradeGuideComponent(controller: _controller),
 
                             // مساحة في الأسفل للتمرير بسهولة
-                            const SizedBox(height: 20),
+                            SizedBox(height: AppDimensions.largeSpacing),
                           ],
                         ),
 
                         // مؤشر التحميل في حالة استيراد المقررات
                         if (_isLoading)
                           Container(
-                            color: Colors.black.withOpacity(0.1),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            color: AppColors.getThemeColor(
+                              Colors.black.withOpacity(0.1),
+                              Colors.white.withOpacity(0.1),
+                              isDarkMode,
+                            ),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.getThemeColor(
+                                  AppColors.primaryDark,
+                                  AppColors.darkPrimaryDark,
+                                  isDarkMode,
+                                ),
+                              ),
                             ),
                           ),
                       ],

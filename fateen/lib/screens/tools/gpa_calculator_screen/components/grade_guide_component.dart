@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/gpa_calculator_constants.dart';
 import '../constants/gpa_calculator_strings.dart';
 import '../controllers/gpa_calculator_controller.dart';
@@ -16,21 +18,34 @@ class GradeGuideComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     bool isSystem5 = controller.isSystem5;
 
     return FadeIn(
       duration: const Duration(milliseconds: 500),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          ),
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           border: Border.all(
-            color: const Color(0xFFE3E0F8),
+            color: AppColors.getThemeColor(
+              AppColors.divider,
+              AppColors.darkDivider,
+              isDarkMode,
+            ),
             width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
+              color: AppColors.getThemeColor(
+                AppColors.shadow,
+                AppColors.darkShadow,
+                isDarkMode,
+              ),
               spreadRadius: 1,
               blurRadius: 2,
               offset: const Offset(0, 1),
@@ -41,7 +56,7 @@ class GradeGuideComponent extends StatelessWidget {
           children: [
             // رأس القسم
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: Row(
                 children: [
                   // أيقونة
@@ -49,26 +64,43 @@ class GradeGuideComponent extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.getThemeColor(
+                        AppColors.surface,
+                        AppColors.darkSurface,
+                        isDarkMode,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                       border: Border.all(
-                        color: const Color(0xFF4338CA).withOpacity(0.1),
+                        color: AppColors.getThemeColor(
+                          AppColors.primaryDark,
+                          AppColors.darkPrimaryDark,
+                          isDarkMode,
+                        ).withOpacity(0.1),
                         width: 1.0,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.table_chart_outlined,
-                      color: Color(0xFF6366F1),
-                      size: 16,
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryLight,
+                        AppColors.darkPrimaryLight,
+                        isDarkMode,
+                      ),
+                      size: AppDimensions.extraSmallIconSize,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: AppDimensions.smallSpacing),
                   Text(
                     GPACalculatorStrings.gradesTable,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: AppDimensions.smallBodyFontSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF374151),
+                      color: AppColors.getThemeColor(
+                        AppColors.textPrimary,
+                        AppColors.darkTextPrimary,
+                        isDarkMode,
+                      ),
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),
@@ -80,17 +112,26 @@ class GradeGuideComponent extends StatelessWidget {
             Divider(
               height: 1,
               thickness: 1,
-              color: const Color(0xFFE3E0F8),
+              color: AppColors.getThemeColor(
+                AppColors.divider,
+                AppColors.darkDivider,
+                isDarkMode,
+              ),
             ),
 
             // الجدول
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: Table(
                 border: TableBorder.all(
-                  color: const Color(0xFFE3E0F8),
+                  color: AppColors.getThemeColor(
+                    AppColors.divider,
+                    AppColors.darkDivider,
+                    isDarkMode,
+                  ),
                   width: 1,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
                 columnWidths: const {
                   0: FlexColumnWidth(1.0),
@@ -100,9 +141,13 @@ class GradeGuideComponent extends StatelessWidget {
                 },
                 children: [
                   TableRow(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF4338CA),
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ),
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(8),
                         topRight: Radius.circular(8),
                       ),
@@ -116,6 +161,7 @@ class GradeGuideComponent extends StatelessWidget {
                   ),
                   ...GPACalculatorConstants.gradeTable
                       .map((item) => _buildGradeTableRow(
+                            context,
                             item['grade'],
                             isSystem5 ? item['points5'] : item['points4'],
                             item['range'],
@@ -135,12 +181,14 @@ class GradeGuideComponent extends StatelessWidget {
   // خلية عنوان الجدول
   Widget _buildTableHeaderCell(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+      padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.smallSpacing,
+          horizontal: AppDimensions.smallSpacing / 1.5),
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 12,
+        style: TextStyle(
+          fontSize: AppDimensions.smallLabelFontSize,
           fontWeight: FontWeight.bold,
           color: Colors.white,
           fontFamily: 'SYMBIOAR+LT',
@@ -151,6 +199,7 @@ class GradeGuideComponent extends StatelessWidget {
 
   // صف في جدول التقديرات
   TableRow _buildGradeTableRow(
+    BuildContext context,
     String grade,
     String points,
     String range,
@@ -158,28 +207,40 @@ class GradeGuideComponent extends StatelessWidget {
     Color color,
   ) {
     return TableRow(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.getThemeColor(
+          AppColors.surface,
+          AppColors.darkSurface,
+          Theme.of(context).brightness == Brightness.dark,
+        ),
       ),
       children: [
         _buildTableGradeCell(grade, color),
-        _buildTableCell(points),
-        _buildTableCell(range),
-        _buildTableCell(verbal),
+        _buildTableCell(context, points),
+        _buildTableCell(context, range),
+        _buildTableCell(context, verbal),
       ],
     );
   }
 
   // خلية في الجدول
-  Widget _buildTableCell(String text) {
+  Widget _buildTableCell(BuildContext context, String text) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+      padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.smallSpacing,
+          horizontal: AppDimensions.smallSpacing / 1.5),
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Color(0xFF374151),
+        style: TextStyle(
+          fontSize: AppDimensions.smallLabelFontSize,
+          color: AppColors.getThemeColor(
+            AppColors.textPrimary,
+            AppColors.darkTextPrimary,
+            isDarkMode,
+          ),
           fontFamily: 'SYMBIOAR+LT',
         ),
       ),
@@ -189,9 +250,12 @@ class GradeGuideComponent extends StatelessWidget {
   // خلية تقدير في الجدول
   Widget _buildTableGradeCell(String grade, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+      padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.smallSpacing,
+          horizontal: AppDimensions.smallSpacing / 1.5),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+        padding: EdgeInsets.symmetric(
+            vertical: 2, horizontal: AppDimensions.smallSpacing),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(4),
@@ -200,7 +264,7 @@ class GradeGuideComponent extends StatelessWidget {
           grade,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: AppDimensions.smallLabelFontSize,
             fontWeight: FontWeight.bold,
             color: color,
             fontFamily: 'SYMBIOAR+LT',

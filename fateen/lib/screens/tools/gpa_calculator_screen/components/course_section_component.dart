@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/gpa_calculator_strings.dart';
 import '../../../../models/course_item.dart';
 import '../services/firebaseServices/course_service.dart';
@@ -29,19 +31,33 @@ class CourseSectionComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return FadeIn(
       duration: const Duration(milliseconds: 400),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          ),
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           border: Border.all(
-            color: const Color(0xFFE3E0F8),
+            color: AppColors.getThemeColor(
+              AppColors.divider,
+              AppColors.darkDivider,
+              isDarkMode,
+            ),
             width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
+              color: AppColors.getThemeColor(
+                AppColors.shadow,
+                AppColors.darkShadow,
+                isDarkMode,
+              ),
               spreadRadius: 1,
               blurRadius: 2,
               offset: const Offset(0, 1),
@@ -52,7 +68,7 @@ class CourseSectionComponent extends StatelessWidget {
           children: [
             // رأس القسم مع الأزرار
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(AppDimensions.defaultSpacing),
               child: Column(
                 children: [
                   // العنوان في سطر منفصل
@@ -62,33 +78,50 @@ class CourseSectionComponent extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.getThemeColor(
+                            AppColors.surface,
+                            AppColors.darkSurface,
+                            isDarkMode,
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                           border: Border.all(
-                            color: const Color(0xFF4338CA).withOpacity(0.1),
+                            color: AppColors.getThemeColor(
+                              AppColors.primaryDark,
+                              AppColors.darkPrimaryDark,
+                              isDarkMode,
+                            ).withOpacity(0.1),
                             width: 1.0,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.book_outlined,
-                          color: Color(0xFF6366F1),
-                          size: 16,
+                          color: AppColors.getThemeColor(
+                            AppColors.primaryLight,
+                            AppColors.darkPrimaryLight,
+                            isDarkMode,
+                          ),
+                          size: AppDimensions.extraSmallIconSize,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: AppDimensions.smallSpacing),
                       Text(
                         GPACalculatorStrings.currentTermCourses,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: AppDimensions.smallBodyFontSize,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF374151),
+                          color: AppColors.getThemeColor(
+                            AppColors.textPrimary,
+                            AppColors.darkTextPrimary,
+                            isDarkMode,
+                          ),
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.smallSpacing),
 
                   // الأزرار في سطر منفصل
                   Row(
@@ -97,30 +130,44 @@ class CourseSectionComponent extends StatelessWidget {
                       // زر إضافة مقرر
                       InkWell(
                         onTap: onAddCourse,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDimensions.smallSpacing,
+                            vertical: AppDimensions.smallSpacing - 2,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5F3FF),
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.getThemeColor(
+                              AppColors.primaryPale,
+                              AppColors.darkPrimaryPale,
+                              isDarkMode,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.smallRadius),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.add_circle_outline,
-                                size: 16,
-                                color: Color(0xFF6366F1),
+                                size: AppDimensions.extraSmallIconSize,
+                                color: AppColors.getThemeColor(
+                                  AppColors.primaryLight,
+                                  AppColors.darkPrimaryLight,
+                                  isDarkMode,
+                                ),
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: AppDimensions.smallSpacing / 2),
                               Text(
                                 GPACalculatorStrings.addCourse,
-                                style: const TextStyle(
-                                  color: Color(0xFF6366F1),
+                                style: TextStyle(
+                                  color: AppColors.getThemeColor(
+                                    AppColors.primaryLight,
+                                    AppColors.darkPrimaryLight,
+                                    isDarkMode,
+                                  ),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontSize: AppDimensions.smallLabelFontSize,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
@@ -129,36 +176,50 @@ class CourseSectionComponent extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.smallSpacing),
 
                       // زر استيراد المقررات
                       InkWell(
                         onTap: loadCoursesFromFirestore ??
                             () => _importCourses(context),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.smallRadius),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDimensions.smallSpacing,
+                            vertical: AppDimensions.smallSpacing - 2,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5F3FF),
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.getThemeColor(
+                              AppColors.primaryPale,
+                              AppColors.darkPrimaryPale,
+                              isDarkMode,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                                AppDimensions.smallRadius),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.file_download_outlined,
-                                size: 16,
-                                color: Color(0xFF6366F1),
+                                size: AppDimensions.extraSmallIconSize,
+                                color: AppColors.getThemeColor(
+                                  AppColors.primaryLight,
+                                  AppColors.darkPrimaryLight,
+                                  isDarkMode,
+                                ),
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: AppDimensions.smallSpacing / 2),
                               Text(
                                 GPACalculatorStrings.importCourses,
-                                style: const TextStyle(
-                                  color: Color(0xFF6366F1),
+                                style: TextStyle(
+                                  color: AppColors.getThemeColor(
+                                    AppColors.primaryLight,
+                                    AppColors.darkPrimaryLight,
+                                    isDarkMode,
+                                  ),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontSize: AppDimensions.smallLabelFontSize,
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
@@ -176,16 +237,23 @@ class CourseSectionComponent extends StatelessWidget {
             Divider(
               height: 1,
               thickness: 1,
-              color: const Color(0xFFE3E0F8),
+              color: AppColors.getThemeColor(
+                AppColors.divider,
+                AppColors.darkDivider,
+                isDarkMode,
+              ),
             ),
 
             // عناوين الأعمدة
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.defaultSpacing,
+                vertical: AppDimensions.smallSpacing,
+              ),
               child: Row(
                 children: [
                   // مساحة لزر الحذف
-                  const SizedBox(width: 30),
+                  SizedBox(width: 30),
 
                   // التقدير
                   Expanded(
@@ -193,10 +261,14 @@ class CourseSectionComponent extends StatelessWidget {
                     child: Text(
                       GPACalculatorStrings.grade,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: AppDimensions.smallBodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF374151),
+                        color: AppColors.getThemeColor(
+                          AppColors.textPrimary,
+                          AppColors.darkTextPrimary,
+                          isDarkMode,
+                        ),
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -208,10 +280,14 @@ class CourseSectionComponent extends StatelessWidget {
                     child: Text(
                       GPACalculatorStrings.creditHours,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: AppDimensions.smallBodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF374151),
+                        color: AppColors.getThemeColor(
+                          AppColors.textPrimary,
+                          AppColors.darkTextPrimary,
+                          isDarkMode,
+                        ),
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -223,10 +299,14 @@ class CourseSectionComponent extends StatelessWidget {
                     child: Text(
                       GPACalculatorStrings.courseName,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: AppDimensions.smallBodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF374151),
+                        color: AppColors.getThemeColor(
+                          AppColors.textPrimary,
+                          AppColors.darkTextPrimary,
+                          isDarkMode,
+                        ),
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -242,7 +322,11 @@ class CourseSectionComponent extends StatelessWidget {
               itemCount: courses.length,
               separatorBuilder: (context, index) => Divider(
                 height: 1,
-                color: const Color(0xFFE3E0F8).withOpacity(0.5),
+                color: AppColors.getThemeColor(
+                  AppColors.divider,
+                  AppColors.darkDivider,
+                  isDarkMode,
+                ).withOpacity(0.5),
               ),
               itemBuilder: (context, index) {
                 return CourseItemComponent(
@@ -261,29 +345,43 @@ class CourseSectionComponent extends StatelessWidget {
 
   // استيراد المقررات من الفايربيس - الطريقة السابقة للتوافق
   Future<void> _importCourses(BuildContext context) async {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     try {
       // عرض مؤشر التحميل
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => Dialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.getThemeColor(
+            AppColors.surface,
+            AppColors.darkSurface,
+            isDarkMode,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(
-                  color: Color(0xFF4338CA),
+                CircularProgressIndicator(
+                  color: AppColors.getThemeColor(
+                    AppColors.primaryDark,
+                    AppColors.darkPrimaryDark,
+                    isDarkMode,
+                  ),
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: AppDimensions.defaultSpacing - 2),
                 Text(
                   GPACalculatorStrings.importingCourses,
-                  style: const TextStyle(
-                    color: Color(0xFF374151),
+                  style: TextStyle(
+                    color: AppColors.getThemeColor(
+                      AppColors.textPrimary,
+                      AppColors.darkTextPrimary,
+                      isDarkMode,
+                    ),
                     fontWeight: FontWeight.w600,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
@@ -312,12 +410,12 @@ class CourseSectionComponent extends StatelessWidget {
                 .replaceAll("%d", "${coursesList.length}"),
             style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: EdgeInsets.all(AppDimensions.smallSpacing),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -332,12 +430,16 @@ class CourseSectionComponent extends StatelessWidget {
             "${GPACalculatorStrings.importError} ${e.toString()}",
             style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
-          backgroundColor: const Color(0xFFEC4899),
+          backgroundColor: AppColors.getThemeColor(
+            AppColors.accent,
+            AppColors.darkAccent,
+            isDarkMode,
+          ),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
-          margin: const EdgeInsets.all(12),
+          margin: EdgeInsets.all(AppDimensions.smallSpacing),
           duration: const Duration(seconds: 3),
         ),
       );

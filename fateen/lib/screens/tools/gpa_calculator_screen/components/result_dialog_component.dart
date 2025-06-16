@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/gpa_calculator_strings.dart';
 import '../controllers/gpa_calculator_controller.dart';
 
@@ -23,6 +25,8 @@ class ResultDialogComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // الحصول على نظام المعدل الحالي
     bool isSystem5 = controller.isSystem5;
 
@@ -31,28 +35,39 @@ class ResultDialogComponent extends StatelessWidget {
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
       ),
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: FadeIn(
         duration: const Duration(milliseconds: 300),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           child: Container(
-            color: Colors.white,
+            color: AppColors.getThemeColor(
+              AppColors.surface,
+              AppColors.darkSurface,
+              isDarkMode,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // مقبض السحب
                 Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 10),
+                  padding: EdgeInsets.only(
+                    top: AppDimensions.smallSpacing,
+                    bottom: AppDimensions.smallSpacing,
+                  ),
                   child: Center(
                     child: Container(
                       width: 40,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: AppColors.getThemeColor(
+                          AppColors.border,
+                          AppColors.darkBorder,
+                          isDarkMode,
+                        ),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -65,7 +80,8 @@ class ResultDialogComponent extends StatelessWidget {
                   children: [
                     // الصف الأول: زر الرجوع والعنوان
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.defaultSpacing),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -76,40 +92,66 @@ class ResultDialogComponent extends StatelessWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.getThemeColor(
+                                  AppColors.surface,
+                                  AppColors.darkSurface,
+                                  isDarkMode,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.smallRadius),
                                 border: Border.all(
-                                  color: Colors.grey.shade200,
+                                  color: AppColors.getThemeColor(
+                                    AppColors.border,
+                                    AppColors.darkBorder,
+                                    isDarkMode,
+                                  ),
                                   width: 1.0,
                                 ),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.close,
-                                color: Color(0xFF4338CA),
-                                size: 18,
+                                color: AppColors.getThemeColor(
+                                  AppColors.primaryDark,
+                                  AppColors.darkPrimaryDark,
+                                  isDarkMode,
+                                ),
+                                size: AppDimensions.extraSmallIconSize,
                               ),
                             ),
                           ),
                           // العنوان
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 7,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultSpacing - 2,
+                              vertical: AppDimensions.smallSpacing - 1,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.getThemeColor(
+                                AppColors.surface,
+                                AppColors.darkSurface,
+                                isDarkMode,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: AppColors.getThemeColor(
+                                  AppColors.border,
+                                  AppColors.darkBorder,
+                                  isDarkMode,
+                                ),
                                 width: 1.0,
                               ),
                             ),
                             child: Text(
                               GPACalculatorStrings.resultTitle,
-                              style: const TextStyle(
-                                fontSize: 15,
+                              style: TextStyle(
+                                fontSize: AppDimensions.bodyFontSize,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4338CA),
+                                color: AppColors.getThemeColor(
+                                  AppColors.primaryDark,
+                                  AppColors.darkPrimaryDark,
+                                  isDarkMode,
+                                ),
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -119,40 +161,58 @@ class ResultDialogComponent extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppDimensions.defaultSpacing),
 
                     // وصف مع أيقونة
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.defaultSpacing),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.smallSpacing,
+                          vertical: AppDimensions.smallSpacing,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.getThemeColor(
+                            AppColors.surface,
+                            AppColors.darkSurface,
+                            isDarkMode,
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.smallRadius),
                           border: Border.all(
-                            color: const Color(0xFF4338CA).withOpacity(0.1),
+                            color: AppColors.getThemeColor(
+                              AppColors.primaryDark,
+                              AppColors.darkPrimaryDark,
+                              isDarkMode,
+                            ).withOpacity(0.1),
                             width: 1.0,
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.info_outline,
-                              color: Color(0xFF4338CA),
-                              size: 18,
+                              color: AppColors.getThemeColor(
+                                AppColors.primaryDark,
+                                AppColors.darkPrimaryDark,
+                                isDarkMode,
+                              ),
+                              size: AppDimensions.extraSmallIconSize,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: AppDimensions.smallSpacing),
                             Expanded(
                               child: Text(
                                 "تم حساب المعدل بنجاح وفقًا للمعلومات المدخلة (نظام $maxGPA)",
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: AppDimensions.smallLabelFontSize,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade800,
+                                  color: AppColors.getThemeColor(
+                                    AppColors.textPrimary,
+                                    AppColors.darkTextPrimary,
+                                    isDarkMode,
+                                  ),
                                   fontFamily: 'SYMBIOAR+LT',
                                 ),
                               ),
@@ -161,19 +221,23 @@ class ResultDialogComponent extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppDimensions.defaultSpacing),
 
-                    const Divider(
+                    Divider(
                       height: 1,
                       thickness: 1,
-                      color: Color(0xFFE3E0F8),
+                      color: AppColors.getThemeColor(
+                        AppColors.divider,
+                        AppColors.darkDivider,
+                        isDarkMode,
+                      ),
                     ),
                   ],
                 ),
 
                 // المحتوى
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                  padding: EdgeInsets.all(AppDimensions.largeSpacing),
                   child: Column(
                     children: [
                       // معدلات الفصل والتراكمي
@@ -182,6 +246,7 @@ class ResultDialogComponent extends StatelessWidget {
                           // معدل الفصل
                           Expanded(
                             child: _buildGPACircle(
+                              context,
                               termGPA,
                               GPACalculatorStrings.termGPA,
                               controller.getGPAColor(termGPA),
@@ -192,6 +257,7 @@ class ResultDialogComponent extends StatelessWidget {
                           // المعدل التراكمي
                           Expanded(
                             child: _buildGPACircle(
+                              context,
                               cumulativeGPA,
                               GPACalculatorStrings.cumulativeGPAResult,
                               controller.getGPAColor(cumulativeGPA),
@@ -201,38 +267,58 @@ class ResultDialogComponent extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: AppDimensions.largeSpacing),
 
                       // تفاصيل إضافية
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(16),
+                          color: AppColors.getThemeColor(
+                            AppColors.primaryPale,
+                            AppColors.darkPrimaryPale,
+                            isDarkMode,
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                           border: Border.all(
-                            color: const Color(0xFFE3E0F8),
+                            color: AppColors.getThemeColor(
+                              AppColors.divider,
+                              AppColors.darkDivider,
+                              isDarkMode,
+                            ),
                             width: 1,
                           ),
                         ),
                         child: Column(
                           children: [
                             _buildResultRow(
+                              context,
                               GPACalculatorStrings.registeredHours,
                               '${totalCredits.toStringAsFixed(0)}',
                             ),
                             Divider(
-                              height: 16,
-                              color: Colors.grey.withOpacity(0.3),
+                              height: AppDimensions.defaultSpacing,
+                              color: AppColors.getThemeColor(
+                                AppColors.border,
+                                AppColors.darkBorder,
+                                isDarkMode,
+                              ).withOpacity(0.3),
                             ),
                             _buildResultRow(
+                              context,
                               GPACalculatorStrings.earnedPoints,
                               '${totalPoints.toStringAsFixed(2)}',
                             ),
                             Divider(
-                              height: 16,
-                              color: Colors.grey.withOpacity(0.3),
+                              height: AppDimensions.defaultSpacing,
+                              color: AppColors.getThemeColor(
+                                AppColors.border,
+                                AppColors.darkBorder,
+                                isDarkMode,
+                              ).withOpacity(0.3),
                             ),
                             _buildResultRow(
+                              context,
                               GPACalculatorStrings.gradeLabel,
                               controller.getGPAGrade(cumulativeGPA),
                               color: controller.getGPAColor(cumulativeGPA),
@@ -241,10 +327,11 @@ class ResultDialogComponent extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: AppDimensions.largeSpacing),
 
                       // زر موافق
                       _buildPrimaryButton(
+                        context: context,
                         text: GPACalculatorStrings.ok,
                         onPressed: () => Navigator.pop(context),
                       ),
@@ -260,7 +347,10 @@ class ResultDialogComponent extends StatelessWidget {
   }
 
   // بناء دائرة عرض المعدل
-  Widget _buildGPACircle(double gpa, String label, Color color, double maxGPA) {
+  Widget _buildGPACircle(BuildContext context, double gpa, String label,
+      Color color, double maxGPA) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // للتأكد من عدم تجاوز الحد الأقصى للمعدل في العرض
     double displayGPA = gpa > maxGPA ? maxGPA : gpa;
 
@@ -288,7 +378,7 @@ class ResultDialogComponent extends StatelessWidget {
             child: Text(
               displayGPA.toStringAsFixed(2),
               style: TextStyle(
-                fontSize: 22,
+                fontSize: AppDimensions.smallTitleFontSize,
                 fontWeight: FontWeight.bold,
                 color: color,
                 fontFamily: 'SYMBIOAR+LT',
@@ -296,13 +386,17 @@ class ResultDialogComponent extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: AppDimensions.smallSpacing),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: AppDimensions.smallBodyFontSize,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
+            color: AppColors.getThemeColor(
+              AppColors.textPrimary,
+              AppColors.darkTextPrimary,
+              isDarkMode,
+            ),
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -311,24 +405,36 @@ class ResultDialogComponent extends StatelessWidget {
   }
 
   // بناء صف في نتائج الحساب
-  Widget _buildResultRow(String label, String value, {Color? color}) {
+  Widget _buildResultRow(BuildContext context, String label, String value,
+      {Color? color}) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
+            fontSize: AppDimensions.smallBodyFontSize,
+            color: AppColors.getThemeColor(
+              AppColors.textSecondary,
+              AppColors.darkTextSecondary,
+              isDarkMode,
+            ),
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.smallBodyFontSize,
             fontWeight: FontWeight.bold,
-            color: color ?? const Color(0xFF374151),
+            color: color ??
+                AppColors.getThemeColor(
+                  AppColors.textPrimary,
+                  AppColors.darkTextPrimary,
+                  isDarkMode,
+                ),
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),
@@ -338,17 +444,24 @@ class ResultDialogComponent extends StatelessWidget {
 
   // بناء زر رئيسي بتصميم محسّن
   Widget _buildPrimaryButton({
+    required BuildContext context,
     required String text,
     required VoidCallback onPressed,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
-      height: 48,
+      height: AppDimensions.buttonHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4338CA).withOpacity(0.25),
+            color: AppColors.getThemeColor(
+              AppColors.primaryDark,
+              AppColors.darkPrimaryDark,
+              isDarkMode,
+            ).withOpacity(0.25),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -357,19 +470,24 @@ class ResultDialogComponent extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4338CA),
+          backgroundColor: AppColors.getThemeColor(
+            AppColors.primaryDark,
+            AppColors.darkPrimaryDark,
+            isDarkMode,
+          ),
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
         ),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: AppDimensions.bodyFontSize,
             fontFamily: 'SYMBIOAR+LT',
           ),
         ),

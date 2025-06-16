@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../../core/constants/app_dimensions.dart';
+import '../../../../../core/constants/appColor.dart';
 import '../constants/gpa_calculator_constants.dart';
 import '../constants/gpa_calculator_strings.dart';
 import '../../../../models/course_item.dart';
@@ -22,102 +24,156 @@ class CourseItemComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.defaultSpacing,
+          vertical: AppDimensions.smallSpacing),
       child: Row(
         children: [
           // اسم المقرر
           Expanded(
             flex: 6,
             child: Container(
-              height: 45,
+              height: AppDimensions.inputFieldHeight,
               child: TextFormField(
                 controller: course.nameController,
                 decoration: InputDecoration(
                   hintText: GPACalculatorStrings.courseNameHint,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.smallSpacing,
+                    vertical: AppDimensions.smallSpacing + 6,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
                     borderSide: BorderSide(
-                      color: const Color(0xFF4338CA).withOpacity(0.2),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ).withOpacity(0.2),
                       width: 1.0,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
                     borderSide: BorderSide(
-                      color: const Color(0xFF4338CA).withOpacity(0.2),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ).withOpacity(0.2),
                       width: 1.0,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF4338CA),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
+                    borderSide: BorderSide(
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ),
                       width: 1.5,
                     ),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: const TextStyle(
-                    color: Color(0xFF9CA3AF),
-                    fontSize: 14,
+                  fillColor: AppColors.getThemeColor(
+                    AppColors.surface,
+                    AppColors.darkSurface,
+                    isDarkMode,
+                  ),
+                  hintStyle: TextStyle(
+                    color: AppColors.getThemeColor(
+                      AppColors.textHint,
+                      AppColors.darkTextHint,
+                      isDarkMode,
+                    ),
+                    fontSize: AppDimensions.smallBodyFontSize,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: 14,
-                  color: Color(0xFF374151),
+                  fontSize: AppDimensions.smallBodyFontSize,
+                  color: AppColors.getThemeColor(
+                    AppColors.textPrimary,
+                    AppColors.darkTextPrimary,
+                    isDarkMode,
+                  ),
                 ),
                 textAlign: TextAlign.right,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: AppDimensions.smallSpacing),
 
           // عدد الساعات
           Expanded(
             flex: 3,
             child: Container(
-              height: 45,
+              height: AppDimensions.inputFieldHeight,
               child: TextFormField(
                 controller: course.creditsController,
                 decoration: InputDecoration(
                   hintText: GPACalculatorStrings.creditHoursHint,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 14,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.smallSpacing,
+                    vertical: AppDimensions.smallSpacing + 6,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
                     borderSide: BorderSide(
-                      color: const Color(0xFF4338CA).withOpacity(0.2),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ).withOpacity(0.2),
                       width: 1.0,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
                     borderSide: BorderSide(
-                      color: const Color(0xFF4338CA).withOpacity(0.2),
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ).withOpacity(0.2),
                       width: 1.0,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF4338CA),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.inputBorderRadius),
+                    borderSide: BorderSide(
+                      color: AppColors.getThemeColor(
+                        AppColors.primaryDark,
+                        AppColors.darkPrimaryDark,
+                        isDarkMode,
+                      ),
                       width: 1.5,
                     ),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: const TextStyle(
-                    color: Color(0xFF9CA3AF),
-                    fontSize: 14,
+                  fillColor: AppColors.getThemeColor(
+                    AppColors.surface,
+                    AppColors.darkSurface,
+                    isDarkMode,
+                  ),
+                  hintStyle: TextStyle(
+                    color: AppColors.getThemeColor(
+                      AppColors.textHint,
+                      AppColors.darkTextHint,
+                      isDarkMode,
+                    ),
+                    fontSize: AppDimensions.smallBodyFontSize,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -131,47 +187,72 @@ class CourseItemComponent extends StatelessWidget {
                   }
                   return null;
                 },
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'SYMBIOAR+LT',
-                  fontSize: 14,
-                  color: Color(0xFF374151),
+                  fontSize: AppDimensions.smallBodyFontSize,
+                  color: AppColors.getThemeColor(
+                    AppColors.textPrimary,
+                    AppColors.darkTextPrimary,
+                    isDarkMode,
+                  ),
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: AppDimensions.smallSpacing),
 
           // التقدير
           Expanded(
             flex: 3,
             child: Container(
-              height: 45,
+              height: AppDimensions.inputFieldHeight,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.getThemeColor(
+                  AppColors.surface,
+                  AppColors.darkSurface,
+                  isDarkMode,
+                ),
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.inputBorderRadius),
                 border: Border.all(
-                  color: const Color(0xFF4338CA).withOpacity(0.2),
+                  color: AppColors.getThemeColor(
+                    AppColors.primaryDark,
+                    AppColors.darkPrimaryDark,
+                    isDarkMode,
+                  ).withOpacity(0.2),
                   width: 1.0,
                 ),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: course.grade,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF6366F1),
-                    size: 20,
+                    color: AppColors.getThemeColor(
+                      AppColors.primaryLight,
+                      AppColors.darkPrimaryLight,
+                      isDarkMode,
+                    ),
+                    size: AppDimensions.smallIconSize,
                   ),
                   isExpanded: true,
-                  style: const TextStyle(
-                    color: Color(0xFF374151),
-                    fontSize: 14,
+                  style: TextStyle(
+                    color: AppColors.getThemeColor(
+                      AppColors.textPrimary,
+                      AppColors.darkTextPrimary,
+                      isDarkMode,
+                    ),
+                    fontSize: AppDimensions.smallBodyFontSize,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                   alignment: Alignment.center,
-                  dropdownColor: Colors.white,
+                  dropdownColor: AppColors.getThemeColor(
+                    AppColors.surface,
+                    AppColors.darkSurface,
+                    isDarkMode,
+                  ),
                   onChanged: (String? newValue) {
                     if (newValue != null) {
                       onGradeChanged(index, newValue);
@@ -188,7 +269,11 @@ class CourseItemComponent extends StatelessWidget {
                           value,
                           style: TextStyle(
                             color: GPACalculatorConstants.gradeColors[value] ??
-                                const Color(0xFF374151),
+                                AppColors.getThemeColor(
+                                  AppColors.textPrimary,
+                                  AppColors.darkTextPrimary,
+                                  isDarkMode,
+                                ),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -207,19 +292,27 @@ class CourseItemComponent extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEC4899).withOpacity(0.1),
+                  color: AppColors.getThemeColor(
+                    AppColors.accent,
+                    AppColors.darkAccent,
+                    isDarkMode,
+                  ).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.remove,
-                  color: Color(0xFFEC4899),
-                  size: 16,
+                  color: AppColors.getThemeColor(
+                    AppColors.accent,
+                    AppColors.darkAccent,
+                    isDarkMode,
+                  ),
+                  size: AppDimensions.extraSmallIconSize,
                 ),
               ),
               onPressed: () => onRemove(index),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              splashRadius: 20,
+              splashRadius: AppDimensions.smallIconSize,
             ),
           ),
         ],
