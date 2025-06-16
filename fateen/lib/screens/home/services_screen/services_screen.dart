@@ -1,3 +1,4 @@
+import 'package:fateen/models/service_item.dart';
 import 'package:flutter/material.dart';
 import 'controllers/services_controller.dart';
 import 'controllers/service_card_controller.dart';
@@ -20,6 +21,9 @@ class _ServicesScreenState extends State<ServicesScreen>
   late ServicesController _servicesController;
   late ServiceCardController _cardController;
 
+  // قائمة الخدمات المفلترة
+  List<ServiceItem> filteredServices = [];
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +32,13 @@ class _ServicesScreenState extends State<ServicesScreen>
     _servicesController = ServicesController();
     _servicesController.initAnimation(this);
     _cardController = ServiceCardController();
+
+    // تخصيص الخدمات المعروضة - حاسبة المعدل ووقت المذاكرة والملاحظات فقط
+    filteredServices = ServicesConstants.services.where((service) {
+      return service.title == "حاسبة GPA" ||
+          service.title == "وقت المذاكرة" ||
+          service.title == "الملاحظات";
+    }).toList();
   }
 
   @override
@@ -46,8 +57,6 @@ class _ServicesScreenState extends State<ServicesScreen>
             // هيدر الصفحة
             ServicesHeaderComponent.buildHeader(context),
 
-            // خط فاصل
-
             // محتوى الصفحة
             Expanded(
               child: SingleChildScrollView(
@@ -57,6 +66,7 @@ class _ServicesScreenState extends State<ServicesScreen>
                   child: ServicesGridComponent(
                     servicesController: _servicesController,
                     cardController: _cardController,
+                    services: filteredServices,
                   ),
                 ),
               ),
