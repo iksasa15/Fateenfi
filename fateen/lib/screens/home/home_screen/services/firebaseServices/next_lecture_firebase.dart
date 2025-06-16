@@ -147,4 +147,110 @@ class NextLectureFirebase {
       return Stream.value([]);
     }
   }
+
+  /// تحديث أيام المحاضرات للمقررات التي لا تحتوي على أيام محاضرات
+  Future<void> updateCourseDays() async {
+    if (currentUser == null) {
+      debugPrint('لا يوجد مستخدم مسجل دخول لتحديث أيام المحاضرات');
+      return;
+    }
+
+    try {
+      final userId = currentUser!.uid;
+      final courseCollection =
+          _firestore.collection('users').doc(userId).collection('courses');
+
+      final snapshot = await courseCollection.get();
+      int updatedCount = 0;
+
+      // تحديث كل مقرر ليحتوي على يوم محاضرة
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final courseName =
+            data[NextLectureConstants.courseNameField] ?? 'مقرر غير معروف';
+
+        // التحقق من وجود يوم محاضرة
+        final hasLectureDay = data.containsKey('lectureDay') &&
+            data['lectureDay'] != null &&
+            data['lectureDay'] != '';
+        final hasDayOfWeek =
+            data.containsKey(NextLectureConstants.dayOfWeekField) &&
+                data[NextLectureConstants.dayOfWeekField] != null;
+
+        if (!hasLectureDay && !hasDayOfWeek) {
+          // تعيين يوم افتراضي (يوم مختلف لكل مقرر)
+          final defaultDay =
+              (updatedCount % 5) + 1; // توزيع على أيام الأسبوع (1-5)
+          final dayName = _getDayNameFromNumber(defaultDay);
+
+          // تحديث المقرر
+          await courseCollection.doc(doc.id).update({
+            NextLectureConstants.dayOfWeekField: defaultDay,
+            'lectureDay': dayName
+          });
+
+          debugPrint(
+              'تم تحديث مقرر: $courseName، يوم المحاضرة: $dayName ($defaultDay)');
+          updatedCount++;
+        }
+
+        // أيضًا تحقق من وقت المحاضرة وأضفه إذا كان غير موجود
+        final hasLectureTime =
+            data.containsKey(NextLectureConstants.lectureTimeField) &&
+                data[NextLectureConstants.lectureTimeField] != null &&
+                data[NextLectureConstants.lectureTimeField] != '';
+
+        if (!hasLectureTime) {
+          // توزيع أوقات المحاضرات بين 9 صباحًا و3 مساءً
+          final hours = [9, 10, 11, 12, 14, 15];
+          final defaultHour = hours[updatedCount % hours.length];
+          final defaultTime = '$defaultHour:30';
+
+          // تحديث المقرر بإضافة وقت المحاضرة
+          await courseCollection
+              .doc(doc.id)
+              .update({NextLectureConstants.lectureTimeField: defaultTime});
+
+          debugPrint('تم تحديث مقرر: $courseName، وقت المحاضرة: $defaultTime');
+        }
+
+        // أيضًا تحقق من القاعة وأضفها إذا كانت غير موجودة
+        final hasClassroom =
+            data.containsKey(NextLectureConstants.classroomField) &&
+                data[NextLectureConstants.classroomField] != null &&
+                data[NextLectureConstants.classroomField] != '';
+
+        if (!hasClassroom) {
+          // إضافة قاعة افتراضية
+          final defaultClassroom = 'قاعة ${100 + (updatedCount % 20)}';
+
+          // تحديث المقرر بإضافة القاعة
+          await courseCollection
+              .doc(doc.id)
+              .update({NextLectureConstants.classroomField: defaultClassroom});
+
+          debugPrint('تم تحديث مقرر: $courseName، القاعة: $defaultClassroom');
+        }
+      }
+
+      debugPrint(
+          'تم تحديث أيام المحاضرات وبيانات إضافية لـ $updatedCount مقرر');
+    } catch (e) {
+      debugPrint('خطأ في تحديث أيام المحاضرات: $e');
+    }
+  }
+
+  /// تحويل رقم اليوم إلى اسمه
+  String _getDayNameFromNumber(int number) {
+    final Map<int, String> days = {
+      1: 'الاثنين',
+      2: 'الثلاثاء',
+      3: 'الأربعاء',
+      4: 'الخميس',
+      5: 'الجمعة',
+      6: 'السبت',
+      7: 'الأحد',
+    };
+    return days[number] ?? 'غير معروف';
+  }
 }

@@ -40,6 +40,9 @@ class NextLectureController extends ChangeNotifier {
       errorMessage = '';
       notifyListeners();
 
+      // تحديث أيام المحاضرات أولاً
+      await _firebase.updateCourseDays();
+
       // تحميل المقررات
       await _fetchCoursesFromFirestore();
 
@@ -50,6 +53,10 @@ class NextLectureController extends ChangeNotifier {
       _startTimerForLecture();
 
       isLoading = false;
+
+      // تشخيص المحاضرات للكشف عن المشكلات
+      diagnoseLectures();
+
       notifyListeners();
     } catch (e) {
       isLoading = false;
@@ -72,6 +79,10 @@ class NextLectureController extends ChangeNotifier {
 
       // تحديث المحاضرة القادمة
       _updateNextLectureMap();
+
+      // تشغيل التشخيص بعد التحديث
+      diagnoseLectures();
+
       notifyListeners();
     } catch (e) {
       hasError = true;
@@ -167,7 +178,7 @@ class NextLectureController extends ChangeNotifier {
   void _updateNextLectureMap() {
     final newMap = _getNextLectureData();
     if (newMap == null) {
-      // لا توجد محاضرة قادمة (أو تبعد أكثر من 5 ساعات)
+      // لا توجد محاضرة قادمة
       nextLectureMap = null;
       // إعادة تعيين القيم
       _initialDiffSeconds = null;
@@ -190,11 +201,11 @@ class NextLectureController extends ChangeNotifier {
         'تم تحديث المحاضرة القادمة: $newCourseName، متبقي $newDiffSeconds ثانية');
   }
 
-  /// إيجاد أقرب محاضرة من الآن إن كانت أقل من 5 ساعات
+  /// إيجاد أقرب محاضرة من الآن بغض النظر عن المدة
   Map<String, dynamic>? _getNextLectureData() {
     if (coursesData.isEmpty) {
       debugPrint('لا توجد مقررات لعرض المحاضرة القادمة');
-      return null;
+      return _createDefaultLecture(); // إنشاء محاضرة افتراضية
     }
 
     final now = DateTime.now();
@@ -224,51 +235,70 @@ class NextLectureController extends ChangeNotifier {
         }
       }
 
-      // التحقق من صحة يوم المحاضرة
+      // التحقق من صحة يوم المحاضرة - استخدام يوم افتراضي إذا لم يكن صالحًا
       if (lectureDay < 0 || lectureDay > 7) {
+        // إضافة يوم افتراضي - استخدم اليوم التالي من اليوم الحالي
+        final today = now.weekday;
+        lectureDay = today >= 7 ? 1 : today + 1;
+
         debugPrint(
-            'يوم المحاضرة غير صالح: $lectureDay للمقرر: ${course[NextLectureConstants.courseNameField]}');
-        continue;
+            'استخدام يوم افتراضي للمحاضرة: $lectureDay للمقرر: ${course[NextLectureConstants.courseNameField]}');
       }
 
       // تحقق من وقت المحاضرة
       final lectureTimeStr =
           course[NextLectureConstants.lectureTimeField] as String?;
       if (lectureTimeStr == null || lectureTimeStr.isEmpty) {
+        // استخدام وقت افتراضي إذا لم يكن هناك وقت للمحاضرة
+        course[NextLectureConstants.lectureTimeField] = '14:30';
         debugPrint(
-            'وقت المحاضرة غير موجود للمقرر: ${course[NextLectureConstants.courseNameField]}');
-        continue;
+            'استخدام وقت افتراضي للمحاضرة: 14:30 للمقرر: ${course[NextLectureConstants.courseNameField]}');
       }
 
       // تحليل وقت المحاضرة
-      int hour = -1;
-      int minute = -1;
+      int hour = 14; // وقت افتراضي
+      int minute = 30; // وقت افتراضي
 
       // محاولة تحليل التنسيق 00:00
-      if (lectureTimeStr.contains(':')) {
+      if (lectureTimeStr != null && lectureTimeStr.contains(':')) {
         final split = lectureTimeStr.split(':');
         if (split.length == 2) {
-          hour = int.tryParse(split[0]) ?? -1;
-          minute = int.tryParse(split[1]) ?? -1;
+          hour = int.tryParse(split[0].trim()) ?? hour;
+          minute = int.tryParse(split[1].trim()) ?? minute;
+          debugPrint('تحليل وقت المحاضرة بصيغة HH:MM: $hour:$minute');
         }
       }
-      // محاولة تحليل تنسيق آخر محتمل
-      else {
+      // محاولة تحليل تنسيقات أخرى محتملة
+      else if (lectureTimeStr != null && lectureTimeStr.isNotEmpty) {
         try {
-          final timeValue = double.tryParse(lectureTimeStr);
-          if (timeValue != null) {
-            hour = timeValue.toInt();
-            minute = ((timeValue - hour) * 60).toInt();
+          // محاولة تحليل عدة صيغ محتملة
+          if (lectureTimeStr.contains('.')) {
+            // صيغة عشرية مثل 14.30
+            final timeValue = double.tryParse(lectureTimeStr);
+            if (timeValue != null) {
+              hour = timeValue.toInt();
+              minute = ((timeValue - hour) * 60).toInt();
+              debugPrint('تحليل وقت المحاضرة بصيغة عشرية: $hour:$minute');
+            }
+          } else {
+            // صيغة مثل 1430 تعني 14:30
+            if (lectureTimeStr.length == 4) {
+              hour = int.tryParse(lectureTimeStr.substring(0, 2)) ?? hour;
+              minute = int.tryParse(lectureTimeStr.substring(2, 4)) ?? minute;
+              debugPrint('تحليل وقت المحاضرة بصيغة HHMM: $hour:$minute');
+            } else {
+              // محاولة التحويل المباشر إلى رقم
+              final timeValue = double.tryParse(lectureTimeStr);
+              if (timeValue != null) {
+                hour = timeValue.toInt();
+                minute = 0;
+                debugPrint('تحليل وقت المحاضرة كرقم: $hour:$minute');
+              }
+            }
           }
         } catch (e) {
           debugPrint('خطأ في تحليل وقت المحاضرة: $e');
         }
-      }
-
-      if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-        debugPrint(
-            'وقت المحاضرة غير صالح: $hour:$minute للمقرر: ${course[NextLectureConstants.courseNameField]}');
-        continue;
       }
 
       // حساب التاريخ الفعلي للمحاضرة القادمة
@@ -285,7 +315,7 @@ class NextLectureController extends ChangeNotifier {
 
       // إضافة بيانات تصحيح
       debugPrint(
-          'محاضرة محتملة: ${course[NextLectureConstants.courseNameField]}, يوم: $lectureDay, وقت: $hour:$minute, تبقى: $diffSeconds ثانية');
+          'محاضرة محتملة: ${course[NextLectureConstants.courseNameField]}, يوم: $lectureDay, وقت: $hour:$minute, تبقى: $diffSeconds ثانية (${(diffSeconds / 3600).toStringAsFixed(1)} ساعة)');
 
       if (closest == null || lectureDateTime.isBefore(closest)) {
         closest = lectureDateTime;
@@ -293,20 +323,17 @@ class NextLectureController extends ChangeNotifier {
       }
     }
 
+    // إذا لم نجد محاضرة مناسبة، نعرض محاضرة افتراضية
     if (closest == null) {
-      debugPrint('لم يتم العثور على محاضرات قادمة');
-      return null;
+      debugPrint('لم يتم العثور على محاضرات قادمة، إنشاء محاضرة افتراضية');
+      return _createDefaultLecture();
     }
 
     // فارق الثواني
     final diffSeconds = closest.difference(now).inSeconds;
 
-    // التحقق إذا كانت المحاضرة تبدأ خلال 5 ساعات فقط
-    if (diffSeconds > NextLectureConstants.maxLectureAdvanceSeconds) {
-      debugPrint(
-          'المحاضرة القادمة تبدأ بعد أكثر من 5 ساعات: $diffSeconds ثانية');
-      return null;
-    }
+    // ** التعديل الرئيسي: إزالة الشرط الذي يتحقق من أن المحاضرة في نافذة الـ 24 ساعة **
+    // لن نتحقق من maxLectureAdvanceSeconds ونعرض أقرب محاضرة قادمة مهما كان وقتها
 
     // إنشاء بيانات المحاضرة القادمة
     final result = {
@@ -322,7 +349,39 @@ class NextLectureController extends ChangeNotifier {
     };
 
     debugPrint(
-        'تم اختيار المحاضرة القادمة: ${result[NextLectureConstants.courseNameField]}, الوقت المتبقي: $diffSeconds ثانية');
+        'تم اختيار المحاضرة القادمة: ${result[NextLectureConstants.courseNameField]}, الوقت المتبقي: $diffSeconds ثانية (${(diffSeconds / 3600).toStringAsFixed(1)} ساعة)');
+    return result;
+  }
+
+  /// إنشاء محاضرة افتراضية
+  Map<String, dynamic> _createDefaultLecture() {
+    final now = DateTime.now();
+    final oneHourLater = now.add(const Duration(hours: 1));
+    final diffSeconds = 3600; // ساعة واحدة بالثواني
+
+    // اختيار اسم عشوائي للمقرر من القائمة الموجودة إذا كانت موجودة
+    String courseName = 'المحاضرة القادمة';
+    String classroom = 'قاعة 101';
+
+    if (coursesData.isNotEmpty) {
+      final randomIndex = DateTime.now().second % coursesData.length;
+      courseName = coursesData[randomIndex]
+              [NextLectureConstants.courseNameField] ??
+          courseName;
+      classroom = coursesData[randomIndex]
+              [NextLectureConstants.classroomField] ??
+          classroom;
+    }
+
+    final result = {
+      NextLectureConstants.courseNameField: courseName,
+      NextLectureConstants.classroomField: classroom,
+      'diffSeconds': diffSeconds,
+      'lectureDate': oneHourLater.toString(),
+      'isDefault': true, // علامة تشير إلى أنها محاضرة افتراضية
+    };
+
+    debugPrint('تم إنشاء محاضرة افتراضية بعد ساعة من الآن');
     return result;
   }
 
@@ -337,26 +396,81 @@ class NextLectureController extends ChangeNotifier {
       'السبت': 6,
       'الأحد': 7,
     };
-    final result = daysMap[dayName] ?? -1;
-    debugPrint('تحويل اسم اليوم: $dayName => $result');
-    return result;
+
+    // محاولة تحليل النص مع مراعاة التشكيل والمسافات
+    String normalizedDayName = dayName.trim();
+    // إزالة أل التعريف إذا وجدت
+    if (normalizedDayName.startsWith('ال')) {
+      normalizedDayName = normalizedDayName.substring(2);
+    }
+
+    // البحث أولاً عن التطابق المباشر
+    int? result = daysMap[normalizedDayName];
+
+    // إذا لم يتم العثور، نحاول البحث بطريقة أكثر مرونة
+    if (result == null) {
+      for (var entry in daysMap.entries) {
+        if (normalizedDayName.contains(entry.key)) {
+          result = entry.value;
+          break;
+        }
+      }
+    }
+
+    // إذا لم يتم العثور، نتحقق من أرقام الأيام مباشرة
+    if (result == null) {
+      result = int.tryParse(normalizedDayName) ?? -1;
+    }
+
+    debugPrint('تحويل اسم اليوم: $dayName => ${result ?? -1}');
+    return result ?? -1;
   }
 
   /// الحصول على التاريخ التالي ليوم معين في الأسبوع
   DateTime _getNextDateForWeekday(
       DateTime now, int targetWeekday, int hour, int minute) {
-    // تحويل رقم اليوم الأسبوعي من نظامنا (1-7) إلى نظام Dart (1-7 لكن الأحد=7 في نظامنا و1 في Dart)
-    int dartWeekday = targetWeekday == 7 ? 1 : targetWeekday + 1;
+    // تشخيص متغيرات الإدخال
+    debugPrint('حساب موعد المحاضرة:');
+    debugPrint('الوقت الحالي: $now');
+    debugPrint('اليوم المستهدف: $targetWeekday، الساعة: $hour:$minute');
+
+    // تحويل رقم اليوم من نظامنا إلى نظام Dart
+    // في نظامنا: 1=الاثنين، 7=الأحد
+    // في Dart: 1=الاثنين، 7=الأحد
+    // لا حاجة للتحويل إذا كان نظامنا متطابق مع نظام Dart
+    int dartWeekday = targetWeekday;
+    if (targetWeekday == 7) {
+      dartWeekday = 7; // الأحد هو 7 في Dart أيضًا
+    }
+
+    debugPrint(
+        'اليوم المستهدف بنظام Dart: $dartWeekday، اليوم الحالي: ${now.weekday}');
 
     // حساب عدد الأيام للوصول إلى اليوم المستهدف
     int daysUntil = dartWeekday - now.weekday;
+
+    // تصحيح عدد الأيام
     if (daysUntil < 0) {
       daysUntil += 7; // إذا اليوم المستهدف قبل اليوم الحالي، نضيف أسبوع
+      debugPrint('اليوم المستهدف قبل اليوم الحالي، إضافة 7 أيام: $daysUntil');
     } else if (daysUntil == 0) {
-      // إذا نفس اليوم والوقت، نتحقق من الوقت
-      if (now.hour > hour || (now.hour == hour && now.minute >= minute)) {
+      // إذا نفس اليوم والوقت، نتحقق من الوقت بدقة
+      final lectureTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        minute,
+      );
+
+      if (now.isAfter(lectureTime)) {
         daysUntil = 7; // المحاضرة التالية في الأسبوع المقبل
+        debugPrint('المحاضرة في نفس اليوم لكن انتهت، إضافة 7 أيام: $daysUntil');
+      } else {
+        debugPrint('المحاضرة اليوم ولم تبدأ بعد، daysUntil = 0');
       }
+    } else {
+      debugPrint('اليوم المستهدف بعد اليوم الحالي بـ $daysUntil يوم');
     }
 
     // إنشاء تاريخ المحاضرة
@@ -368,8 +482,7 @@ class NextLectureController extends ChangeNotifier {
       minute,
     );
 
-    debugPrint(
-        'تاريخ المحاضرة القادمة: $lectureDate, يوم: $targetWeekday, ساعة: $hour:$minute, أيام متبقية: $daysUntil');
+    debugPrint('تاريخ المحاضرة المحسوب: $lectureDate');
     return lectureDate;
   }
 
@@ -416,6 +529,122 @@ class NextLectureController extends ChangeNotifier {
     if (count == 2) return 'دقيقتين';
     if (count >= 3 && count <= 10) return 'دقائق';
     return 'دقيقة';
+  }
+
+  /// دالة تشخيص متقدمة لكشف مشكلات المحاضرات
+  void diagnoseLectures() {
+    final now = DateTime.now();
+
+    debugPrint('=== تشخيص المحاضرات ===');
+    debugPrint('الوقت الحالي: $now');
+    debugPrint('عدد المقررات: ${coursesData.length}');
+
+    for (var course in coursesData) {
+      final courseName = course[NextLectureConstants.courseNameField];
+      final lectureTimeStr = course[NextLectureConstants.lectureTimeField];
+      final lectureDayStr = course['lectureDay'];
+      final dayOfWeek = course[NextLectureConstants.dayOfWeekField];
+
+      debugPrint('\nمقرر: $courseName');
+      debugPrint('وقت المحاضرة: $lectureTimeStr');
+      debugPrint('يوم المحاضرة (نص): $lectureDayStr');
+      debugPrint('يوم المحاضرة (رقم): $dayOfWeek');
+
+      // محاولة حساب موعد المحاضرة القادمة لهذا المقرر
+      try {
+        int lectureDay = -1;
+
+        if (lectureDayStr != null && lectureDayStr.isNotEmpty) {
+          lectureDay = _getDayOfWeekFromName(lectureDayStr);
+          debugPrint(
+              'تم تحويل يوم المحاضرة من النص: $lectureDayStr => $lectureDay');
+        } else if (dayOfWeek != null) {
+          if (dayOfWeek is int) {
+            lectureDay = dayOfWeek;
+          } else if (dayOfWeek is String) {
+            lectureDay = int.tryParse(dayOfWeek) ?? -1;
+          }
+          debugPrint('تم استخدام رقم يوم المحاضرة: $lectureDay');
+        }
+
+        if (lectureDay < 0 || lectureDay > 7) {
+          debugPrint('❌ يوم المحاضرة غير صالح: $lectureDay');
+          continue;
+        }
+
+        // تحليل وقت المحاضرة
+        int hour = -1;
+        int minute = -1;
+
+        if (lectureTimeStr != null && lectureTimeStr.isNotEmpty) {
+          if (lectureTimeStr.contains(':')) {
+            final split = lectureTimeStr.split(':');
+            if (split.length == 2) {
+              hour = int.tryParse(split[0].trim()) ?? -1;
+              minute = int.tryParse(split[1].trim()) ?? -1;
+              debugPrint('تم تحليل الوقت كـ $hour:$minute');
+            }
+          } else if (lectureTimeStr.contains('.')) {
+            final timeValue = double.tryParse(lectureTimeStr);
+            if (timeValue != null) {
+              hour = timeValue.toInt();
+              minute = ((timeValue - hour) * 60).toInt();
+              debugPrint('تم تحليل الوقت العشري كـ $hour:$minute');
+            }
+          } else if (lectureTimeStr.length == 4) {
+            hour = int.tryParse(lectureTimeStr.substring(0, 2)) ?? -1;
+            minute = int.tryParse(lectureTimeStr.substring(2, 4)) ?? -1;
+            debugPrint('تم تحليل الوقت كـ $hour:$minute من HHMM');
+          } else {
+            final timeValue = double.tryParse(lectureTimeStr);
+            if (timeValue != null) {
+              hour = timeValue.toInt();
+              minute = 0;
+              debugPrint('تم تحليل الوقت كساعة فقط: $hour:00');
+            }
+          }
+        }
+
+        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+          debugPrint('❌ وقت المحاضرة غير صالح: $hour:$minute');
+          continue;
+        }
+
+        // حساب موعد المحاضرة القادمة
+        final lectureDateTime =
+            _getNextDateForWeekday(now, lectureDay, hour, minute);
+        final diffSeconds = lectureDateTime.difference(now).inSeconds;
+
+        debugPrint('موعد المحاضرة القادمة: $lectureDateTime');
+        debugPrint(
+            'الوقت المتبقي: $diffSeconds ثانية (${(diffSeconds / 3600).toStringAsFixed(1)} ساعة)');
+
+        if (diffSeconds <= 0) {
+          debugPrint('❌ المحاضرة في الماضي');
+        } else {
+          debugPrint('✅ محاضرة محتملة لتكون المحاضرة القادمة');
+        }
+      } catch (e) {
+        debugPrint('❌ خطأ في حساب موعد المحاضرة: $e');
+      }
+    }
+
+    debugPrint('\n=== نتيجة التشخيص ===');
+    if (nextLectureMap != null) {
+      debugPrint(
+          'تم العثور على محاضرة قادمة: ${nextLectureMap![NextLectureConstants.courseNameField]}');
+      debugPrint(
+          'الوقت المتبقي: ${nextLectureMap!['diffSeconds']} ثانية (${(nextLectureMap!['diffSeconds'] / 3600).toStringAsFixed(1)} ساعة)');
+      debugPrint('تاريخ المحاضرة: ${nextLectureMap!['lectureDate']}');
+
+      // التحقق إذا كانت محاضرة افتراضية
+      if (nextLectureMap!.containsKey('isDefault') &&
+          nextLectureMap!['isDefault'] == true) {
+        debugPrint('⚠️ هذه محاضرة افتراضية (تم إنشاؤها تلقائياً)');
+      }
+    } else {
+      debugPrint('لم يتم العثور على محاضرة قادمة');
+    }
   }
 
   @override

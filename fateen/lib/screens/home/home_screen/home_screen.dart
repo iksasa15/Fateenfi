@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async'; // إضافة استيراد Timer
 import 'package:fateen/screens/home/home_screen/controllers/header_controller.dart';
 import 'package:fateen/screens/tasks/task_screen/task_screen.dart';
 import '../home_screen/components/header.dart';
@@ -24,6 +25,7 @@ import 'controllers/task_categories_controller.dart';
 import '../home_screen/controllers/next_lecture_controller.dart';
 import '../home_screen/components/next_lecture_card.dart';
 import '../home_screen/constants/next_lecture_constants.dart';
+// استيراد العداد التنازلي - تم تضمينه في هذا الملف بدلاً من استيراده
 
 // استيراد ملفات ميزة شريط التنقل السفلي
 import '../../bottom_nav/index.dart';
@@ -59,14 +61,23 @@ class StaticNextLectureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // نسخة مبسطة من NextLectureCard بدون أنيميشن
-    String timeText = _formatTime(diffSeconds);
+    // تنسيق الوقت وتحديد الألوان
     Color timeColor = _getTimeColor(context, diffSeconds);
     Color bgColor = _getBgColor(context, diffSeconds);
 
+    // إضافة التدرج اللوني للخلفية
+    LinearGradient gradient = LinearGradient(
+      begin: Alignment.topRight,
+      end: Alignment.bottomLeft,
+      colors: [
+        bgColor,
+        bgColor.withOpacity(0.8),
+      ],
+    );
+
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
@@ -77,111 +88,145 @@ class StaticNextLectureCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // معلومات المحاضرة
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    courseName,
-                    style: TextStyle(
-                      fontFamily: 'SYMBIOAR+LT',
-                      fontSize:
-                          AppDimensions.getBodyFontSize(context),
-                      fontWeight: FontWeight.bold,
-                      color: context.colorTextPrimary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(
-                      height: AppDimensions.getSpacing(context,
-                              size: SpacingSize.small) /
-                          2),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        children: [
+          // زخارف الخلفية
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+
+          Positioned(
+            left: -15,
+            bottom: -15,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+
+          // محتوى البطاقة
+          Padding(
+            padding: EdgeInsets.all(AppDimensions.getSpacing(context)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // معلومات المحاضرة
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: AppDimensions.getIconSize(context,
-                            size: IconSize.small, small: true),
-                        color: context.colorTextHint,
-                      ),
-                      SizedBox(
-                          width: AppDimensions.getSpacing(context,
-                                  size: SpacingSize.small) /
-                              2),
                       Text(
-                        classroom,
+                        courseName,
                         style: TextStyle(
                           fontFamily: 'SYMBIOAR+LT',
-                          fontSize: AppDimensions.getLabelFontSize(context),
-                          color: context.colorTextSecondary,
+                          fontSize: AppDimensions.getBodyFontSize(context),
+                          fontWeight: FontWeight.bold,
+                          color: timeColor.withOpacity(0.9),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      SizedBox(
+                          height: AppDimensions.getSpacing(context,
+                                  size: SpacingSize.small) /
+                              2),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: AppDimensions.getIconSize(context,
+                                size: IconSize.small, small: true),
+                            color: context.colorTextHint,
+                          ),
+                          SizedBox(
+                              width: AppDimensions.getSpacing(context,
+                                      size: SpacingSize.small) /
+                                  2),
+                          Expanded(
+                            child: Text(
+                              classroom,
+                              style: TextStyle(
+                                fontFamily: 'SYMBIOAR+LT',
+                                fontSize:
+                                    AppDimensions.getLabelFontSize(context),
+                                color: context.colorTextSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            // مؤشر الوقت المتبقي
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal:
-                    AppDimensions.getSpacing(context, size: SpacingSize.small),
-                vertical:
-                    AppDimensions.getSpacing(context, size: SpacingSize.small) /
-                        2,
-              ),
-              decoration: BoxDecoration(
-                color: context.colorSurface,
-                borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
-              ),
-              child: Text(
-                timeText,
-                style: TextStyle(
-                  fontFamily: 'SYMBIOAR+LT',
-                  fontSize:
-                      AppDimensions.getLabelFontSize(context),
-                  fontWeight: FontWeight.bold,
-                  color: timeColor,
                 ),
-              ),
+
+                // مؤشر الوقت المتبقي - تحسين بإضافة العداد المتحرك
+                Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: context.colorSurface,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: timeColor,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: timeColor.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.access_time_rounded,
+                          size: AppDimensions.getIconSize(context,
+                              size: IconSize.small, small: true),
+                          color: timeColor,
+                        ),
+                        SizedBox(height: 2),
+                        // استخدام عداد تنازلي متحرك
+                        CountdownTimer(
+                          initialSeconds: diffSeconds,
+                          fontSize:
+                              AppDimensions.getLabelFontSize(context) * 0.8,
+                          showIcon: false,
+                          customColor: timeColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // دوال مساعدة لتنسيق الوقت وألوان العرض
-  String _formatTime(int diffSeconds) {
-    if (diffSeconds < 0) {
-      return "بدأت";
-    }
-    if (diffSeconds < 60) {
-      return "خلال $diffSeconds ثانية";
-    }
-    int diffMinutes = diffSeconds ~/ 60;
-    if (diffMinutes < 60) {
-      return "خلال $diffMinutes دقيقة";
-    }
-    int diffHours = diffMinutes ~/ 60;
-    int remainingMinutes = diffMinutes % 60;
-    if (remainingMinutes == 0) {
-      return "خلال $diffHours ساعة";
-    }
-    return "خلال $diffHours ساعة و $remainingMinutes دقيقة";
-  }
-
+  // تحسين ألوان العرض حسب الوقت المتبقي
   Color _getTimeColor(BuildContext context, int diffSeconds) {
     if (diffSeconds < 900) {
       // أقل من 15 دقيقة
@@ -197,12 +242,12 @@ class StaticNextLectureCard extends StatelessWidget {
   Color _getBgColor(BuildContext context, int diffSeconds) {
     if (diffSeconds < 900) {
       // أقل من 15 دقيقة
-      return context.colorError.withOpacity(0.1);
+      return context.colorError.withOpacity(0.15);
     } else if (diffSeconds < 1800) {
       // أقل من 30 دقيقة
-      return context.colorWarning.withOpacity(0.1);
+      return context.colorWarning.withOpacity(0.15);
     } else {
-      return context.colorSuccess.withOpacity(0.1);
+      return context.colorSuccess.withOpacity(0.15);
     }
   }
 }
@@ -461,8 +506,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // عنوان قسم المحاضرة القادمة
-                                NextLectureComponents.buildSectionTitle(),
+                                // عنوان قسم المحاضرة القادمة مع تحسينات
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.school_rounded,
+                                      size: AppDimensions.getIconSize(context,
+                                          size: IconSize.small, small: true),
+                                      color: context.colorPrimaryDark,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      NextLectureConstants.nextLectureTitle,
+                                      style: TextStyle(
+                                        fontSize:
+                                            AppDimensions.smallTitleFontSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.colorTextPrimary,
+                                        fontFamily: 'SYMBIOAR+LT',
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
                                 SizedBox(
                                     height: AppDimensions.getSpacing(context,
@@ -472,16 +538,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 if (controller.isLoading)
                                   Container(
                                     height:
-                                        _AppDimensionsExtensions.getCardHeight(context),
+                                        _AppDimensionsExtensions.getCardHeight(
+                                            context),
                                     decoration: BoxDecoration(
                                       color: context.colorSurfaceLight,
                                       borderRadius: BorderRadius.circular(
                                           AppDimensions.mediumRadius),
                                     ),
                                     child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: context.colorPrimaryLight,
-                                        strokeWidth: 2,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          CircularProgressIndicator(
+                                            color: context.colorPrimaryLight,
+                                            strokeWidth: 2,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            'جاري البحث عن المحاضرات...',
+                                            style: TextStyle(
+                                              color: context.colorTextSecondary,
+                                              fontSize: AppDimensions
+                                                  .getLabelFontSize(context),
+                                              fontFamily: 'SYMBIOAR+LT',
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   )
@@ -499,6 +582,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 else
                                   NextLectureComponents
                                       .buildEmptyLectureState(),
+
+                                // حالة الخطأ - إضافة جديدة
+                                if (controller.hasError)
+                                  Container(
+                                    margin: EdgeInsets.only(top: 8),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          context.colorError.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline,
+                                          color: context.colorError,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            controller.errorMessage,
+                                            style: TextStyle(
+                                              color: context.colorError,
+                                              fontSize: AppDimensions
+                                                      .getLabelFontSize(
+                                                          context) *
+                                                  0.9,
+                                              fontFamily: 'SYMBIOAR+LT',
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                               ],
                             );
                           },
@@ -540,7 +661,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
                       // مساحة إضافية في الأسفل للسماح بالسحب للأسفل بشكل أفضل
                       SizedBox(
-                          height: _AppDimensionsExtensions.getCardHeight(context,
+                          height: _AppDimensionsExtensions.getCardHeight(
+                              context,
                               size: CardSize.large)),
                     ],
                   ),
@@ -762,4 +884,120 @@ enum CardSize {
   regular,
   medium,
   large,
+}
+
+// عنصر العداد التنازلي
+class CountdownTimer extends StatefulWidget {
+  final int initialSeconds;
+  final double? fontSize;
+  final bool showIcon;
+  final Color? customColor;
+
+  const CountdownTimer({
+    Key? key,
+    required this.initialSeconds,
+    this.fontSize,
+    this.showIcon = true,
+    this.customColor,
+  }) : super(key: key);
+
+  @override
+  State<CountdownTimer> createState() => _CountdownTimerState();
+}
+
+class _CountdownTimerState extends State<CountdownTimer> {
+  late int _remainingSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _remainingSeconds = widget.initialSeconds;
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_remainingSeconds > 0) {
+          _remainingSeconds--;
+        } else {
+          _timer?.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // تنسيق الوقت المتبقي
+    String formattedTime = _formatRemainingTime(_remainingSeconds);
+    Color timeColor =
+        widget.customColor ?? _getTimeColor(context, _remainingSeconds);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (widget.showIcon) ...[
+          Icon(
+            Icons.access_time_rounded,
+            size: widget.fontSize != null
+                ? widget.fontSize! * 1.2
+                : AppDimensions.getIconSize(context,
+                    size: IconSize.small, small: true),
+            color: timeColor,
+          ),
+          SizedBox(width: 4),
+        ],
+        Text(
+          formattedTime,
+          style: TextStyle(
+            fontFamily: 'SYMBIOAR+LT',
+            fontSize: widget.fontSize ??
+                AppDimensions.getLabelFontSize(context) * 0.9,
+            fontWeight: FontWeight.bold,
+            color: timeColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatRemainingTime(int seconds) {
+    if (seconds < 60) {
+      return "$seconds ث";
+    }
+
+    int minutes = seconds ~/ 60;
+    if (minutes < 60) {
+      return "$minutes د";
+    }
+
+    int hours = minutes ~/ 60;
+    int remainingMinutes = minutes % 60;
+
+    if (remainingMinutes == 0) {
+      return "$hours س";
+    }
+
+    return "$hours:${remainingMinutes.toString().padLeft(2, '0')}";
+  }
+
+  Color _getTimeColor(BuildContext context, int seconds) {
+    if (seconds < 900) {
+      // أقل من 15 دقيقة
+      return context.colorError;
+    } else if (seconds < 1800) {
+      // أقل من 30 دقيقة
+      return context.colorWarning;
+    } else {
+      return context.colorSuccess;
+    }
+  }
 }

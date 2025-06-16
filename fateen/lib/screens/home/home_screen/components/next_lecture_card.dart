@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../constants/next_lecture_constants.dart';
-import '../../../../core/constants/appColor.dart'; // استيراد ملف الألوان
-import '../../../../core/constants/app_dimensions.dart'; // استيراد ملف الأبعاد
+import '../../../../core/constants/appColor.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../home/home_screen/components/countdown_timer.dart';
 
-/// بطاقة المحاضرة القادمة
+/// بطاقة المحاضرة القادمة بتصميم محسّن
 class NextLectureCard extends StatelessWidget {
   final String courseName;
   final String classroom;
@@ -26,31 +27,18 @@ class NextLectureCard extends StatelessWidget {
     final bool isMediumScreen =
         screenSize.width >= 360 && screenSize.width < 400;
 
-    // حساب الوقت المتبقي بشكل أكثر دقة
-    int diffHours = diffSeconds ~/ 3600;
-    int diffMinutes = (diffSeconds % 3600) ~/ 60;
-
-    // تنسيق عرض الوقت
-    String timeDisplay;
-    if (diffHours > 0) {
-      timeDisplay = '$diffHours س $diffMinutes د';
-    } else {
-      timeDisplay = '$diffMinutes د';
-    }
-
-    // حساب أحجام العناصر بناءً على حجم الشاشة - تحسين الأحجام
-    final double cardHeight = screenSize.height * 0.12;
-
-    // زيادة أحجام النصوص والأيقونات
+    // حساب أحجام العناصر بناءً على حجم الشاشة
+    final double cardHeight = screenSize.height * 0.13;
     final double titleSize =
         isSmallScreen ? 15.0 : (isMediumScreen ? 16.0 : 17.0);
     final double subtitleSize =
         isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
     final double iconSize =
-        isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final double timeCircleSize = screenSize.width * 0.14;
-    final double timeTextSize =
-        isSmallScreen ? 12.0 : (isMediumScreen ? 13.0 : 14.0);
+        isSmallScreen ? 18.0 : (isMediumScreen ? 20.0 : 22.0);
+
+    // تحديد الألوان بناءً على الوقت المتبقي
+    Color timeColor = _getTimeColor(context, diffSeconds);
+    Color cardColor = _getCardBackgroundColor(context, diffSeconds);
 
     return AnimatedBuilder(
       animation: animation,
@@ -67,145 +55,235 @@ class NextLectureCard extends StatelessWidget {
         width: double.infinity,
         height: cardHeight,
         decoration: BoxDecoration(
-          gradient: context.gradientPrimary, // استخدام التدرج من AppColors
-          borderRadius: BorderRadius.circular(
-              AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           boxShadow: [
             BoxShadow(
-              color: context.colorPrimaryLight
-                  .withOpacity(0.25), // استخدام الألوان من AppColors
-              blurRadius: 6,
+              color: context.colorShadow,
+              blurRadius: 8,
               offset: const Offset(0, 2),
               spreadRadius: 0,
             ),
           ],
+          border: Border.all(
+            color: timeColor.withOpacity(0.3),
+            width: 1.5,
+          ),
         ),
-        // استخدام ClipRRect لضمان عدم تجاوز أي عنصر داخلي
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-              AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
-          child: Stack(
-            children: [
-              // زخارف الخلفية
-              Positioned(
-                left: -25,
-                top: -10,
-                child: Container(
-                  width: screenSize.width * 0.15,
-                  height: screenSize.width * 0.15,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.07),
+        child: Stack(
+          children: [
+            // زخرفة الخلفية - مستطيل ملون على الجانب
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 8,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: timeColor,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                    topLeft: Radius.circular(AppDimensions.largeRadius),
+                    bottomLeft: Radius.circular(AppDimensions.largeRadius),
                   ),
                 ),
               ),
+            ),
 
-              // المحتوى الرئيسي
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDimensions.getSpacing(
-                      context), // استخدام التباعد من AppDimensions
-                  vertical: screenSize.height * 0.015,
-                ),
-                child: Row(
-                  children: [
-                    // المعلومات الرئيسية (اسم المقرر + القاعة)
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // اسم المقرر
-                          Text(
-                            courseName,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: titleSize,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'SYMBIOAR+LT',
-                              height: 1.2, // تحسين المسافة بين السطور
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          SizedBox(height: screenSize.height * 0.01),
-
-                          // القاعة
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.white,
-                                size: iconSize,
-                              ),
-                              SizedBox(width: screenSize.width * 0.01),
-                              Expanded(
-                                child: Text(
-                                  '${NextLectureConstants.classroomPrefix}$classroom',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.9),
-                                    fontSize: subtitleSize,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'SYMBIOAR+LT',
-                                    height: 1.2,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+            // المحتوى الرئيسي
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.getSpacing(context),
+                vertical: screenSize.height * 0.015,
+              ),
+              child: Row(
+                children: [
+                  // أيقونة المحاضرة (مربع دائري ملون)
+                  Container(
+                    width: iconSize * 2,
+                    height: iconSize * 2,
+                    margin: EdgeInsets.only(
+                        right: screenSize.width * 0.03, left: 8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: timeColor.withOpacity(0.1),
                     ),
+                    child: Icon(
+                      Icons.school_outlined,
+                      color: timeColor,
+                      size: iconSize,
+                    ),
+                  ),
 
-                    SizedBox(width: screenSize.width * 0.03),
-
-                    // دائرة الوقت المتبقي
-                    Container(
-                      width: timeCircleSize,
-                      height: timeCircleSize,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.5,
+                  // المعلومات الرئيسية (اسم المقرر + القاعة)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // اسم المقرر
+                        Text(
+                          courseName,
+                          style: TextStyle(
+                            color: context.colorTextPrimary,
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'SYMBIOAR+LT',
+                            height: 1.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+
+                        SizedBox(height: screenSize.height * 0.007),
+
+                        // القاعة
+                        Row(
                           children: [
                             Icon(
-                              Icons.timer_outlined,
-                              color: Colors.white,
-                              size: iconSize,
+                              Icons.location_on_outlined,
+                              color: context.colorTextSecondary,
+                              size: subtitleSize,
                             ),
-                            SizedBox(height: screenSize.height * 0.0025),
-                            Text(
-                              timeDisplay,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: timeTextSize,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'SYMBIOAR+LT',
-                                height: 1.2,
+                            SizedBox(width: screenSize.width * 0.01),
+                            Expanded(
+                              child: Text(
+                                '${NextLectureConstants.classroomPrefix}$classroom',
+                                style: TextStyle(
+                                  color: context.colorTextSecondary,
+                                  fontSize: subtitleSize - 1,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'SYMBIOAR+LT',
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
+
+                        SizedBox(height: screenSize.height * 0.007),
+
+                        // الوقت المتبقي مع العداد التنازلي
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              color: timeColor,
+                              size: subtitleSize,
+                            ),
+                            SizedBox(width: screenSize.width * 0.01),
+                            CountdownTimer(
+                              initialSeconds: diffSeconds,
+                              fontSize: subtitleSize - 1,
+                              showIcon: false,
+                              customColor: timeColor,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // مؤشر الوقت المتبقي (دائرة تظهر مستوى الأهمية)
+                  Container(
+                    width: iconSize * 2,
+                    height: iconSize * 2,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: timeColor,
+                        width: 2,
                       ),
                     ),
-                  ],
-                ),
+                    child: Center(
+                      child:
+                          _buildTimeIndicator(context, diffSeconds, iconSize),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  // دالة لإنشاء مؤشر الوقت المتبقي
+  Widget _buildTimeIndicator(BuildContext context, int seconds, double size) {
+    // تحديد نوع الأيقونة بناءً على الوقت المتبقي
+    IconData iconData;
+    String label;
+
+    if (seconds < 900) {
+      // أقل من 15 دقيقة
+      iconData = Icons.warning_amber_rounded;
+      label = "عاجل";
+    } else if (seconds < 1800) {
+      // أقل من 30 دقيقة
+      iconData = Icons.watch_later_outlined;
+      label = "قريب";
+    } else if (seconds < 3600) {
+      // أقل من ساعة
+      iconData = Icons.access_time;
+      label = "قادم";
+    } else {
+      // أكثر من ساعة
+      iconData = Icons.event_available_outlined;
+      label = "لاحقاً";
+    }
+
+    Color timeColor = _getTimeColor(context, seconds);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          iconData,
+          color: timeColor,
+          size: size,
+        ),
+        SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: timeColor,
+            fontSize: size * 0.5,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'SYMBIOAR+LT',
+          ),
+        ),
+      ],
+    );
+  }
+
+  // لون الوقت حسب المدة المتبقية
+  Color _getTimeColor(BuildContext context, int seconds) {
+    if (seconds < 900) {
+      // أقل من 15 دقيقة
+      return context.colorError;
+    } else if (seconds < 1800) {
+      // أقل من 30 دقيقة
+      return context.colorWarning;
+    } else {
+      return context.colorSuccess;
+    }
+  }
+
+  // لون خلفية البطاقة حسب المدة المتبقية
+  Color _getCardBackgroundColor(BuildContext context, int seconds) {
+    if (seconds < 900) {
+      // أقل من 15 دقيقة
+      return context.colorError.withOpacity(0.05);
+    } else if (seconds < 1800) {
+      // أقل من 30 دقيقة
+      return context.colorWarning.withOpacity(0.05);
+    } else {
+      return context.colorSuccess.withOpacity(0.05);
+    }
   }
 }
 
@@ -215,23 +293,35 @@ class NextLectureComponents {
   static Widget buildSectionTitle() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size screenSize = MediaQuery.of(context).size;
-
         return Padding(
           padding: EdgeInsets.only(
-            bottom: screenSize.height * 0.01,
+            bottom: AppDimensions.getSpacing(context, size: SpacingSize.small),
           ),
           child: Row(
             children: [
-              // نص العنوان فقط بدون خط تحته
+              // أيقونة العنوان
+              Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: context.colorPrimaryPale,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.school_rounded,
+                  size: AppDimensions.getIconSize(context,
+                      size: IconSize.small, small: true),
+                  color: context.colorPrimaryDark,
+                ),
+              ),
+              SizedBox(width: 8),
+
+              // نص العنوان
               Text(
                 NextLectureConstants.nextLectureTitle,
                 style: TextStyle(
-                  fontSize: AppDimensions
-                      .smallTitleFontSize, // استخدام حجم الخط من AppDimensions
+                  fontSize: AppDimensions.smallTitleFontSize,
                   fontWeight: FontWeight.bold,
-                  color:
-                      context.colorTextPrimary, // استخدام لون النص من AppColors
+                  color: context.colorTextPrimary,
                   fontFamily: 'SYMBIOAR+LT',
                   height: 1.2,
                 ),
@@ -266,19 +356,16 @@ class NextLectureComponents {
           ),
           padding: EdgeInsets.symmetric(
             vertical: screenSize.height * 0.02,
-            horizontal: AppDimensions.getSpacing(
-                context), // استخدام التباعد من AppDimensions
+            horizontal: AppDimensions.getSpacing(context),
           ),
           height: screenSize.height * 0.12,
           decoration: BoxDecoration(
-            color: context.colorSurface, // استخدام لون السطح من AppColors
-            borderRadius: BorderRadius.circular(
-                AppDimensions.largeRadius), // استخدام الزوايا من AppDimensions
-            border: Border.all(
-                color: context.colorBorder), // استخدام لون الحدود من AppColors
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
+            border: Border.all(color: context.colorBorder),
             boxShadow: [
               BoxShadow(
-                color: context.colorShadow, // استخدام لون الظل من AppColors
+                color: context.colorShadow,
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: const Offset(0, 1),
@@ -292,14 +379,12 @@ class NextLectureComponents {
                 width: iconSize,
                 height: iconSize,
                 decoration: BoxDecoration(
-                  color: context.colorPrimaryLight
-                      .withOpacity(0.1), // استخدام الألوان من AppColors
+                  color: context.colorPrimaryLight.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.event_note_rounded,
-                  color: context
-                      .colorPrimary, // استخدام اللون الرئيسي من AppColors
+                  color: context.colorPrimary,
                   size: iconSize * 0.5,
                 ),
               ),
@@ -317,8 +402,7 @@ class NextLectureComponents {
                       style: TextStyle(
                         fontSize: titleSize,
                         fontWeight: FontWeight.bold,
-                        color: context
-                            .colorPrimaryDark, // استخدام اللون الرئيسي الداكن من AppColors
+                        color: context.colorPrimaryDark,
                         fontFamily: 'SYMBIOAR+LT',
                         height: 1.2,
                       ),
@@ -328,8 +412,7 @@ class NextLectureComponents {
                       'يمكنك إضافة محاضراتك من قسم الجدول الدراسي',
                       style: TextStyle(
                         fontSize: subtitleSize,
-                        color: context
-                            .colorTextSecondary, // استخدام لون النص الثانوي من AppColors
+                        color: context.colorTextSecondary,
                         fontFamily: 'SYMBIOAR+LT',
                         height: 1.2,
                       ),
