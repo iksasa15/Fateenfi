@@ -1,129 +1,127 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // الألوان الأساسية (توحيد الهوية)
-  static const Color primary = Color(0xFF6A2FEC); // اللون الرئيسي للتطبيق
-  static const Color primaryDark =
-      Color(0xFF4338CA); // نسخة داكنة من اللون الرئيسي
-  static const Color primaryLight =
-      Color(0xFF6366F1); // نسخة خفيفة من اللون الرئيسي
-  static const Color primaryPale =
-      Color(0xFFF5F3FF); // نسخة شاحبة من اللون الرئيسي
-  static const Color accent =
-      Color(0xFFEC4899); // لون التمييز للتأكيد والأزرار المهمة
+  // الألوان الأساسية (توحيد الهوية) - محدثة بألوان عصرية وهادئة
+  static const Color primary = Color(0xFF5B63B7); // لون أزرق-بنفسجي هادئ
+  static const Color primaryDark = Color(0xFF404B8C); // داكن متناسق مع الرئيسي
+  static const Color primaryLight = Color(0xFF7E85D0); // خفيف متناسق
+  static const Color primaryPale = Color(0xFFF0F1FA); // شاحب للخلفيات الخفيفة
+  static const Color accent = Color(0xFFEF6C9E); // وردي معتدل للتمييز
 
-  // ألوان الخلفية (موحدة)
-  static const Color background = Color(0xFFFDFDFF); // خلفية التطبيق الرئيسية
+  // ألوان الخلفية (موحدة) - محدثة لمظهر أكثر انتعاشًا
+  static const Color background = Color(0xFFFAFBFF); // خلفية بلمسة زرقاء خفيفة
   static const Color surface = Color(0xFFFFFFFF); // خلفية البطاقات والعناصر
   static const Color surfaceLight =
-      Color(0xFFF8F8F8); // خلفية ثانوية أخف قليلاً
+      Color(0xFFF5F7FC); // خلفية ثانوية بلمسة زرقاء
 
-  // ألوان النصوص (موحدة)
-  static const Color textPrimary = Color(0xFF374151); // النص الأساسي
-  static const Color textSecondary = Color(0xFF757575); // النص الثانوي
-  static const Color textHint = Color(0xFF9CA3AF); // نص التلميحات والإرشادات
+  // ألوان النصوص (موحدة) - محسنة للقراءة
+  static const Color textPrimary = Color(0xFF2C3256); // أزرق داكن للنص الأساسي
+  static const Color textSecondary = Color(0xFF6B7194); // رمادي مائل للأزرق
+  static const Color textHint = Color(0xFF9CA3BD); // لون تلميحات معتدل
 
-  // ألوان الحالة (موحدة)
-  static const Color success = Color(0xFF34D399); // النجاح والحالة الإيجابية
-  static const Color warning = Color(0xFFFF9800); // التنبيه والحالة المعلقة
-  static const Color error = Color(0xFFE64646); // الخطأ والحالة السلبية
-  static const Color info = Color(0xFF3B82F6); // المعلومات
+  // ألوان الحالة (موحدة) - أكثر حيوية ولكن متناسقة
+  static const Color success = Color(0xFF66BB6A); // أخضر معتدل للنجاح
+  static const Color warning = Color(0xFFFFB74D); // برتقالي معتدل للتنبيه
+  static const Color error = Color(0xFFE57373); // أحمر معتدل للخطأ
+  static const Color info = Color(0xFF64B5F6); // أزرق معتدل للمعلومات
 
-  // ألوان الحدود والفواصل (موحدة)
-  static const Color border = Color(0xFFE0E0E0); // لون الحدود
-  static const Color divider = Color(0xFFEEEEEE); // لون الفواصل
+  // ألوان الحدود والفواصل (موحدة) - ألطف للعين
+  static const Color border = Color(0xFFE4E6F0); // رمادي فاتح بلمسة زرقاء
+  static const Color divider = Color(0xFFF0F1FA); // متناسق مع primaryPale
 
-  // ألوان الظلال (موحدة)
-  static const Color shadow = Color(0x0D221291); // ظلال خفيفة
-  static const Color shadowDark = Color(0x0F000000); // ظلال داكنة
+  // ألوان الظلال (موحدة) - معدلة للتناسق
+  static const Color shadow =
+      Color(0x0D404B8C); // ظلال خفيفة من لون primaryDark
+  static const Color shadowDark = Color(0x14404B8C); // ظلال أعمق قليلًا
 
-  // ألوان التفاعل (موحدة)
-  static const Color focusState = Color(0xFFEEF2FF); // حالة التركيز
-  static const Color disabledState = Color(0xFFDDDDDD); // حالة التعطيل
+  // ألوان التفاعل (موحدة) - محسنة للاستجابة البصرية
+  static const Color focusState = Color(0xFFE8EAFB); // حالة التركيز بلون هادئ
+  static const Color disabledState = Color(0xFFE1E2ED); // حالة التعطيل متناسقة
 
-  // ألوان وسائل التواصل الاجتماعي (موحدة إذا كانت ضرورية)
+  // ألوان وسائل التواصل الاجتماعي (موحدة)
   static const Color google = Color(0xFFEA4335);
   static const Color facebook = Color(0xFF1877F2);
   static const Color apple = Color(0xFF000000);
 
-  // التدرجات الرئيسية (موحدة)
+  // التدرجات الرئيسية (موحدة) - معدلة للمظهر العصري
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF8753F7),
-      Color(0xFF6A2FEC),
+      Color(0xFF7E85D0), // primaryLight
+      Color(0xFF5B63B7), // primary
     ],
   );
 
-  // الإضافات الجديدة - تدرجات إضافية للعناصر المختلفة
+  // تدرجات إضافية للعناصر المختلفة - محسنة للتناسق
   static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFEC4899),
-      Color(0xFFE02D6F),
+      Color(0xFFEF6C9E), // accent
+      Color(0xFFE64B8C), // accent dark
     ],
   );
 
-  // تعريف القيم غير المعرفة سابقاً
-  static const Color shimmerBase = Color(0xFFE0E0E0);
-  static const Color shimmerHighlight = Color(0xFFF5F5F5);
-  static const Color mediumPurple = Color(0xFF9F7AEA);
-  static const Color shadowColor = Color(0x1A000000);
-  static const Color primaryExtraLight = Color(0xFFEEE9FF);
+  // تعريف القيم المساعدة
+  static const Color shimmerBase = Color(0xFFECEEF5);
+  static const Color shimmerHighlight = Color(0xFFF8F9FF);
+  static const Color mediumPurple =
+      Color(0xFF8388C7); // متوسط بين primary و primaryLight
+  static const Color shadowColor = Color(0x14404B8C);
+  static const Color primaryExtraLight = Color(0xFFE8EAFB);
 
-  // ألوان الوضع الليلي (الداكن)
+  // ألوان الوضع الليلي (الداكن) - معدلة للراحة البصرية
   // الألوان الأساسية (وضع داكن)
-  static const Color darkPrimary = Color(0xFF8B5CF6); // اللون الرئيسي للتطبيق
-  static const Color darkPrimaryDark =
-      Color(0xFF7C3AED); // نسخة داكنة من اللون الرئيسي
+  static const Color darkPrimary =
+      Color(0xFF6A75C9); // نسخة وضع داكن من primary
+  static const Color darkPrimaryDark = Color(0xFF4F579F); // نسخة داكنة متناسقة
   static const Color darkPrimaryLight =
-      Color(0xFFA78BFA); // نسخة خفيفة من اللون الرئيسي
-  static const Color darkPrimaryPale =
-      Color(0xFF2E1065); // نسخة شاحبة من اللون الرئيسي
-  static const Color darkAccent =
-      Color(0xFFF472B6); // لون التمييز للتأكيد والأزرار المهمة
+      Color(0xFF8A92D6); // نسخة خفيفة للوضع الداكن
+  static const Color darkPrimaryPale = Color(0xFF242A45); // شاحب للوضع الداكن
+  static const Color darkAccent = Color(0xFFF27FAA); // وردي متناسق للوضع الداكن
 
-  // ألوان الخلفية (وضع داكن)
+  // ألوان الخلفية (وضع داكن) - محسنة للراحة الليلية
   static const Color darkBackground =
-      Color(0xFF121212); // خلفية التطبيق الرئيسية
-  static const Color darkSurface = Color(0xFF1E1E1E); // خلفية البطاقات والعناصر
-  static const Color darkSurfaceLight =
-      Color(0xFF2C2C2C); // خلفية ثانوية أخف قليلاً
+      Color(0xFF121625); // خلفية داكنة بلمسة زرقاء
+  static const Color darkSurface =
+      Color(0xFF1A1F30); // خلفية البطاقات في الوضع الداكن
+  static const Color darkSurfaceLight = Color(0xFF252C42); // خلفية ثانوية خفيفة
 
-  // ألوان النصوص (وضع داكن)
-  static const Color darkTextPrimary = Color(0xFFE2E8F0); // النص الأساسي
-  static const Color darkTextSecondary = Color(0xFFABB3BF); // النص الثانوي
-  static const Color darkTextHint =
-      Color(0xFF6B7280); // نص التلميحات والإرشادات
+  // ألوان النصوص (وضع داكن) - محسنة للقراءة في الإضاءة المنخفضة
+  static const Color darkTextPrimary = Color(0xFFE6E8F5); // نص أساسي واضح
+  static const Color darkTextSecondary = Color(0xFFB0B5D0); // نص ثانوي واضح
+  static const Color darkTextHint = Color(0xFF787E9E); // تلميحات واضحة
 
-  // ألوان الحالة (وضع داكن)
+  // ألوان الحالة (وضع داكن) - متناسقة مع الوضع الداكن
   static const Color darkSuccess =
-      Color(0xFF10B981); // النجاح والحالة الإيجابية
-  static const Color darkWarning = Color(0xFFF59E0B); // التنبيه والحالة المعلقة
-  static const Color darkError = Color(0xFFEF4444); // الخطأ والحالة السلبية
-  static const Color darkInfo = Color(0xFF3B82F6); // المعلومات
+      Color(0xFF81C784); // أخضر للنجاح في الوضع الداكن
+  static const Color darkWarning =
+      Color(0xFFFFD54F); // تنبيه واضح في الوضع الداكن
+  static const Color darkError = Color(0xFFE57373); // خطأ واضح في الوضع الداكن
+  static const Color darkInfo =
+      Color(0xFF64B5F6); // معلومات واضحة في الوضع الداكن
 
-  // ألوان الحدود والفواصل (وضع داكن)
-  static const Color darkBorder = Color(0xFF333333); // لون الحدود
-  static const Color darkDivider = Color(0xFF2A2A2A); // لون الفواصل
+  // ألوان الحدود والفواصل (وضع داكن) - متناسقة مع ألوان الخلفية
+  static const Color darkBorder =
+      Color(0xFF303752); // حدود واضحة في الوضع الداكن
+  static const Color darkDivider = Color(0xFF252C42); // فواصل متناسقة
 
   // ألوان الظلال (وضع داكن)
-  static const Color darkShadow = Color(0x3D000000); // ظلال خفيفة
-  static const Color darkShadowDark = Color(0x66000000); // ظلال داكنة
+  static const Color darkShadow = Color(0x40121625); // ظلال مناسبة للوضع الداكن
+  static const Color darkShadowDark = Color(0x80121625); // ظلال داكنة أكثر
 
   // ألوان التفاعل (وضع داكن)
-  static const Color darkFocusState = Color(0xFF2D3748); // حالة التركيز
-  static const Color darkDisabledState = Color(0xFF4B5563); // حالة التعطيل
+  static const Color darkFocusState = Color(0xFF303752); // حالة تركيز واضحة
+  static const Color darkDisabledState = Color(0xFF343B52); // حالة تعطيل واضحة
 
   // التدرجات الرئيسية (وضع داكن)
   static const LinearGradient darkPrimaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF9F7AEA),
-      Color(0xFF8B5CF6),
+      Color(0xFF8A92D6), // darkPrimaryLight
+      Color(0xFF6A75C9), // darkPrimary
     ],
   );
 
@@ -132,17 +130,17 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFEC4899),
-      Color(0xFFDB2777),
+      Color(0xFFF27FAA), // darkAccent
+      Color(0xFFE65A8C), // darkAccent dark
     ],
   );
 
   // ألوان إضافية للوضع الداكن
-  static const Color darkShimmerBase = Color(0xFF2A2A2A);
-  static const Color darkShimmerHighlight = Color(0xFF3D3D3D);
-  static const Color darkMediumPurple = Color(0xFF8B5CF6);
-  static const Color darkShadowColor = Color(0x40000000);
-  static const Color darkPrimaryExtraLight = Color(0xFF312E81);
+  static const Color darkShimmerBase = Color(0xFF242A45);
+  static const Color darkShimmerHighlight = Color(0xFF303752);
+  static const Color darkMediumPurple = Color(0xFF7981CF);
+  static const Color darkShadowColor = Color(0x40121625);
+  static const Color darkPrimaryExtraLight = Color(0xFF303752);
 
   // دالة مساعدة للحصول على اللون المناسب حسب وضع الثيم
   static Color getThemeColor(
@@ -157,28 +155,28 @@ class AppColors {
     if (isDarkMode) {
       return MaterialColor(darkPrimary.value, {
         50: darkPrimaryPale,
-        100: Color(0xFF312E81),
-        200: Color(0xFF4338CA),
-        300: Color(0xFF4F46E5),
-        400: Color(0xFF6366F1),
-        500: darkPrimaryLight,
-        600: Color(0xFF7C3AED),
-        700: darkPrimaryDark,
-        800: Color(0xFF6D28D9),
-        900: Color(0xFF5B21B6),
+        100: Color(0xFF303752),
+        200: Color(0xFF3F4876),
+        300: Color(0xFF4F579F),
+        400: Color(0xFF5A64B9),
+        500: darkPrimary,
+        600: Color(0xFF7981CF),
+        700: darkPrimaryLight,
+        800: Color(0xFF9BA2DF),
+        900: Color(0xFFACB2EA),
       });
     } else {
       return MaterialColor(primary.value, {
         50: primaryPale,
-        100: Color(0xFFEBE9FF),
-        200: Color(0xFFD7D4FF),
-        300: Color(0xFFC2BFFF),
-        400: Color(0xFF9C98FF),
-        500: primaryLight,
-        600: Color(0xFF5152D9),
+        100: Color(0xFFE8EAFB),
+        200: Color(0xFFD1D4F7),
+        300: Color(0xFFAFB3EB),
+        400: Color(0xFF8E93DF),
+        500: primary,
+        600: Color(0xFF4F579F),
         700: primaryDark,
-        800: Color(0xFF382DA6),
-        900: Color(0xFF231C6A),
+        800: Color(0xFF36406F),
+        900: Color(0xFF28304F),
       });
     }
   }
