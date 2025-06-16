@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../../models/note_model.dart';
 import '../constants/notes_colors.dart';
 import '../constants/notes_icons.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
 
 class NoteCard extends StatelessWidget {
   final Note note;
@@ -29,16 +31,16 @@ class NoteCard extends StatelessWidget {
   Widget _buildListCard(BuildContext context) {
     final formatter = DateFormat('dd/MM/yyyy');
     final categoryColor =
-        NotesColors.categoryColors[note.category] ?? NotesColors.kMediumPurple;
+        NotesColors.categoryColors[note.category] ?? context.colorMediumPurple;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: AppDimensions.smallSpacing),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.colorSurface,
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: context.colorShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -46,13 +48,13 @@ class NoteCard extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           onTap: onTap,
           onLongPress: onLongPress,
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
             child: Row(
               children: [
                 // أيقونة الفئة
@@ -61,7 +63,8 @@ class NoteCard extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     color: categoryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.mediumRadius),
                   ),
                   child: Stack(
                     alignment: Alignment.center,
@@ -69,19 +72,19 @@ class NoteCard extends StatelessWidget {
                       Icon(
                         NotesIcons.getCategoryIcon(note.category),
                         color: categoryColor,
-                        size: 24,
+                        size: AppDimensions.iconSize,
                       ),
                       if (note.isFavorite)
                         Positioned(
                           top: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.all(2),
+                            padding: EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                  color: NotesColors.kBorderColor, width: 1),
+                                  color: context.colorBorder, width: 1),
                             ),
                             child: const Icon(
                               NotesIcons.favorite,
@@ -93,7 +96,7 @@ class NoteCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: AppDimensions.defaultSpacing),
 
                 // تفاصيل الملاحظة
                 Expanded(
@@ -104,11 +107,13 @@ class NoteCard extends StatelessWidget {
                         children: [
                           // التصنيف
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: AppDimensions.smallSpacing,
+                                vertical: 4),
                             decoration: BoxDecoration(
                               color: categoryColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.smallRadius),
                             ),
                             child: Text(
                               note.category,
@@ -128,36 +133,36 @@ class NoteCard extends StatelessWidget {
                             formatter.format(note.timestamp),
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey.shade500,
+                              color: context.colorTextSecondary,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 8),
+                      SizedBox(height: AppDimensions.smallSpacing),
 
                       // العنوان
                       Text(
                         note.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color(0xFF4338CA),
+                          fontSize: AppDimensions.subtitleFontSize,
+                          color: context.colorPrimaryDark,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
 
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
 
                       // المحتوى المختصر
                       Text(
                         note.content,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: context.colorTextSecondary,
                           height: 1.4,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
@@ -173,12 +178,12 @@ class NoteCard extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F3FF),
+                    color: context.colorPrimaryPale,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     NotesIcons.forward,
-                    color: Color(0xFF4338CA),
+                    color: context.colorPrimaryDark,
                     size: 14,
                   ),
                 ),
@@ -194,28 +199,28 @@ class NoteCard extends StatelessWidget {
   Widget _buildGridCard(BuildContext context) {
     final formatter = DateFormat('dd/MM/yyyy');
     final categoryColor =
-        NotesColors.categoryColors[note.category] ?? NotesColors.kMediumPurple;
+        NotesColors.categoryColors[note.category] ?? context.colorMediumPurple;
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade200,
+                color: context.colorShadow,
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(AppDimensions.defaultSpacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -227,7 +232,8 @@ class NoteCard extends StatelessWidget {
                     height: 36,
                     decoration: BoxDecoration(
                       color: categoryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
                     child: Icon(
                       NotesIcons.getCategoryIcon(note.category),
@@ -238,7 +244,7 @@ class NoteCard extends StatelessWidget {
                   const Spacer(),
                   if (note.isFavorite)
                     Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: Colors.amber.withOpacity(0.1),
                         shape: BoxShape.circle,
@@ -252,22 +258,22 @@ class NoteCard extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.smallSpacing),
 
               // عنوان الملاحظة
               Text(
                 note.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
-                  color: Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.smallSpacing),
 
               // محتوى الملاحظة
               Expanded(
@@ -275,7 +281,7 @@ class NoteCard extends StatelessWidget {
                   note.content,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey.shade600,
+                    color: context.colorTextSecondary,
                     height: 1.5,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
@@ -285,17 +291,18 @@ class NoteCard extends StatelessWidget {
               ),
 
               // تذييل البطاقة - التاريخ والتصنيف
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.smallSpacing),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   // التصنيف
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.smallSpacing, vertical: 4),
                     decoration: BoxDecoration(
                       color: categoryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
                     child: Text(
                       note.category,
@@ -315,7 +322,7 @@ class NoteCard extends StatelessWidget {
                     formatter.format(note.timestamp),
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey.shade500,
+                      color: context.colorTextSecondary,
                       fontFamily: 'SYMBIOAR+LT',
                     ),
                   ),

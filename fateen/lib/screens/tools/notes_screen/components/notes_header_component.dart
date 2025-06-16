@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import '../constants/notes_strings.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
 
 class NotesHeaderComponent extends StatelessWidget {
   final VoidCallback onBackPressed;
@@ -14,8 +16,9 @@ class NotesHeaderComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // استخدام نفس قياسات هيدر حاسبة المعدل بالضبط
-    final titleSize = 20.0; // تصغير حجم الخط ليناسب المركز
-    final padding = 20.0;
+    final titleSize =
+        AppDimensions.smallTitleFontSize; // تصغير حجم الخط ليناسب المركز
+    final padding = AppDimensions.sectionPadding;
     final buttonSize = 45.0;
 
     return Column(
@@ -23,7 +26,7 @@ class NotesHeaderComponent extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(padding),
-          color: Colors.white,
+          color: context.colorSurface,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -36,13 +39,14 @@ class NotesHeaderComponent extends StatelessWidget {
                     width: buttonSize,
                     height: buttonSize,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F3FF),
-                      borderRadius: BorderRadius.circular(16),
+                      color: context.colorPrimaryPale,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.largeRadius),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back, // سهم الرجوع
-                      color: Color(0xFF4338CA),
-                      size: 20,
+                      color: context.colorPrimaryDark,
+                      size: AppDimensions.smallIconSize,
                     ),
                   ),
                 ),
@@ -54,7 +58,7 @@ class NotesHeaderComponent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: titleSize,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF374151),
+                  color: context.colorTextPrimary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -66,7 +70,7 @@ class NotesHeaderComponent extends StatelessWidget {
         Container(
           height: 1,
           width: double.infinity,
-          color: Colors.grey.shade200,
+          color: context.colorBorder,
           margin: EdgeInsets.zero,
           padding: EdgeInsets.zero,
         ),

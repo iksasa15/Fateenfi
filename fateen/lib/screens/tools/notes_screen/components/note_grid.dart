@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import '../../../../models/note_model.dart';
 import '../constants/notes_strings.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
+// Add this import
 import 'note_card.dart';
 
 class NotesGrid extends StatelessWidget {
@@ -34,16 +37,16 @@ class NotesGrid extends StatelessWidget {
         children: [
           // عرض المفضلة أولاً
           if (hasFavorites && !isSearching) ...[
-            const Text(
+            Text(
               NotesStrings.favoriteNotes,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4338CA),
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -67,17 +70,17 @@ class NotesGrid extends StatelessWidget {
 
           // عنوان للملاحظات الأخرى
           if (hasFavorites && hasRegular && !isSearching) ...[
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: AppDimensions.largeSpacing),
+            Text(
               NotesStrings.allNotes,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4338CA),
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing),
           ],
 
           // عرض الملاحظات العادية

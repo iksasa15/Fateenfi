@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../constants/notes_colors.dart';
 import '../constants/notes_strings.dart';
 import '../constants/notes_icons.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
 
 class CategoryFilter extends StatelessWidget {
   final String selectedCategory;
@@ -22,39 +24,43 @@ class CategoryFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 16, bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: EdgeInsets.only(
+          top: AppDimensions.defaultSpacing,
+          bottom: AppDimensions.smallSpacing),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.smallSpacing,
+          vertical: AppDimensions.smallSpacing),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F3FF),
-        borderRadius: BorderRadius.circular(12),
+        color: context.colorPrimaryPale,
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         border: Border.all(
-          color: const Color(0xFFE3E0F8),
+          color: context.colorPrimaryExtraLight,
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius),
               border: Border.all(
-                color: const Color(0xFFE3E0F8),
+                color: context.colorPrimaryExtraLight,
                 width: 1,
               ),
             ),
             child: Icon(
               NotesIcons.filter,
-              color: _getCategoryColor(selectedCategory),
+              color: _getCategoryColor(context, selectedCategory),
               size: 16,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: AppDimensions.smallSpacing),
           Text(
             '${NotesStrings.filterByCategory}$selectedCategory',
-            style: const TextStyle(
-              color: Color(0xFF4338CA),
+            style: TextStyle(
+              color: context.colorPrimaryDark,
               fontWeight: FontWeight.w500,
               fontFamily: 'SYMBIOAR+LT',
             ),
@@ -63,9 +69,10 @@ class CategoryFilter extends StatelessWidget {
           TextButton(
             onPressed: onFilterCleared,
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding:
+                  EdgeInsets.symmetric(horizontal: AppDimensions.smallSpacing),
               minimumSize: const Size(0, 0),
-              foregroundColor: const Color(0xFF6366F1),
+              foregroundColor: context.colorPrimaryLight,
             ),
             child: const Text(
               NotesStrings.clearFilter,
@@ -81,7 +88,7 @@ class CategoryFilter extends StatelessWidget {
   }
 
   // الحصول على لون الفئة
-  Color _getCategoryColor(String category) {
-    return NotesColors.categoryColors[category] ?? NotesColors.kMediumPurple;
+  Color _getCategoryColor(BuildContext context, String category) {
+    return NotesColors.categoryColors[category] ?? context.colorMediumPurple;
   }
 }

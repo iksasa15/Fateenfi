@@ -15,6 +15,8 @@ import 'components/category_filter.dart';
 import 'constants/notes_strings.dart';
 import 'constants/notes_colors.dart';
 import 'constants/notes_icons.dart';
+import '../../../core/constants/appColor.dart'; // Add this import
+import '../../../core/constants/app_dimensions.dart'; // Add this import
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({Key? key}) : super(key: key);
@@ -127,8 +129,9 @@ class _NotesScreenState extends State<NotesScreen> {
 
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppDimensions.largeRadius)),
       ),
       builder: (context) {
         return TaskOptionsMenu(
@@ -148,7 +151,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   content: Text(e.toString()),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                   ),
                 ),
               );
@@ -166,7 +170,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                   ),
                 ),
               );
@@ -176,7 +181,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   content: Text(e.toString()),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.smallRadius),
                   ),
                 ),
               );
@@ -192,7 +198,8 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
               ),
             );
@@ -213,21 +220,23 @@ class _NotesScreenState extends State<NotesScreen> {
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.sectionPadding,
+            vertical: AppDimensions.largeSpacing),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: context.colorSurface,
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: context.colorShadowColor,
                 blurRadius: 15,
                 spreadRadius: 0,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(AppDimensions.sectionPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -235,37 +244,37 @@ class _NotesScreenState extends State<NotesScreen> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: NotesColors.kAccentColor.withOpacity(0.1),
+                  color: context.colorAccent.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.delete_outline,
-                  color: NotesColors.kAccentColor,
+                  color: context.colorAccent,
                   size: 30,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: AppDimensions.defaultSpacing),
+              Text(
                 NotesStrings.deleteNote,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: AppDimensions.subtitleFontSize,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF374151),
+                  color: context.colorTextPrimary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.smallSpacing),
               Text(
                 NotesStrings.deleteConfirmation,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
+                style: TextStyle(
+                  fontSize: AppDimensions.smallSubtitleFontSize,
+                  color: context.colorTextSecondary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimensions.largeSpacing),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -273,33 +282,37 @@ class _NotesScreenState extends State<NotesScreen> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.smallSpacing),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                         ),
                         side: BorderSide(
-                          color: Colors.grey.shade300,
+                          color: context.colorBorder,
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         NotesStrings.cancel,
                         style: TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: context.colorTextSecondary,
                           fontFamily: 'SYMBIOAR+LT',
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.smallSpacing),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        backgroundColor: NotesColors.kAccentColor,
+                        padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.smallSpacing),
+                        backgroundColor: context.colorAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.mediumRadius),
                         ),
                       ),
                       child: const Text(
@@ -332,7 +345,8 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius)),
             ),
           );
         }
@@ -346,7 +360,8 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius)),
             ),
           );
         }
@@ -364,18 +379,19 @@ class _NotesScreenState extends State<NotesScreen> {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.sectionPadding,
+              vertical: AppDimensions.largeSpacing),
           child: Container(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.75,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: context.colorShadowColor,
                   blurRadius: 15,
                   spreadRadius: 0,
                   offset: const Offset(0, 4),
@@ -383,7 +399,7 @@ class _NotesScreenState extends State<NotesScreen> {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -391,16 +407,18 @@ class _NotesScreenState extends State<NotesScreen> {
                   Container(
                     width: 40,
                     height: 5,
-                    margin: const EdgeInsets.only(top: 12, bottom: 10),
+                    margin: EdgeInsets.only(
+                        top: AppDimensions.smallSpacing, bottom: 10),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: context.colorBorder,
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
 
                   // شريط العنوان
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.defaultSpacing),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -411,39 +429,39 @@ class _NotesScreenState extends State<NotesScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.colorSurface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: context.colorBorder,
                                 width: 1.0,
                               ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.close,
-                              color: Color(0xFF4338CA),
-                              size: 18,
+                              color: context.colorPrimaryDark,
+                              size: AppDimensions.extraSmallIconSize,
                             ),
                           ),
                         ),
 
                         // العنوان
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 7),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: context.colorSurface,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: Colors.grey.shade200,
+                              color: context.colorBorder,
                               width: 1.0,
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             NotesStrings.chooseCategory,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: AppDimensions.smallSubtitleFontSize,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
@@ -455,38 +473,39 @@ class _NotesScreenState extends State<NotesScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.smallSpacing),
 
                   // وصف مع أيقونة
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.defaultSpacing),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.smallSpacing, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colorSurface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: const Color(0xFF4338CA).withOpacity(0.1),
+                          color: context.colorPrimaryDark.withOpacity(0.1),
                           width: 1.0,
                         ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
-                            color: Color(0xFF4338CA),
-                            size: 18,
+                            color: context.colorPrimaryDark,
+                            size: AppDimensions.extraSmallIconSize,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.smallSpacing),
                           Expanded(
                             child: Text(
                               "اختر تصفية الملاحظات حسب الفئة",
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: AppDimensions.smallLabelFontSize,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.grey.shade800,
+                                color: context.colorTextPrimary,
                                 fontFamily: 'SYMBIOAR+LT',
                               ),
                             ),
@@ -496,10 +515,12 @@ class _NotesScreenState extends State<NotesScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.smallSpacing),
 
-                  const Divider(
-                      height: 1, thickness: 1, color: Color(0xFFE3E0F8)),
+                  Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: context.colorPrimaryExtraLight),
 
                   // قائمة الفئات
                   Expanded(
@@ -512,9 +533,9 @@ class _NotesScreenState extends State<NotesScreen> {
                             category == NotesStrings.allCategories;
 
                         final categoryColor = isAllCategory
-                            ? NotesColors.kMediumPurple
+                            ? context.colorMediumPurple
                             : NotesColors.categoryColors[category] ??
-                                NotesColors.kMediumPurple;
+                                context.colorMediumPurple;
 
                         return ListTile(
                           leading: Container(
@@ -524,7 +545,8 @@ class _NotesScreenState extends State<NotesScreen> {
                               color: categoryColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(0xFF4338CA).withOpacity(0.1),
+                                color:
+                                    context.colorPrimaryDark.withOpacity(0.1),
                                 width: 1.0,
                               ),
                             ),
@@ -533,7 +555,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                   ? NotesIcons.allInclusive
                                   : NotesIcons.getCategoryIcon(category),
                               color: categoryColor,
-                              size: 20,
+                              size: AppDimensions.smallIconSize,
                             ),
                           ),
                           title: Text(
@@ -543,18 +565,18 @@ class _NotesScreenState extends State<NotesScreen> {
                                   _controller.selectedCategory == category
                                       ? FontWeight.bold
                                       : FontWeight.normal,
-                              color: const Color(0xFF4338CA),
+                              color: context.colorPrimaryDark,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
                           trailing: _controller.selectedCategory == category
                               ? Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Color(0xFF6366F1),
+                                    color: context.colorPrimaryLight,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.check,
                                     color: Colors.white,
                                     size: 16,
@@ -583,7 +605,7 @@ class _NotesScreenState extends State<NotesScreen> {
     // بداية بإظهار مؤشر التحميل حتى تكتمل تهيئة البيانات
     if (!_isInitialized) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: context.colorSurface,
         body: SafeArea(
           child: Column(
             children: [
@@ -594,7 +616,7 @@ class _NotesScreenState extends State<NotesScreen> {
               Expanded(
                 child: Center(
                   child: CircularProgressIndicator(
-                    color: NotesColors.kMediumPurple,
+                    color: context.colorMediumPurple,
                   ),
                 ),
               ),
@@ -611,10 +633,10 @@ class _NotesScreenState extends State<NotesScreen> {
     final notesCount = filteredNotes.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFF),
+      backgroundColor: context.colorBackground,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.white,
+          statusBarColor: context.colorSurface,
         ),
         child: SafeArea(
           child: Column(
@@ -628,15 +650,18 @@ class _NotesScreenState extends State<NotesScreen> {
               // شريط البحث
               if (_controller.isSearching)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.smallSpacing,
+                      vertical: AppDimensions.smallSpacing),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.defaultSpacing,
+                      vertical: AppDimensions.smallSpacing),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    color: context.colorSurface,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.mediumRadius),
                     border: Border.all(
-                      color: const Color(0xFFE3E0F8),
+                      color: context.colorPrimaryExtraLight,
                       width: 1.0,
                     ),
                   ),
@@ -646,33 +671,33 @@ class _NotesScreenState extends State<NotesScreen> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colorSurface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF4338CA).withOpacity(0.1),
+                            color: context.colorPrimaryDark.withOpacity(0.1),
                             width: 1.0,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.search,
-                          color: Color(0xFF6366F1),
+                          color: context.colorPrimaryLight,
                           size: 16,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.smallSpacing),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: NotesStrings.searchHint,
                             border: InputBorder.none,
                             hintStyle: TextStyle(
-                              color: Color(0xFF9CA3AF),
+                              color: context.colorTextHint,
                               fontFamily: 'SYMBIOAR+LT',
                             ),
                           ),
-                          style: const TextStyle(
-                            color: Color(0xFF4338CA),
+                          style: TextStyle(
+                            color: context.colorPrimaryDark,
                             fontFamily: 'SYMBIOAR+LT',
                           ),
                           onChanged: _controller.setSearchText,
@@ -680,10 +705,10 @@ class _NotesScreenState extends State<NotesScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
-                          color: Color(0xFF6366F1),
-                          size: 20,
+                          color: context.colorPrimaryLight,
+                          size: AppDimensions.smallIconSize,
                         ),
                         onPressed: _toggleSearching,
                         constraints:
@@ -699,7 +724,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   _controller.selectedCategory != NotesStrings.allCategories &&
                   !_controller.isSearching)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.defaultSpacing),
                   child: CategoryFilter(
                     selectedCategory: _controller.selectedCategory!,
                     categories: _controller.categories.skip(1).toList(),
@@ -716,24 +742,24 @@ class _NotesScreenState extends State<NotesScreen> {
               // عدد الملاحظات والنتائج
               if (_controller.searchText.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppDimensions.defaultSpacing),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F3FF),
-                      borderRadius: BorderRadius.circular(8),
+                      color: context.colorPrimaryPale,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                       border: Border.all(
-                        color: const Color(0xFFE3E0F8),
+                        color: context.colorPrimaryExtraLight,
                         width: 1,
                       ),
                     ),
                     child: Text(
                       '${NotesStrings.searchResults}${filteredNotes.length}${NotesStrings.noteCountSuffix}',
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: AppDimensions.smallSubtitleFontSize,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4338CA),
+                        color: context.colorPrimaryDark,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -742,18 +768,19 @@ class _NotesScreenState extends State<NotesScreen> {
 
               // شريط التحكم - مطابق لشاشة المهام
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.defaultSpacing,
+                    vertical: AppDimensions.smallSpacing),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // إضافة عنوان على اليمين
-                    const Text(
+                    Text(
                       "عرض الملاحظات",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.subtitleFontSize,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF4338CA),
+                        color: context.colorPrimaryDark,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                     ),
@@ -769,24 +796,25 @@ class _NotesScreenState extends State<NotesScreen> {
                               width: 45,
                               height: 45,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F3FF),
-                                borderRadius: BorderRadius.circular(12),
+                                color: context.colorPrimaryPale,
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.mediumRadius),
                                 border: Border.all(
-                                  color: const Color(0xFFE3E0F8),
+                                  color: context.colorPrimaryExtraLight,
                                   width: 1,
                                 ),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Icon(
                                   Icons.filter_list_rounded,
-                                  color: Color(0xFF4338CA),
+                                  color: context.colorPrimaryDark,
                                   size: 22,
                                 ),
                               ),
                             ),
                           ),
 
-                        const SizedBox(width: 8),
+                        SizedBox(width: AppDimensions.smallSpacing),
 
                         // زر تبديل العرض (قائمة/شبكة)
                         GestureDetector(
@@ -795,10 +823,11 @@ class _NotesScreenState extends State<NotesScreen> {
                             width: 45,
                             height: 45,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F3FF),
-                              borderRadius: BorderRadius.circular(12),
+                              color: context.colorPrimaryPale,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.mediumRadius),
                               border: Border.all(
-                                color: const Color(0xFFE3E0F8),
+                                color: context.colorPrimaryExtraLight,
                                 width: 1,
                               ),
                             ),
@@ -807,14 +836,14 @@ class _NotesScreenState extends State<NotesScreen> {
                                 _controller.isGridView
                                     ? Icons.view_list_rounded
                                     : Icons.grid_view_rounded,
-                                color: const Color(0xFF4338CA),
+                                color: context.colorPrimaryDark,
                                 size: 22,
                               ),
                             ),
                           ),
                         ),
 
-                        const SizedBox(width: 8),
+                        SizedBox(width: AppDimensions.smallSpacing),
 
                         // زر البحث
                         if (!_controller.isSearching)
@@ -824,17 +853,18 @@ class _NotesScreenState extends State<NotesScreen> {
                               width: 45,
                               height: 45,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F3FF),
-                                borderRadius: BorderRadius.circular(12),
+                                color: context.colorPrimaryPale,
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.mediumRadius),
                                 border: Border.all(
-                                  color: const Color(0xFFE3E0F8),
+                                  color: context.colorPrimaryExtraLight,
                                   width: 1,
                                 ),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Icon(
                                   Icons.search_rounded,
-                                  color: Color(0xFF4338CA),
+                                  color: context.colorPrimaryDark,
                                   size: 22,
                                 ),
                               ),
@@ -849,9 +879,9 @@ class _NotesScreenState extends State<NotesScreen> {
               // عرض الملاحظات
               Expanded(
                 child: _controller.isLoading
-                    ? const Center(
-                        child:
-                            CircularProgressIndicator(color: Color(0xFF6366F1)),
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            color: context.colorPrimaryLight),
                       )
                     : _controller.notes.isEmpty
                         ? EmptyNotesState(
@@ -864,8 +894,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                 onAddNote: _onAddNote,
                               )
                             : Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: AppDimensions.defaultSpacing),
                                 child: _controller.isGridView
                                     ? NotesGrid(
                                         notes: filteredNotes,
@@ -888,10 +918,10 @@ class _NotesScreenState extends State<NotesScreen> {
       // زر إضافة الملاحظات - مطابق لزر صفحة المهام
       floatingActionButton: FloatingActionButton(
         onPressed: _onAddNote,
-        backgroundColor: const Color(0xFF4338CA),
+        backgroundColor: context.colorPrimaryDark,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
         ),
         child: const Icon(Icons.add),
       ),

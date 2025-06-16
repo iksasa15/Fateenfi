@@ -7,6 +7,8 @@ import '../controllers/note_editor_controller.dart';
 import '../constants/notes_colors.dart';
 import '../constants/notes_strings.dart';
 import '../constants/notes_icons.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
 
 class NoteEditor extends StatefulWidget {
   final Note? note;
@@ -55,15 +57,17 @@ class _NoteEditorState extends State<NoteEditor> {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      insetPadding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.sectionPadding,
+          vertical: AppDimensions.extraLargeSpacing),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: context.colorSurface,
+          borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: context.colorShadowColor,
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -74,13 +78,14 @@ class _NoteEditorState extends State<NoteEditor> {
           children: [
             // مؤشر السحب
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 10),
+              padding:
+                  EdgeInsets.only(top: AppDimensions.smallSpacing, bottom: 10),
               child: Center(
                 child: Container(
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: context.colorBorder,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -90,7 +95,8 @@ class _NoteEditorState extends State<NoteEditor> {
             // محتوى النافذة
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: EdgeInsets.fromLTRB(AppDimensions.defaultSpacing, 0,
+                    AppDimensions.defaultSpacing, AppDimensions.defaultSpacing),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -132,7 +138,8 @@ class _NoteEditorState extends State<NoteEditor> {
 
                     // أزرار الحفظ والمفضلة
                     Padding(
-                      padding: const EdgeInsets.only(top: 16),
+                      padding:
+                          EdgeInsets.only(top: AppDimensions.defaultSpacing),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -141,10 +148,11 @@ class _NoteEditorState extends State<NoteEditor> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              color: context.colorSurface,
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.mediumRadius),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: context.colorBorder,
                                 width: 1.0,
                               ),
                             ),
@@ -156,8 +164,8 @@ class _NoteEditorState extends State<NoteEditor> {
                                     : NotesIcons.notFavorite,
                                 color: _controller.isFavorite
                                     ? Colors.amber
-                                    : Colors.grey.shade400,
-                                size: 24,
+                                    : context.colorBorder,
+                                size: AppDimensions.iconSize,
                               ),
                               padding: EdgeInsets.zero,
                             ),
@@ -199,7 +207,8 @@ class _NoteEditorState extends State<NoteEditor> {
             style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
         ),
       );
 
@@ -215,8 +224,8 @@ class _NoteEditorState extends State<NoteEditor> {
               style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
           ),
         );
       } else {
@@ -227,8 +236,8 @@ class _NoteEditorState extends State<NoteEditor> {
               style: TextStyle(fontFamily: 'SYMBIOAR+LT'),
             ),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.smallRadius)),
           ),
         );
       }
@@ -243,12 +252,12 @@ class _NoteEditorState extends State<NoteEditor> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             NotesStrings.newCategory,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppDimensions.subtitleFontSize,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF4338CA),
+              color: context.colorPrimaryDark,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -257,21 +266,22 @@ class _NoteEditorState extends State<NoteEditor> {
             decoration: InputDecoration(
               hintText: NotesStrings.categoryName,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+                borderSide: BorderSide(color: context.colorBorder),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+                borderSide: BorderSide(color: context.colorPrimaryLight),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.defaultSpacing,
+                  vertical: AppDimensions.smallSpacing),
             ),
             autofocus: true,
             style: const TextStyle(fontFamily: 'SYMBIOAR+LT'),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           ),
           actions: [
             TextButton(
@@ -299,10 +309,11 @@ class _NoteEditorState extends State<NoteEditor> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4338CA),
+                backgroundColor: context.colorPrimaryDark,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.smallRadius),
                 ),
               ),
               child: const Text(
@@ -325,19 +336,19 @@ class _NoteEditorState extends State<NoteEditor> {
     IconData? icon,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.smallSpacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان الحقل
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               labelText,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.smallSubtitleFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -346,12 +357,12 @@ class _NoteEditorState extends State<NoteEditor> {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
                 color: errorText != null
-                    ? const Color(0xFFEC4899)
-                    : const Color(0xFF4338CA).withOpacity(0.2),
+                    ? context.colorAccent
+                    : context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
@@ -359,22 +370,22 @@ class _NoteEditorState extends State<NoteEditor> {
               children: [
                 // أيقونة حقل الإدخال
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  margin: EdgeInsets.symmetric(horizontal: 10),
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colorSurface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: context.colorPrimaryDark.withOpacity(0.1),
                       width: 1.0,
                     ),
                   ),
                   child: Icon(
                     icon ?? Icons.text_fields,
                     color: controller.text.isEmpty
-                        ? const Color(0xFF6366F1)
-                        : const Color(0xFF4338CA),
+                        ? context.colorPrimaryLight
+                        : context.colorPrimaryDark,
                     size: 16,
                   ),
                 ),
@@ -384,15 +395,15 @@ class _NoteEditorState extends State<NoteEditor> {
                   child: TextField(
                     controller: controller,
                     keyboardType: keyboardType,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'SYMBIOAR+LT',
-                      fontSize: 14,
-                      color: Color(0xFF374151),
+                      fontSize: AppDimensions.smallSubtitleFontSize,
+                      color: context.colorTextPrimary,
                     ),
                     decoration: InputDecoration(
-                      hintStyle: const TextStyle(
-                        color: Color(0xFF9CA3AF),
-                        fontSize: 14,
+                      hintStyle: TextStyle(
+                        color: context.colorTextHint,
+                        fontSize: AppDimensions.smallSubtitleFontSize,
                         fontFamily: 'SYMBIOAR+LT',
                       ),
                       errorText: null,
@@ -408,7 +419,7 @@ class _NoteEditorState extends State<NoteEditor> {
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: context.colorSurface,
                     ),
                   ),
                 ),
@@ -418,11 +429,11 @@ class _NoteEditorState extends State<NoteEditor> {
           // عرض رسالة الخطأ إن وجدت
           if (errorText != null)
             Padding(
-              padding: const EdgeInsets.only(top: 4, right: 4),
+              padding: EdgeInsets.only(top: 4, right: 4),
               child: Text(
                 errorText,
-                style: const TextStyle(
-                  color: Color(0xFFEC4899),
+                style: TextStyle(
+                  color: context.colorAccent,
                   fontSize: 12,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -436,19 +447,19 @@ class _NoteEditorState extends State<NoteEditor> {
   // بناء حقل المحتوى
   Widget _buildContentField() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: AppDimensions.smallSpacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // عنوان الحقل
           Padding(
-            padding: const EdgeInsets.only(bottom: 6, right: 4),
+            padding: EdgeInsets.only(bottom: 6, right: 4),
             child: Text(
               NotesStrings.noteContent,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.smallSubtitleFontSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
@@ -458,32 +469,33 @@ class _NoteEditorState extends State<NoteEditor> {
           Container(
             height: 150,
             decoration: BoxDecoration(
-              color: Colors.white, // تم تعيين لون الخلفية للأبيض
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface, // تم تعيين لون الخلفية للأبيض
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF6366F1),
+                color: context.colorPrimaryLight,
                 width: 1.0,
               ),
             ),
             child: TextField(
               controller: _controller.contentController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: NotesStrings.noteContentHint,
                 border: InputBorder.none,
                 hintStyle: TextStyle(
-                  color: Color(0xFF9CA3AF),
-                  fontSize: 14,
+                  color: context.colorTextHint,
+                  fontSize: AppDimensions.smallSubtitleFontSize,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.defaultSpacing,
+                    vertical: AppDimensions.smallSpacing),
                 filled: true,
-                fillColor: Colors.white, // تأكيد أن لون الحقل أبيض
+                fillColor: context.colorSurface, // تأكيد أن لون الحقل أبيض
               ),
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: AppDimensions.smallSubtitleFontSize,
                 height: 1.5,
-                color: Color(0xFF374151),
+                color: context.colorTextPrimary,
                 fontFamily: 'SYMBIOAR+LT',
               ),
               maxLines: null,
@@ -496,12 +508,12 @@ class _NoteEditorState extends State<NoteEditor> {
           Align(
             alignment: Alignment.centerRight,
             child: Padding(
-              padding: const EdgeInsets.only(top: 4, right: 4),
+              padding: EdgeInsets.only(top: 4, right: 4),
               child: Text(
                 _controller.getWordCount(),
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: context.colorTextSecondary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -522,25 +534,25 @@ class _NoteEditorState extends State<NoteEditor> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 6, right: 4),
+              padding: EdgeInsets.only(bottom: 6, right: 4),
               child: Text(
                 NotesStrings.category,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: AppDimensions.smallSubtitleFontSize,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF374151),
+                  color: context.colorTextPrimary,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
             ),
             TextButton.icon(
               onPressed: _addNewCategory,
-              icon: const Icon(NotesIcons.addCircle,
-                  size: 16, color: Color(0xFF6366F1)),
-              label: const Text(
+              icon: Icon(NotesIcons.addCircle,
+                  size: 16, color: context.colorPrimaryLight),
+              label: Text(
                 NotesStrings.addCategory,
                 style: TextStyle(
-                  color: Color(0xFF6366F1),
+                  color: context.colorPrimaryLight,
                   fontSize: 12,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
@@ -557,16 +569,18 @@ class _NoteEditorState extends State<NoteEditor> {
           onTap: () => _showCategoryPicker(),
           child: Container(
             height: 72,
-            margin: const EdgeInsets.only(bottom: 14),
+            margin: EdgeInsets.only(bottom: AppDimensions.smallSpacing),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: context.colorSurface,
+              borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
               border: Border.all(
-                color: const Color(0xFF4338CA).withOpacity(0.2),
+                color: context.colorPrimaryDark.withOpacity(0.2),
                 width: 1.0,
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.smallSpacing,
+                vertical: AppDimensions.smallSpacing),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -575,9 +589,9 @@ class _NoteEditorState extends State<NoteEditor> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colorSurface,
                     border: Border.all(
-                      color: const Color(0xFF4338CA).withOpacity(0.1),
+                      color: context.colorPrimaryDark.withOpacity(0.1),
                       width: 1.0,
                     ),
                     shape: BoxShape.circle,
@@ -585,12 +599,12 @@ class _NoteEditorState extends State<NoteEditor> {
                   child: Center(
                     child: Icon(
                       NotesIcons.getCategoryIcon(_controller.selectedCategory),
-                      size: 20,
-                      color: const Color(0xFF4338CA),
+                      size: AppDimensions.smallIconSize,
+                      color: context.colorPrimaryDark,
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
 
                 // تفاصيل التصنيف
                 Expanded(
@@ -603,17 +617,17 @@ class _NoteEditorState extends State<NoteEditor> {
                         NotesStrings.category,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: context.colorTextSecondary,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
                         _controller.selectedCategory,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF4338CA),
+                          color: context.colorPrimaryDark,
                           fontFamily: 'SYMBIOAR+LT',
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -627,17 +641,17 @@ class _NoteEditorState extends State<NoteEditor> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colorSurface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Colors.grey.shade200,
+                      color: context.colorBorder,
                       width: 1.0,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF4338CA),
-                    size: 20,
+                    color: context.colorPrimaryDark,
+                    size: AppDimensions.smallIconSize,
                   ),
                 ),
               ],
@@ -654,12 +668,12 @@ class _NoteEditorState extends State<NoteEditor> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             NotesStrings.category,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppDimensions.subtitleFontSize,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF4338CA),
+              color: context.colorPrimaryDark,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -669,14 +683,15 @@ class _NoteEditorState extends State<NoteEditor> {
               shrinkWrap: true,
               children: widget.categories.map((category) {
                 final categoryColor = NotesColors.categoryColors[category] ??
-                    const Color(0xFF6366F1);
+                    context.colorPrimaryLight;
                 return ListTile(
                   leading: Container(
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
                       color: categoryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.smallRadius),
                     ),
                     child: Icon(
                       NotesIcons.getCategoryIcon(category),
@@ -694,7 +709,7 @@ class _NoteEditorState extends State<NoteEditor> {
                     ),
                   ),
                   trailing: _controller.selectedCategory == category
-                      ? const Icon(Icons.check, color: Color(0xFF6366F1))
+                      ? Icon(Icons.check, color: context.colorPrimaryLight)
                       : null,
                   onTap: () {
                     _controller.setCategory(category);
@@ -705,7 +720,7 @@ class _NoteEditorState extends State<NoteEditor> {
             ),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
           ),
         );
       },
@@ -731,37 +746,37 @@ class _NoteEditorState extends State<NoteEditor> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colorSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Colors.grey.shade200,
+                    color: context.colorBorder,
                     width: 1.0,
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.close,
-                  color: Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   size: 18,
                 ),
               ),
             ),
             // العنوان
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSurface,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.grey.shade200,
+                  color: context.colorBorder,
                   width: 1.0,
                 ),
               ),
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
@@ -770,27 +785,28 @@ class _NoteEditorState extends State<NoteEditor> {
             const SizedBox(width: 36),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: AppDimensions.defaultSpacing),
         // وصف مع أيقونة
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(
+              horizontal: AppDimensions.smallSpacing, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.colorSurface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: const Color(0xFF4338CA).withOpacity(0.1),
+              color: context.colorPrimaryDark.withOpacity(0.1),
               width: 1.0,
             ),
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.info_outline,
-                color: Color(0xFF4338CA),
+                color: context.colorPrimaryDark,
                 size: 18,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: AppDimensions.smallSpacing),
               Expanded(
                 child: Text(
                   widget.note == null
@@ -799,7 +815,7 @@ class _NoteEditorState extends State<NoteEditor> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade800,
+                    color: context.colorTextPrimary,
                     fontFamily: 'SYMBIOAR+LT',
                   ),
                 ),
@@ -807,7 +823,7 @@ class _NoteEditorState extends State<NoteEditor> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: AppDimensions.defaultSpacing),
       ],
     );
   }
@@ -821,12 +837,12 @@ class _NoteEditorState extends State<NoteEditor> {
   }) {
     return Container(
       width: double.infinity,
-      height: 48,
+      height: AppDimensions.extraSmallButtonHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4338CA).withOpacity(0.25),
+            color: context.colorPrimaryDark.withOpacity(0.25),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -835,14 +851,15 @@ class _NoteEditorState extends State<NoteEditor> {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4338CA),
+          backgroundColor: context.colorPrimaryDark,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.shade300,
+          disabledBackgroundColor: context.colorDisabledState,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: AppDimensions.defaultSpacing),
         ),
         child: isLoading
             ? const SizedBox(
@@ -859,11 +876,11 @@ class _NoteEditorState extends State<NoteEditor> {
                 children: [
                   if (icon != null) ...[
                     Icon(icon, size: 18),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppDimensions.smallSpacing),
                   ],
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                       fontFamily: 'SYMBIOAR+LT',

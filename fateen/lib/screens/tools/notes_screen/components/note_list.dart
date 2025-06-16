@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import '../../../../models/note_model.dart';
 import '../constants/notes_strings.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
+ // Add this import
 import 'note_card.dart';
 
 class NotesList extends StatelessWidget {
@@ -36,14 +39,14 @@ class NotesList extends StatelessWidget {
           if (hasFavorites && !isSearching) ...[
             Text(
               NotesStrings.favoriteNotes,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: AppDimensions.subtitleFontSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4338CA),
+                color: context.colorPrimaryDark,
                 fontFamily: 'SYMBIOAR+LT',
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.smallSpacing),
             ...favoriteNotes.map((note) => NoteCard(
                   note: note,
                   onTap: () => onNoteTap(note),
@@ -53,21 +56,21 @@ class NotesList extends StatelessWidget {
 
           // المسافة بين المفضلة والعادية
           if (hasFavorites && hasRegular && !isSearching)
-            const SizedBox(height: 20),
+            SizedBox(height: AppDimensions.sectionPadding),
 
           // عنوان للملاحظات العادية
           if (hasRegular && (hasFavorites || isSearching)) ...[
             if (!isSearching)
-              const Text(
+              Text(
                 NotesStrings.allNotes,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: AppDimensions.subtitleFontSize,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF4338CA),
+                  color: context.colorPrimaryDark,
                   fontFamily: 'SYMBIOAR+LT',
                 ),
               ),
-            if (!isSearching) const SizedBox(height: 12),
+            if (!isSearching) SizedBox(height: AppDimensions.smallSpacing),
           ],
 
           // عرض الملاحظات العادية

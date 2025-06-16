@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../constants/notes_colors.dart';
 import '../constants/notes_strings.dart';
 import '../constants/notes_icons.dart';
+import '../../../../core/constants/appColor.dart'; // Add this import
+import '../../../../core/constants/app_dimensions.dart'; // Add this import
 
 class EmptyNotesState extends StatelessWidget {
   final bool isFiltering;
@@ -25,36 +27,36 @@ class EmptyNotesState extends StatelessWidget {
           Container(
             width: 160,
             height: 160,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F3FF),
+            decoration: BoxDecoration(
+              color: context.colorPrimaryPale,
               shape: BoxShape.circle,
             ),
             child: Icon(
               isFiltering
                   ? Icons.search_off_rounded
                   : NotesIcons.getCategoryIcon(''),
-              size: 80,
-              color: const Color(0xFF4338CA),
+              size: AppDimensions.largeIconSize,
+              color: context.colorPrimaryDark,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.largeSpacing),
           Text(
             isFiltering ? NotesStrings.noMatchingNotes : NotesStrings.noNotes,
-            style: const TextStyle(
-              fontSize: 22,
+            style: TextStyle(
+              fontSize: AppDimensions.smallTitleFontSize,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF4338CA),
+              color: context.colorPrimaryDark,
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.smallSpacing),
           Text(
             isFiltering
                 ? NotesStrings.tryDifferentSearch
                 : NotesStrings.startAddingNotes,
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
+              fontSize: AppDimensions.subtitleFontSize,
+              color: context.colorTextSecondary,
               fontFamily: 'SYMBIOAR+LT',
             ),
             textAlign: TextAlign.center,
