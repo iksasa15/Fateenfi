@@ -96,7 +96,6 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
-      customArchiveName = "NextEd"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
