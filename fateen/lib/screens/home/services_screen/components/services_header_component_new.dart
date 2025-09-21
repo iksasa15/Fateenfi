@@ -1,17 +1,19 @@
 // components/services_header_component_new.dart
 import 'package:flutter/material.dart';
 import '../constants/services_constants.dart';
-import '../../../../core/constants/appColor.dart';
-import '../../../../core/constants/app_dimensions.dart';
+
 class ServicesHeaderComponent {
   /// بناء هيدر الخدمات مع وضع مساحة مخصصة تحاكي وجود أيقونة
   static Widget buildHeader(BuildContext context) {
+    // استخدام نفس قياسات هيدر المقررات بالضبط
+    final titleSize = 26.0;
+    final padding = 20.0;
     final buttonSize = 45.0; // حجم زر التبديل في هيدر
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(AppDimensions.sectionPadding),
-      color: context.colorSurface,
+      padding: EdgeInsets.all(padding),
+      color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -19,9 +21,9 @@ class ServicesHeaderComponent {
           Text(
             ServicesConstants.servicesTitle,
             style: TextStyle(
-              fontSize: AppDimensions.smallTitleFontSize + 2,
+              fontSize: titleSize,
               fontWeight: FontWeight.bold,
-              color: context.colorTextPrimary,
+              color: const Color(0xFF374151),
               fontFamily: 'SYMBIOAR+LT',
             ),
           ),
@@ -32,7 +34,7 @@ class ServicesHeaderComponent {
             height: buttonSize,
             decoration: BoxDecoration(
               color: Colors.transparent, // شفاف لكنه يحتل نفس المساحة
-              borderRadius: BorderRadius.circular(AppDimensions.largeRadius),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ],

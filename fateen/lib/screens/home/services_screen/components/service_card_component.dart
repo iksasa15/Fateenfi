@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../controllers/service_card_controller.dart';
 import '../controllers/services_controller.dart';
 import '../../../../models/service_item.dart';
-import '../../../../core/constants/appColor.dart';
-import '../../../../core/constants/app_dimensions.dart';
+
 class ServiceCardComponent extends StatelessWidget {
   final ServiceItem service;
   final bool isPressed;
@@ -39,14 +38,14 @@ class ServiceCardComponent extends StatelessWidget {
           elevation: 0,
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.mediumRadius),
+            borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: context.colorDivider,
+              color: Colors.grey.shade100,
               width: 1,
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(AppDimensions.defaultSpacing),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,8 +56,7 @@ class ServiceCardComponent extends StatelessWidget {
                   height: 52,
                   decoration: BoxDecoration(
                     color: service.iconColor.withOpacity(0.08),
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.smallRadius),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     service.icon,
@@ -66,15 +64,15 @@ class ServiceCardComponent extends StatelessWidget {
                     size: 26,
                   ),
                 ),
-                SizedBox(height: AppDimensions.smallSpacing + 4),
+                const SizedBox(height: 12),
 
                 // عنوان الخدمة
                 Text(
                   service.title,
-                  style: TextStyle(
-                    color: context.colorTextPrimary,
+                  style: const TextStyle(
+                    color: Color(0xFF374151),
                     fontWeight: FontWeight.w500,
-                    fontSize: AppDimensions.smallBodyFontSize,
+                    fontSize: 14,
                     fontFamily: 'SYMBIOAR+LT',
                     height: 1.2,
                   ),
@@ -85,12 +83,12 @@ class ServiceCardComponent extends StatelessWidget {
 
                 // وصف الخدمة (إذا وجد)
                 if (service.description != null) ...[
-                  SizedBox(height: AppDimensions.smallSpacing / 2),
+                  const SizedBox(height: 4),
                   Text(
                     service.description!,
                     style: TextStyle(
-                      color: context.colorTextSecondary,
-                      fontSize: AppDimensions.smallLabelFontSize - 2,
+                      color: Colors.grey.shade500,
+                      fontSize: 11,
                       fontFamily: 'SYMBIOAR+LT',
                       height: 1.2,
                     ),

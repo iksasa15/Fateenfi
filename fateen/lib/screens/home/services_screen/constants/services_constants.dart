@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../models/service_item.dart';
+import '../../../ai/AiGptMainPage/ai_gpt_main_screen.dart';
+import '../../../editors/interactive_whiteboard/interactive_whiteboard_screen.dart';
 import '../../../tools/pomodoro_page/pomodoro_screen.dart';
+import '../../../tools/Translate_screen/translate_screen.dart';
+import '../../../tools/stats_screen/stats_screen.dart';
 import '../../../tools/gpa_calculator_screen/gpa_calculator_screen.dart';
 import '../../../tools/notes_screen/notes_screen.dart';
+import '../screens/calendar_screen.dart';
 
 class ServicesConstants {
   // الألوان
@@ -20,9 +25,9 @@ class ServicesConstants {
   static const String allServicesTitle = 'كل الخدمات';
   static const String loadingText = 'جاري تحميل الخدمات...';
 
-  // قائمة الخدمات - فقط حاسبة المعدل ووقت المذاكرة والملاحظات
+  // قائمة الخدمات
   static final List<ServiceItem> services = [
-    // حاسبة GPA
+    // إضافة حاسبة GPA كأول خدمة (أعلى القائمة)
     ServiceItem(
       title: 'حاسبة GPA',
       description: 'احسب معدلك الفصلي والتراكمي',
@@ -30,21 +35,55 @@ class ServicesConstants {
       iconColor: const Color(0xFF3949AB), // أزرق داكن
       destination: const GPACalculatorScreen(),
     ),
-    // الملاحظات
+    // إضافة الملاحظات كخدمة ثانية (تحديث الوجهة)
     ServiceItem(
       title: 'الملاحظات',
       description: 'تنظيم الملاحظات الدراسية',
       icon: Icons.note_alt_outlined,
       iconColor: const Color(0xFFFFCA28), // أصفر
-      destination: const NotesScreen(),
+      destination: const NotesScreen(), // تغيير إلى صفحة الملاحظات الجديدة
     ),
-    // وقت المذاكرة
+    ServiceItem(
+      title: 'الذكاء الاصطناعي',
+      description: 'استخدم الذكاء الاصطناعي للإجابة على أسئلتك',
+      icon: Icons.smart_toy_outlined,
+      iconColor: const Color(0xFF6A5ACD), // أرجواني
+      destination: const AiGptMainScreen(),
+    ),
+    ServiceItem(
+      title: 'السبورة التفاعلية',
+      description: 'سبورة رقمية للكتابة والرسم',
+      icon: Icons.edit_note,
+      iconColor: const Color(0xFF4CAF50), // أخضر
+      destination: const InteractiveWhiteboardScreen(),
+    ),
     ServiceItem(
       title: 'وقت المذاكرة',
       description: 'تنظيم الوقت للدراسة بفعالية',
       icon: Icons.timer_outlined,
       iconColor: const Color(0xFFE53935), // أحمر
       destination: PomodoroScreen(),
+    ),
+    ServiceItem(
+      title: 'الترجمة',
+      description: 'ترجمة نصوص بين عدة لغات',
+      icon: Icons.translate_outlined,
+      iconColor: const Color(0xFF29B6F6), // أزرق فاتح
+      destination: const TranslateScreen(),
+    ),
+    ServiceItem(
+      title: 'الإحصائيات',
+      description: 'إحصائيات ورسوم بيانية للمقررات',
+      icon: Icons.bar_chart_outlined,
+      iconColor: const Color(0xFFFF7043), // برتقالي
+      destination: StatsScreen(courses: []),
+    ),
+    ServiceItem(
+      title: 'تقويم المواعيد',
+      description: 'تنظيم وتذكير بالمواعيد المهمة',
+      icon: Icons.calendar_month_outlined,
+      iconColor: const Color(0xFF26A69A), // أخضر مزرق
+      destination: const CalendarScreen(),
     ),
   ];
 }
