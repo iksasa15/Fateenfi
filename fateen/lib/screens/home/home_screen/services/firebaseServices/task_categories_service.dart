@@ -44,11 +44,12 @@ class TaskCategoriesService {
 
         debugPrint('عدد المهام المسترجعة: ${tasksSnapshot.docs.length}');
 
-        if (tasksSnapshot.docs.isNotEmpty) {
-          int urgentCount = 0;
-          int upcomingCount = 0;
-          int completedCount = 0;
+        // حساب الإحصائيات بناءً على المهام الموجودة (أو إرجاع أصفار إذا لم توجد مهام)
+        int urgentCount = 0;
+        int upcomingCount = 0;
+        int completedCount = 0;
 
+        if (tasksSnapshot.docs.isNotEmpty) {
           for (var doc in tasksSnapshot.docs) {
             final Map<String, dynamic> task =
                 doc.data() as Map<String, dynamic>;
@@ -84,39 +85,41 @@ class TaskCategoriesService {
               }
             }
           }
-
-          // إرجاع الإحصائيات المحسوبة
-          final Map<String, dynamic> stats = {
-            'urgent': urgentCount,
-            'upcoming': upcomingCount,
-            'completed': completedCount,
-            'all': tasksSnapshot.docs.length,
-          };
-
-          debugPrint('إحصائيات المهام المحسوبة: $stats');
-          return stats;
         }
+
+        // إرجاع الإحصائيات المحسوبة (ستكون أصفار إذا لم تكن هناك مهام)
+        final Map<String, dynamic> stats = {
+          'urgent': urgentCount,
+          'upcoming': upcomingCount,
+          'completed': completedCount,
+          'all': tasksSnapshot.docs.length,
+        };
+
+        debugPrint('إحصائيات المهام المحسوبة: $stats');
+        return stats;
       }
 
-      // في حالة عدم وجود مستخدم أو بيانات، استخدم بيانات افتراضية
-      final defaultData = _getDefaultCategoriesData();
-      debugPrint('استخدام بيانات افتراضية: $defaultData');
-      return defaultData;
+      // في حالة عدم وجود مستخدم، استخدم أصفار
+      final zeroStats = _getZeroStats();
+      debugPrint('لا يوجد مستخدم، إرجاع أصفار: $zeroStats');
+      return zeroStats;
     } catch (e) {
       debugPrint('خطأ في الحصول على بيانات فئات المهام: $e');
 
-      // إرجاع بيانات افتراضية في حالة الخطأ
-      return _getDefaultCategoriesData();
+      // إرجاع أصفار في حالة الخطأ
+      final zeroStats = _getZeroStats();
+      debugPrint('حدث خطأ، إرجاع أصفار: $zeroStats');
+      return zeroStats;
     }
   }
 
-  // بيانات افتراضية لفئات المهام
-  Map<String, dynamic> _getDefaultCategoriesData() {
+  // بيانات صفرية لفئات المهام
+  Map<String, dynamic> _getZeroStats() {
     return {
-      'urgent': 3,
-      'upcoming': 5,
-      'completed': 12,
-      'all': 20,
+      'urgent': 0,
+      'upcoming': 0,
+      'completed': 0,
+      'all': 0,
     };
   }
 }

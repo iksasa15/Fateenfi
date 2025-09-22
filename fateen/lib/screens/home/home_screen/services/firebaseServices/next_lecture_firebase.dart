@@ -56,6 +56,9 @@ class NextLectureFirebase {
         if (data.containsKey(NextLectureConstants.dayOfWeekField) &&
             data[NextLectureConstants.dayOfWeekField] != null) {
           dayOfWeek = data[NextLectureConstants.dayOfWeekField];
+        } else if (lectureDay != null) {
+          // تحويل اسم اليوم إلى رقم
+          dayOfWeek = _getDayNumberFromName(lectureDay);
         }
 
         // إنشاء كائن المقرر مع معالجة حقول الوقت والقاعة
@@ -125,6 +128,9 @@ class NextLectureFirebase {
           if (data.containsKey(NextLectureConstants.dayOfWeekField) &&
               data[NextLectureConstants.dayOfWeekField] != null) {
             dayOfWeek = data[NextLectureConstants.dayOfWeekField];
+          } else if (lectureDay != null) {
+            // تحويل اسم اليوم إلى رقم
+            dayOfWeek = _getDayNumberFromName(lectureDay);
           }
 
           return {
@@ -192,6 +198,24 @@ class NextLectureFirebase {
           debugPrint(
               'تم تحديث مقرر: $courseName، يوم المحاضرة: $dayName ($defaultDay)');
           updatedCount++;
+        } else if (hasLectureDay && !hasDayOfWeek) {
+          // إذا كان لدينا فقط اسم اليوم، نضيف رقم اليوم
+          final dayName = data['lectureDay'].toString();
+          final dayNumber = _getDayNumberFromName(dayName);
+
+          if (dayNumber != null) {
+            await courseCollection
+                .doc(doc.id)
+                .update({NextLectureConstants.dayOfWeekField: dayNumber});
+            debugPrint('تم إضافة رقم اليوم $dayNumber للمقرر: $courseName');
+          }
+        } else if (!hasLectureDay && hasDayOfWeek) {
+          // إذا كان لدينا فقط رقم اليوم، نضيف اسم اليوم
+          final dayNumber = data[NextLectureConstants.dayOfWeekField];
+          final dayName = _getDayNameFromNumber(dayNumber);
+
+          await courseCollection.doc(doc.id).update({'lectureDay': dayName});
+          debugPrint('تم إضافة اسم اليوم $dayName للمقرر: $courseName');
         }
 
         // أيضًا تحقق من وقت المحاضرة وأضفه إذا كان غير موجود
@@ -252,5 +276,170 @@ class NextLectureFirebase {
       7: 'الأحد',
     };
     return days[number] ?? 'غير معروف';
+  }
+
+  /// تحويل اسم اليوم إلى رقمه (مطابق لـ DateTime.weekday)
+  int? _getDayNumberFromName(String dayName) {
+    final Map<String, int> days = {
+      'الاثنين': 1,
+      'الثلاثاء': 2,
+      'الأربعاء': 3,
+      'الخميس': 4,
+      'الجمعة': 5,
+      'السبت': 6,
+      'الأحد': 7,
+    };
+    return days[dayName];
+  }
+
+  /// الحصول على المحاضرة التالية بناءً على اليوم الحالي
+  Future<Map<String, dynamic>?> getNextLecture() async {
+    try {
+      final courses = await fetchCourses();
+      if (courses.isEmpty) {
+        debugPrint('لا توجد مقررات متاحة للبحث عن المحاضرة التالية');
+        return null;
+      }
+
+      // الحصول على اليوم الحالي (1 = الاثنين، 7 = الأحد)
+      final now = DateTime.now();
+      final currentDayOfWeek = now.weekday;
+      final currentHour = now.hour;
+      final currentMinute = now.minute;
+
+      debugPrint(
+          'اليوم الحالي: ${_getDayNameFromNumber(currentDayOfWeek)}, الساعة: $currentHour:$currentMinute');
+
+      // تحويل الوقت الحالي إلى دقائق منذ بداية اليوم
+      final currentTimeInMinutes = currentHour * 60 + currentMinute;
+
+      // ترتيب المقررات حسب اليوم والوقت
+      List<Map<String, dynamic>> validCourses = [];
+
+      for (var course in courses) {
+        final courseName = course[NextLectureConstants.courseNameField];
+        dynamic dayOfWeekValue = course[NextLectureConstants.dayOfWeekField];
+        int? dayOfWeek;
+
+        // التأكد من أن لدينا رقم يوم صحيح
+        if (dayOfWeekValue is int) {
+          dayOfWeek = dayOfWeekValue;
+        } else if (dayOfWeekValue is String && dayOfWeekValue.isNotEmpty) {
+          dayOfWeek = int.tryParse(dayOfWeekValue);
+        } else if (course['lectureDay'] != null) {
+          dayOfWeek = _getDayNumberFromName(course['lectureDay'].toString());
+        }
+
+        if (dayOfWeek == null) {
+          debugPrint('لا يمكن تحديد يوم المحاضرة للمقرر: $courseName');
+          continue;
+        }
+
+        // تحويل وقت المحاضرة إلى دقائق
+        String lectureTimeStr =
+            course[NextLectureConstants.lectureTimeField] ?? '';
+        int? lectureTimeInMinutes = _parseTimeToMinutes(lectureTimeStr);
+
+        if (lectureTimeInMinutes == null) {
+          debugPrint('لا يمكن تحويل وقت المحاضرة للمقرر: $courseName');
+          continue;
+        }
+
+        // تخزين المعلومات المحسوبة مع المقرر
+        course['_dayOfWeekNumber'] = dayOfWeek;
+        course['_lectureTimeInMinutes'] = lectureTimeInMinutes;
+
+        validCourses.add(course);
+      }
+
+      // تصنيف المقررات إلى مقررات اليوم الحالي والأيام المستقبلية
+      List<Map<String, dynamic>> todayCourses = [];
+      List<Map<String, dynamic>> futureCourses = [];
+
+      for (var course in validCourses) {
+        final courseDay = course['_dayOfWeekNumber'] as int;
+        final courseTime = course['_lectureTimeInMinutes'] as int;
+
+        if (courseDay == currentDayOfWeek) {
+          if (courseTime > currentTimeInMinutes) {
+            // محاضرة اليوم ولم تبدأ بعد
+            todayCourses.add(course);
+          }
+        } else if ((courseDay > currentDayOfWeek) ||
+            (courseDay < currentDayOfWeek)) {
+          // لمراعاة أيام الأسبوع القادم
+          futureCourses.add(course);
+        }
+      }
+
+      // ترتيب محاضرات اليوم حسب الوقت
+      todayCourses.sort((a, b) {
+        final aTime = a['_lectureTimeInMinutes'] as int;
+        final bTime = b['_lectureTimeInMinutes'] as int;
+        return aTime.compareTo(bTime);
+      });
+
+      // ترتيب المحاضرات المستقبلية حسب اليوم ثم الوقت
+      futureCourses.sort((a, b) {
+        final aDayOfWeek = a['_dayOfWeekNumber'] as int;
+        final bDayOfWeek = b['_dayOfWeekNumber'] as int;
+
+        // حساب الأيام المتبقية من اليوم الحالي
+        int aDaysFromNow = (aDayOfWeek - currentDayOfWeek + 7) % 7;
+        if (aDaysFromNow == 0)
+          aDaysFromNow = 7; // إذا كانت النتيجة 0، فهذا يعني 7 أيام
+
+        int bDaysFromNow = (bDayOfWeek - currentDayOfWeek + 7) % 7;
+        if (bDaysFromNow == 0) bDaysFromNow = 7;
+
+        // مقارنة الأيام أولاً
+        final dayComparison = aDaysFromNow.compareTo(bDaysFromNow);
+        if (dayComparison != 0) return dayComparison;
+
+        // إذا كان نفس اليوم، قارن الوقت
+        final aTime = a['_lectureTimeInMinutes'] as int;
+        final bTime = b['_lectureTimeInMinutes'] as int;
+        return aTime.compareTo(bTime);
+      });
+
+      // البحث عن المحاضرة التالية
+      Map<String, dynamic>? nextLecture;
+
+      if (todayCourses.isNotEmpty) {
+        // المحاضرة التالية هي أول محاضرة في اليوم الحالي
+        nextLecture = todayCourses.first;
+        debugPrint(
+            'المحاضرة التالية هي محاضرة اليوم: ${nextLecture[NextLectureConstants.courseNameField]}');
+      } else if (futureCourses.isNotEmpty) {
+        // المحاضرة التالية هي أول محاضرة في الأيام القادمة
+        nextLecture = futureCourses.first;
+        debugPrint(
+            'المحاضرة التالية هي في يوم آخر: ${nextLecture[NextLectureConstants.courseNameField]}');
+      }
+
+      return nextLecture;
+    } catch (e) {
+      debugPrint('خطأ في الحصول على المحاضرة التالية: $e');
+      return null;
+    }
+  }
+
+  /// تحويل سلسلة الوقت (مثل "10:30") إلى عدد الدقائق منذ بداية اليوم
+  int? _parseTimeToMinutes(String timeStr) {
+    if (timeStr.isEmpty) return null;
+
+    // دعم صيغ مختلفة (10:30، 10.30، 10,30، 10-30)
+    timeStr =
+        timeStr.replaceAll('.', ':').replaceAll(',', ':').replaceAll('-', ':');
+
+    final parts = timeStr.split(':');
+    if (parts.length < 2) return null;
+
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+
+    if (hour == null || minute == null) return null;
+
+    return hour * 60 + minute;
   }
 }

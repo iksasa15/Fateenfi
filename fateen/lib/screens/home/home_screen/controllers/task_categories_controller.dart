@@ -49,8 +49,8 @@ class TaskCategoriesController extends ChangeNotifier {
     } catch (e) {
       debugPrint('خطأ في تهيئة وحدة تحكم فئات المهام: $e');
       _errorMessage = 'حدث خطأ أثناء تحميل البيانات: $e';
-      _categories =
-          _getDefaultCategories(); // استخدام بيانات افتراضية في حالة الخطأ
+      // ضمان استخدام أصفار في حالة الخطأ
+      _categories = _getZeroCategories();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -60,106 +60,114 @@ class TaskCategoriesController extends ChangeNotifier {
 
   // معالجة البيانات القادمة من Firebase
   void _processData(Map<String, dynamic> data) {
-    // إذا كانت البيانات فارغة، استخدم البيانات الافتراضية
-    if (data.isEmpty) {
-      debugPrint('بيانات فئات المهام فارغة، استخدام البيانات الافتراضية');
-      _categories = _getDefaultCategories();
-      return;
-    }
-
+    // حتى إذا كانت البيانات فارغة، نقوم بإنشاء الفئات مع قيم صفرية
     _categories = [];
 
-    // المهام العاجلة
-    if (data.containsKey('urgent')) {
-      _categories.add(
-        TaskCategory(
-          id: 'urgent',
-          title: TaskCategoriesConstants.urgentTasksTitle,
-          icon: TaskCategoriesConstants.urgentTasksIcon,
-          color: TaskCategoriesConstants.urgentTasksColor,
-          count: data['urgent'] ?? 0,
-        ),
-      );
-    }
+    // المهام العاجلة - التأكد من استخدام 0 كقيمة افتراضية
+    _categories.add(
+      TaskCategory(
+        id: 'urgent',
+        title: TaskCategoriesConstants.urgentTasksTitle,
+        icon: TaskCategoriesConstants.urgentTasksIcon,
+        color: TaskCategoriesConstants.urgentTasksColor,
+        count: _parseCountValue(data['urgent']),
+      ),
+    );
 
-    // المهام القادمة
-    if (data.containsKey('upcoming')) {
-      _categories.add(
-        TaskCategory(
-          id: 'upcoming',
-          title: TaskCategoriesConstants.upcomingTasksTitle,
-          icon: TaskCategoriesConstants.upcomingTasksIcon,
-          color: TaskCategoriesConstants.upcomingTasksColor,
-          count: data['upcoming'] ?? 0,
-        ),
-      );
-    }
+    // المهام القادمة - التأكد من استخدام 0 كقيمة افتراضية
+    _categories.add(
+      TaskCategory(
+        id: 'upcoming',
+        title: TaskCategoriesConstants.upcomingTasksTitle,
+        icon: TaskCategoriesConstants.upcomingTasksIcon,
+        color: TaskCategoriesConstants.upcomingTasksColor,
+        count: _parseCountValue(data['upcoming']),
+      ),
+    );
 
-    // المهام المكتملة
-    if (data.containsKey('completed')) {
-      _categories.add(
-        TaskCategory(
-          id: 'completed',
-          title: TaskCategoriesConstants.completedTasksTitle,
-          icon: TaskCategoriesConstants.completedTasksIcon,
-          color: TaskCategoriesConstants.completedTasksColor,
-          count: data['completed'] ?? 0,
-        ),
-      );
-    }
+    // المهام المكتملة - التأكد من استخدام 0 كقيمة افتراضية
+    _categories.add(
+      TaskCategory(
+        id: 'completed',
+        title: TaskCategoriesConstants.completedTasksTitle,
+        icon: TaskCategoriesConstants.completedTasksIcon,
+        color: TaskCategoriesConstants.completedTasksColor,
+        count: _parseCountValue(data['completed']),
+      ),
+    );
 
-    // كل المهام
-    if (data.containsKey('all')) {
-      _categories.add(
-        TaskCategory(
-          id: 'all',
-          title: TaskCategoriesConstants.allTasksTitle,
-          icon: TaskCategoriesConstants.allTasksIcon,
-          color: TaskCategoriesConstants.allTasksColor,
-          count: data['all'] ?? 0,
-        ),
-      );
-    }
+    // كل المهام - التأكد من استخدام 0 كقيمة افتراضية
+    _categories.add(
+      TaskCategory(
+        id: 'all',
+        title: TaskCategoriesConstants.allTasksTitle,
+        icon: TaskCategoriesConstants.allTasksIcon,
+        color: TaskCategoriesConstants.allTasksColor,
+        count: _parseCountValue(data['all']),
+      ),
+    );
 
-    // إذا لم تكن هناك فئات، استخدم البيانات الافتراضية
-    if (_categories.isEmpty) {
-      debugPrint('لا توجد فئات مهام بعد المعالجة، استخدام البيانات الافتراضية');
-      _categories = _getDefaultCategories();
-    } else {
-      debugPrint('تم تجهيز ${_categories.length} فئات مهام');
-    }
+    debugPrint('تم تجهيز ${_categories.length} فئات مهام');
   }
 
-  // بيانات افتراضية للفئات
-  List<TaskCategory> _getDefaultCategories() {
+  // دالة لتحويل القيمة إلى عدد صحيح بقيمة افتراضية 0
+  int _parseCountValue(dynamic value) {
+    if (value == null) return 0;
+
+    // إذا كانت القيمة عدد صحيح
+    if (value is int) {
+      return value < 0 ? 0 : value;
+    }
+
+    // إذا كانت القيمة نص
+    if (value is String) {
+      try {
+        final parsed = int.parse(value);
+        return parsed < 0 ? 0 : parsed;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    // إذا كانت القيمة عدد عشري
+    if (value is double) {
+      return value.toInt() < 0 ? 0 : value.toInt();
+    }
+
+    // أي قيمة أخرى
+    return 0;
+  }
+
+  // إنشاء فئات مع قيم صفرية
+  List<TaskCategory> _getZeroCategories() {
     return [
       TaskCategory(
         id: 'urgent',
         title: TaskCategoriesConstants.urgentTasksTitle,
         icon: TaskCategoriesConstants.urgentTasksIcon,
         color: TaskCategoriesConstants.urgentTasksColor,
-        count: 3,
+        count: 0,
       ),
       TaskCategory(
         id: 'upcoming',
         title: TaskCategoriesConstants.upcomingTasksTitle,
         icon: TaskCategoriesConstants.upcomingTasksIcon,
         color: TaskCategoriesConstants.upcomingTasksColor,
-        count: 5,
+        count: 0,
       ),
       TaskCategory(
         id: 'completed',
         title: TaskCategoriesConstants.completedTasksTitle,
         icon: TaskCategoriesConstants.completedTasksIcon,
         color: TaskCategoriesConstants.completedTasksColor,
-        count: 12,
+        count: 0,
       ),
       TaskCategory(
         id: 'all',
         title: TaskCategoriesConstants.allTasksTitle,
         icon: TaskCategoriesConstants.allTasksIcon,
         color: TaskCategoriesConstants.allTasksColor,
-        count: 20,
+        count: 0,
       ),
     ];
   }
