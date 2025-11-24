@@ -2,7 +2,7 @@ name: fateen
 description: "A new Flutter project."
 publish_to: "none"
 
-version: 6.0.0+16
+version: 6.0.0+1666
 
 environment:
   sdk: ^3.5.3
