@@ -11,17 +11,17 @@ class RecognizedObjectModel {
 
   factory RecognizedObjectModel.fromJson(Map<String, dynamic> json) {
     return RecognizedObjectModel(
-      name: json['name'] ?? 'غير معروف',
-      confidence: (json['confidence'] ?? 0.0).toDouble(),
+      name: json['name'] ?? 'عنصر غير معروف',
+      confidence: (json['confidence'] is num)
+          ? (json['confidence'] as num).toDouble()
+          : 0.0,
       description: json['description'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'confidence': confidence,
-      'description': description,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'confidence': confidence,
+        'description': description,
+      };
 }

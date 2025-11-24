@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
 import '../controllers/aiming_controller.dart';
 
 class AimingResultComponent extends StatelessWidget {
@@ -243,35 +244,75 @@ class AimingResultComponent extends StatelessWidget {
               },
             ),
 
-            // زر التقاط صورة جديدة
-            Container(
-              width: double.infinity,
-              height: 48,
-              margin: const EdgeInsets.only(top: 16),
-              child: ElevatedButton.icon(
-                onPressed: controller.resetContent,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF5F3FF),
-                  foregroundColor: const Color(0xFF4338CA),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: const Color(0xFF4338CA).withOpacity(0.2),
-                      width: 1,
+            // أزرار التحكم
+            Row(
+              children: [
+                // زر التقاط صورة جديدة
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    margin: const EdgeInsets.only(top: 16, left: 8),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        controller.resetContent();
+                        // فتح الكاميرا مباشرة بعد المسح
+                        Future.delayed(const Duration(milliseconds: 300), () {
+                          controller.pickImage(ImageSource.camera, context);
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4338CA),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text(
+                        "صورة جديدة",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                icon: const Icon(Icons.camera_alt),
-                label: const Text(
-                  "التقاط صورة جديدة",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    fontFamily: 'SYMBIOAR+LT',
+
+                // زر مسح النتائج
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    margin: const EdgeInsets.only(top: 16, right: 8),
+                    child: ElevatedButton.icon(
+                      onPressed: controller.resetContent,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF5F3FF),
+                        foregroundColor: const Color(0xFF4338CA),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: const Color(0xFF4338CA).withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text(
+                        "مسح النتائج",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../services/aiming_api_service.dart';
 import '../services/aiming_image_service.dart';
-import '../../../../models/recognized_object_model.dart'; // سنحتاج لإنشاء هذا النموذج
+import '../../../../models/recognized_object_model.dart';
 
 class AimingController extends ChangeNotifier {
   // Animation controllers injected from parent
@@ -117,6 +117,15 @@ class AimingController extends ChangeNotifier {
     }
   }
 
+  // فتح الكاميرا تلقائياً عند بدء الصفحة
+  Future<void> openCameraAutomatically(BuildContext context) async {
+    // انتظر قليلاً لتأكد من أن الصفحة تم تحميلها بالكامل
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // افتح الكاميرا
+    await pickImage(ImageSource.camera, context);
+  }
+
   // التقاط صورة من الكاميرا أو معرض الصور
   Future<void> pickImage(ImageSource source, BuildContext context) async {
     try {
@@ -125,6 +134,9 @@ class AimingController extends ChangeNotifier {
       if (result['success']) {
         _imagePath = result['imagePath'];
         _imageBase64 = result['imageBase64'];
+
+        // مسح النتائج السابقة إن وجدت
+        _recognizedObjects = [];
 
         // عرض رسالة نجاح
         ScaffoldMessenger.of(context).showSnackBar(
@@ -257,7 +269,7 @@ class AimingController extends ChangeNotifier {
     });
   }
 
-  // إعادة تعيين المحتوى
+  // إعادة تعيين المحتوى ومسح الصور
   void resetContent() {
     _imagePath = null;
     _imageBase64 = null;

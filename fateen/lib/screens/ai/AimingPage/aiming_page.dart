@@ -23,6 +23,12 @@ class _AimingPageState extends State<AimingPage> with TickerProviderStateMixin {
     _controller = AimingController(vsync: this);
     _controller.initializeAnimations();
     _controller.checkServerStatus();
+
+    // تأخير قصير لفتح الكاميرا تلقائيًا
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // فتح الكاميرا تلقائيًا
+      _controller.openCameraAutomatically(context);
+    });
   }
 
   @override
