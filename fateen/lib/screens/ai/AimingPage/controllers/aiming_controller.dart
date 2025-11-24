@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +26,16 @@ class AimingController extends ChangeNotifier {
   List<RecognizedObjectModel> _recognizedObjects = [];
   bool _isTestMode = false;
 
+  // إضافة متغير لتتبع محاولات الفشل المتتالية
+  int _failedCameraAttempts = 0;
+  bool _cameraBlocked = false;
+
   // Getters
   bool get isLoading => _isLoading;
   String? get imagePath => _imagePath;
   List<RecognizedObjectModel> get recognizedObjects => _recognizedObjects;
   bool get isTestMode => _isTestMode;
+  bool get cameraBlocked => _cameraBlocked;
 
   // Constructor
   AimingController({required this.vsync}) {
@@ -117,11 +123,88 @@ class AimingController extends ChangeNotifier {
     }
   }
 
-  // تم تعديل هذه الدالة لمنع فتح الكاميرا تلقائيًا
-  Future<void> openCameraAutomatically(BuildContext context) async {
-    // لا تفعل شيئًا - تم تعطيل فتح الكاميرا تلقائيًا
-    debugPrint("تم تعطيل فتح الكاميرا تلقائيًا");
-    return;
+  // طريقة آمنة لالتقاط الصور مع معالجة الاستثناءات والخروج المفاجئ
+  Future<void> safePickImage(ImageSource source, BuildContext context) async {
+    // إذا كانت الكاميرا محظورة، اعرض رسالة ثم عد
+    if (_cameraBlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              "يبدو أن هناك مشكلة في الوصول للكاميرا. الرجاء استخدام وضع الاختبار."),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // تسجيل محاولة التقاط الصورة في سجل التطبيق
+      debugPrint("بدء محاولة التقاط الصورة...");
+
+      // التقاط الصورة
+      await pickImage(source, context);
+
+      // إعادة ضبط عداد المحاولات الفاشلة عند النجاح
+      _failedCameraAttempts = 0;
+    } catch (e) {
+      // زيادة عداد المحاولات الفاشلة
+      _failedCameraAttempts++;
+
+      debugPrint(
+          "خطأ خطير أثناء التقاط الصورة (محاولة فاشلة رقم $_failedCameraAttempts): $e");
+
+      // إذا كان عدد المحاولات الفاشلة تجاوز الحد، ضع علامة على الكاميرا كمحظورة
+      if (_failedCameraAttempts >= 3) {
+        _cameraBlocked = true;
+
+        // إظهار رسالة مفصلة عن المشكلة
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Text("مشكلة في الكاميرا"),
+              content: const Text(
+                  "هناك مشكلة مستمرة في الوصول للكاميرا. سنستخدم وضع الاختبار بدلاً من ذلك. هل تود المتابعة؟"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    // تفعيل وضع الاختبار واستخدام بيانات تجريبية
+                    _isTestMode = true;
+                    _generateDummyImage();
+                  },
+                  child: const Text("متابعة"),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        // إذا كان عدد المحاولات أقل من الحد، أعرض رسالة بسيطة
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  "حدث خطأ أثناء فتح الكاميرا: ${e.toString().substring(0, min(50, e.toString().length))}..."),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  // إنشاء صورة وهمية للاختبار
+  void _generateDummyImage() {
+    _imagePath = "dummy_image_path"; // مسار وهمي فقط للتمثيل
+    _imageBase64 = ""; // قيمة وهمية
+    notifyListeners();
+
+    // عرض رسالة للمستخدم
+    debugPrint("تم إنشاء صورة وهمية في وضع الاختبار");
   }
 
   // التقاط صورة من الكاميرا أو معرض الصور
@@ -158,8 +241,11 @@ class AimingController extends ChangeNotifier {
     } catch (e) {
       debugPrint("خطأ أثناء التقاط الصورة: $e");
       if (context.mounted) {
-        _showErrorSnackBar(context, "حدث خطأ أثناء التقاط الصورة: $e");
+        _showErrorSnackBar(context, "حدث خطأ أثناء التقاط الصورة");
       }
+
+      // إعادة رفع الاستثناء ليتم التقاطه في safePickImage
+      rethrow;
     }
 
     notifyListeners();
@@ -167,7 +253,7 @@ class AimingController extends ChangeNotifier {
 
   // معالجة الصورة والتعرف على محتواها
   Future<void> processImage(BuildContext context) async {
-    if (_imagePath == null || _imageBase64 == null) {
+    if (_imagePath == null && !_isTestMode) {
       _showErrorSnackBar(context, "الرجاء التقاط صورة أولاً");
       return;
     }
@@ -320,3 +406,4 @@ class AimingController extends ChangeNotifier {
     );
   }
 }
+

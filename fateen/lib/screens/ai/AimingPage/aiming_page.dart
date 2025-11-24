@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-import 'controllers/aiming_controller.dart';
-import 'components/aiming_header_component.dart';
-import 'components/aiming_input_component.dart';
-import 'components/aiming_result_component.dart';
-import 'constants/aiming_colors.dart';
-import 'constants/aiming_strings.dart';
-import 'constants/aiming_dimensions.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AimingPage extends StatefulWidget {
   const AimingPage({Key? key}) : super(key: key);
@@ -14,23 +8,11 @@ class AimingPage extends StatefulWidget {
   State<AimingPage> createState() => _AimingPageState();
 }
 
-class _AimingPageState extends State<AimingPage> with TickerProviderStateMixin {
-  late AimingController _controller;
+class _AimingPageState extends State<AimingPage> {
+  final ImagePicker _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AimingController(vsync: this);
-    _controller.initializeAnimations();
-    _controller.checkServerStatus();
-    // تم حذف استدعاء فتح الكاميرا تلقائيًا
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  // مؤشر لعرض رسالة عند فتح الكاميرا
+  bool _isCameraOpening = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,154 +20,182 @@ class _AimingPageState extends State<AimingPage> with TickerProviderStateMixin {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: const Color(0xFFFDFDFF),
+        appBar: AppBar(
+          title: const Text(
+            "التعرف على الصور",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF374151),
+              fontFamily: 'SYMBIOAR+LT',
+            ),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF4338CA),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // هيدر الصفحة
-              AimingHeaderComponent(
-                controller: _controller,
-                title: AimingStrings.pageTitle,
-                onBackPressed: () => Navigator.pop(context),
-                onResetPressed: _controller.recognizedObjects.isNotEmpty &&
-                        !_controller.isLoading
-                    ? () => _controller.resetContent()
-                    : null,
-              ),
-
-              // المحتوى الرئيسي
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, _) {
-                      // إذا كانت هناك نتائج للتعرف على الصورة
-                      if (_controller.recognizedObjects.isNotEmpty &&
-                          !_controller.isLoading) {
-                        return AimingResultComponent(
-                          controller: _controller,
-                          fadeAnimation: _controller.fadeAnimation,
-                          slideAnimation: _controller.slideAnimation,
-                        );
-                      }
-
-                      // عرض مؤشر التحميل أثناء معالجة الصورة
-                      if (_controller.isLoading) {
-                        return _buildLoadingComponent();
-                      }
-
-                      // عرض نموذج إدخال الصورة
-                      return AimingInputComponent(
-                        controller: _controller,
-                        isLoading: _controller.isLoading,
-                        onImageProcessPressed: () =>
-                            _controller.processImage(context),
-                      );
-                    },
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // أيقونة الكاميرا
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFF5F3FF),
+                      border: Border.all(
+                        color: const Color(0xFFE3E0F8),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: Color(0xFF4338CA),
+                      size: 64,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 30),
+
+                  // عنوان
+                  const Text(
+                    "التقاط صورة",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF374151),
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // نص وصفي
+                  Text(
+                    "انقر على زر فتح الكاميرا لالتقاط صورة",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                      fontFamily: 'SYMBIOAR+LT',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // زر فتح الكاميرا
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _isCameraOpening ? null : _openCamera,
+                      icon: _isCameraOpening
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.camera_alt,
+                              color: Colors.white, size: 28),
+                      label: Text(
+                        _isCameraOpening
+                            ? "جاري فتح الكاميرا..."
+                            : "فتح الكاميرا",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'SYMBIOAR+LT',
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4338CA),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // مكون التحميل
-  Widget _buildLoadingComponent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFE3E0F8),
-              width: 1.0,
+  // فتح الكاميرا بشكل آمن مع معالجة الأخطاء المحتملة
+  Future<void> _openCamera() async {
+    try {
+      // تغيير حالة الزر لمنع النقرات المتعددة
+      setState(() {
+        _isCameraOpening = true;
+      });
+
+      // فتح الكاميرا
+      final XFile? photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1280,
+        maxHeight: 1280,
+        imageQuality: 85,
+      );
+
+      // تم إغلاق الكاميرا أو التقاط الصورة
+      setState(() {
+        _isCameraOpening = false;
+      });
+
+      // لا نقوم بمعالجة الصورة أو إرسالها إلى أي خدمة
+      if (photo != null) {
+        // يمكن هنا عرض رسالة بسيطة أن الصورة تم التقاطها
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("تم التقاط الصورة بنجاح"),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.05),
-                spreadRadius: 1,
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
+          );
+        }
+      }
+    } catch (e) {
+      // في حالة حدوث خطأ، إعادة الزر إلى حالته الطبيعية
+      setState(() {
+        _isCameraOpening = false;
+      });
+
+      // عرض رسالة خطأ
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("حدث خطأ أثناء فتح الكاميرا"),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: 'حاول مرة أخرى',
+              textColor: Colors.white,
+              onPressed: _openCamera,
+            ),
           ),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // أيقونة التحميل
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFF5F3FF),
-                  border: Border.all(
-                    color: const Color(0xFFE3E0F8),
-                    width: 1.0,
-                  ),
-                ),
-                child: Center(
-                  child: RotationTransition(
-                    turns: Tween(begin: 0.0, end: 1.0).animate(
-                      CurvedAnimation(
-                        parent: _controller.loadingController,
-                        curve: Curves.linear,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.image_search,
-                      color: Color(0xFF4338CA),
-                      size: 36,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // رسالة التحميل
-              Text(
-                AimingStrings.processingImageText,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF374151),
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-
-              // رسالة انتظار
-              Text(
-                AimingStrings.waitMomentText,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  fontFamily: 'SYMBIOAR+LT',
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 16),
-
-              // مؤشر خطي
-              LinearProgressIndicator(
-                backgroundColor: const Color(0xFFF5F3FF),
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(Color(0xFF4338CA)),
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+        );
+      }
+    }
   }
 }
