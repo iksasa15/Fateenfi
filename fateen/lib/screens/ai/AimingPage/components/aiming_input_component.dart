@@ -143,8 +143,8 @@ class AimingInputComponent extends StatelessWidget {
                                   // زر الكاميرا
                                   Expanded(
                                     child: InkWell(
-                                      onTap: () => controller.pickImage(
-                                          ImageSource.camera, context),
+                                      onTap: () => _handleCameraPermission(
+                                          context, ImageSource.camera),
                                       borderRadius: BorderRadius.circular(12),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
@@ -322,5 +322,29 @@ class AimingInputComponent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // التعامل مع أذونات الكاميرا بشكل آمن
+  void _handleCameraPermission(BuildContext context, ImageSource source) {
+    try {
+      controller.pickImage(source, context);
+    } catch (e) {
+      debugPrint("خطأ عند محاولة الوصول إلى الكاميرا: $e");
+
+      // عرض رسالة خطأ مفيدة
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "تعذر الوصول إلى الكاميرا. قد تحتاج لمنح الإذن من إعدادات الجهاز",
+          ),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: 'المعرض',
+            textColor: Colors.white,
+            onPressed: () => controller.pickImage(ImageSource.gallery, context),
+          ),
+        ),
+      );
+    }
   }
 }

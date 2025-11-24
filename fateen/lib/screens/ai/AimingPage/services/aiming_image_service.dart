@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -10,11 +11,21 @@ class AimingImageService {
     try {
       // استدعاء طريقة اختيار الصورة
       final ImagePicker picker = ImagePicker();
-      final XFile? pickedFile = await picker.pickImage(
+
+      // إضافة مهلة لمنع التعليق
+      final XFile? pickedFile = await picker
+          .pickImage(
         source: source,
         maxWidth: 1280,
         maxHeight: 1280,
         imageQuality: 85,
+      )
+          .timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw TimeoutException(
+              "انتهى وقت الانتظار أثناء محاولة التقاط الصورة");
+        },
       );
 
       if (pickedFile == null) {
@@ -26,14 +37,19 @@ class AimingImageService {
 
       // تحويل الصورة إلى Base64
       String? imageBase64;
-      if (kIsWeb) {
-        // في الويب، نحصل على البيانات كـ bytes
-        final bytes = await pickedFile.readAsBytes();
-        imageBase64 = base64Encode(bytes);
-      } else {
-        // في التطبيقات الأصلية، نقرأ الملف كـ bytes
-        final bytes = await File(imagePath).readAsBytes();
-        imageBase64 = base64Encode(bytes);
+      try {
+        if (kIsWeb) {
+          // في الويب، نحصل على البيانات كـ bytes
+          final bytes = await pickedFile.readAsBytes();
+          imageBase64 = base64Encode(bytes);
+        } else {
+          // في التطبيقات الأصلية، نقرأ الملف كـ bytes
+          final bytes = await File(imagePath).readAsBytes();
+          imageBase64 = base64Encode(bytes);
+        }
+      } catch (e) {
+        debugPrint("خطأ عند قراءة الصورة: $e");
+        return {'success': false, 'error': 'فشل قراءة بيانات الصورة: $e'};
       }
 
       return {

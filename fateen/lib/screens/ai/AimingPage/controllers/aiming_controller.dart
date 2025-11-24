@@ -117,19 +117,20 @@ class AimingController extends ChangeNotifier {
     }
   }
 
-  // فتح الكاميرا تلقائياً عند بدء الصفحة
+  // تم تعديل هذه الدالة لمنع فتح الكاميرا تلقائيًا
   Future<void> openCameraAutomatically(BuildContext context) async {
-    // انتظر قليلاً لتأكد من أن الصفحة تم تحميلها بالكامل
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    // افتح الكاميرا
-    await pickImage(ImageSource.camera, context);
+    // لا تفعل شيئًا - تم تعطيل فتح الكاميرا تلقائيًا
+    debugPrint("تم تعطيل فتح الكاميرا تلقائيًا");
+    return;
   }
 
   // التقاط صورة من الكاميرا أو معرض الصور
   Future<void> pickImage(ImageSource source, BuildContext context) async {
     try {
+      // استخدام AimingImageService لالتقاط الصورة
       final result = await AimingImageService.pickImage(source);
+
+      if (!context.mounted) return; // التحقق من أن السياق لا يزال صالحًا
 
       if (result['success']) {
         _imagePath = result['imagePath'];
@@ -139,20 +140,26 @@ class AimingController extends ChangeNotifier {
         _recognizedObjects = [];
 
         // عرض رسالة نجاح
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("تم التقاط الصورة بنجاح"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("تم التقاط الصورة بنجاح"),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       } else {
-        _showErrorSnackBar(
-            context, result['error'] ?? "حدث خطأ أثناء التقاط الصورة");
+        if (context.mounted) {
+          _showErrorSnackBar(
+              context, result['error'] ?? "حدث خطأ أثناء التقاط الصورة");
+        }
       }
     } catch (e) {
       debugPrint("خطأ أثناء التقاط الصورة: $e");
-      _showErrorSnackBar(context, "حدث خطأ أثناء التقاط الصورة: $e");
+      if (context.mounted) {
+        _showErrorSnackBar(context, "حدث خطأ أثناء التقاط الصورة: $e");
+      }
     }
 
     notifyListeners();
