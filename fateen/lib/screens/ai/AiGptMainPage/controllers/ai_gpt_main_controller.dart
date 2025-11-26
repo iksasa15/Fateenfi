@@ -5,7 +5,7 @@ import '../../AiGptQuestionsPage/ai_gpt_questions_screen.dart';
 import '../../AiGptSummaryPage/AiGptSummaryPage.dart';
 import '../../AiGptFlashcardsPage/AiGptFlashcardsPage.dart';
 import '../../AiConceptExplainerPage/AiConceptExplainerPage.dart';
-import '../../AimingPage/aiming_page.dart'; // استيراد صفحة التعرف على الصور
+import '../../AimingPage/screens/home_screen.dart'; // استيراد صفحة التعرف على الصور
 
 class AiGptMainController {
   List<AiServiceModel> getServicesList(BuildContext context) {
@@ -52,7 +52,7 @@ class AiGptMainController {
         description: AiServicesConstants.imageRecognitionDescription,
         iconColor: AiServicesConstants.imageRecognitionColor,
         icon: Icons.image_search,
-        onTap: () => _navigateToPage(context, const AimingPage()),
+        onTap: () => _navigateToPage(context, const HomeScreen()),
       ),
     ];
   }
